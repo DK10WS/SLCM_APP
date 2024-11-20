@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -72,17 +73,29 @@ class _MyLoginState extends State<MyLogin> {
                         onPressed: () {
                           // Add your action here
                         },
-                        icon: const Icon(Icons.arrow_forward),
+                        icon: const Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     Row(
                       children: [
                         TextButton(
-                            onPressed: () async {},
-                            child: Text(
+                            onPressed: () async {
+                              const url =
+                                  'https://passwordreset.microsoftonline.com/';
+                              if (await canLaunchUrl(Uri.parse(url))) {
+                                await launchUrl(Uri.parse(url),
+                                    mode: LaunchMode.externalApplication);
+                              } else {
+                                throw 'Could not launch $url';
+                              }
+                            },
+                            child: const Text(
                               "Forgot Password",
                               style: TextStyle(
                                   decoration: TextDecoration.underline),
