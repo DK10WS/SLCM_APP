@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
@@ -22,7 +24,7 @@ class _MyLoginState extends State<MyLogin> {
     return parts.isNotEmpty ? parts[0].trim() : '';
   }
 
-  Future<String?> _login(String username, String password) async {
+  Future<Map<String, String>?> _login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       _showError('Please fill in both fields.');
       return null;
@@ -110,7 +112,7 @@ class _MyLoginState extends State<MyLogin> {
 
             SessionManager.setSession(cleanedCookies + '; ' + cleanedAPI);
 
-            return name;
+            return {'name': name ?? '', 'newCookies': newCookies};
           }
         }
       }
@@ -214,15 +216,22 @@ class _MyLoginState extends State<MyLogin> {
                                 String username = _usernameController.text;
                                 String password = _passwordController.text;
 
-                                String? name = await _login(username, password);
+                                Map<String, String>? loginResult =
+                                    await _login(username, password);
                                 _toggleLoading(false);
 
-                                if (name != null) {
+                                if (loginResult != null) {
+                                  String name = loginResult['name']!;
+                                  String newCookies =
+                                      loginResult['newCookies']!;
+
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) =>
-                                          HomePage(name: name),
+                                      builder: (context) => HomePage(
+                                        name: name,
+                                        newCookies: newCookies,
+                                      ),
                                     ),
                                   );
                                 }

@@ -31,8 +31,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
-  html_unescape: ^2.0.0
   html: ^0.15.0
+  html_unescape: ^2.0.0
   http: ^1.2.2
 
 dev_dependencies:

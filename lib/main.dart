@@ -9,7 +9,6 @@ void main() {
     initialRoute: _initialRoute(),
     routes: {
       'login': (context) => const MyLogin(),
-      'home': (context) => const HomePage(name: "User"),
     },
   ));
 }

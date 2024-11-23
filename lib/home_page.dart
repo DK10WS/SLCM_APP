@@ -5,8 +5,10 @@ import 'session_manager.dart';
 
 class HomePage extends StatelessWidget {
   final String name;
+  final String newCookies;
 
-  const HomePage({Key? key, required this.name}) : super(key: key);
+  const HomePage({Key? key, required this.name, required this.newCookies})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +44,7 @@ class HomePage extends StatelessWidget {
                 width: MediaQuery.of(context).size.width * 0.90,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    iconColor: Colors.cyan,
+                    backgroundColor: Colors.cyan,
                     padding: const EdgeInsets.symmetric(vertical: 15),
                     textStyle: const TextStyle(fontSize: 20),
                   ),
@@ -50,12 +52,14 @@ class HomePage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const AttendancePage(),
+                        builder: (context) => AttendancePage(
+                          newCookies: newCookies,
+                        ),
                       ),
                     );
                   },
                   child: const Text(
-                    "Attendence",
+                    "Attendance",
                     style: TextStyle(fontFamily: "DancingScript"),
                   ),
                 ),
