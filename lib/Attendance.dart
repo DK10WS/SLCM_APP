@@ -61,7 +61,8 @@ class _AttendancePageState extends State<AttendancePage> {
 
     for (var record in attendanceList) {
       String fullName = record["CourseID"] ?? "Unknown Subject";
-      String percentage = record["Percentage"] ?? "0%";
+      String percentage = record["Percentage"] ?? "0";
+      int newpercentage = int.tryParse(record["Percentage"] ?? "0%") ?? 0;
 
       // Split subject and course code
       String courseCode = fullName.split(":").length > 1
@@ -73,9 +74,20 @@ class _AttendancePageState extends State<AttendancePage> {
           : fullName;
 
       // Calculate attended and missed classes based on the available data
-      int totalClasses = int.tryParse(record["TotalClasses"] ?? "0") ?? 0;
+      int totalClasses = int.tryParse(record["Total"] ?? "0") ?? 0;
       int attendedClasses = int.tryParse(record["Present"] ?? "0") ?? 0;
       int missedClasses = totalClasses - attendedClasses;
+
+      String statusMessage;
+      int? classesNeeded;
+      if (newpercentage < 75) {
+        classesNeeded =
+            ((0.75 * totalClasses - attendedClasses) / (1 - 0.75)).ceil();
+        statusMessage = "$classesNeeded more classes needed to reach 75%.";
+      } else {
+        statusMessage = "Good! Your attendance is above or equal to 75%.";
+        classesNeeded = null;
+      }
 
       attendanceData.add({
         "courseCode": courseCode,
@@ -84,6 +96,8 @@ class _AttendancePageState extends State<AttendancePage> {
         "attendedClasses": attendedClasses,
         "missedClasses": missedClasses,
         "totalClasses": totalClasses,
+        "statusMessage": statusMessage,
+        "classesNeeded": classesNeeded,
       });
     }
 
@@ -149,8 +163,7 @@ class _AttendancePageState extends State<AttendancePage> {
                         final percentage = attendance["percentage"];
                         final attendedClasses = attendance["attendedClasses"];
                         final missedClasses = attendance["missedClasses"];
-                        final courseCode = attendance[
-                            "courseCode"]; // Hidden in table but used in popup
+                        final courseCode = attendance["courseCode"];
 
                         return DataRow(
                           cells: [
@@ -177,11 +190,24 @@ class _AttendancePageState extends State<AttendancePage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text("Course Code: $courseCode"),
-                                            Text("Attendance: $percentage"),
+                                            Text("Attendance: $percentage %"),
                                             Text(
                                                 "Attended Classes: $attendedClasses"),
                                             Text(
                                                 "Missed Classes: $missedClasses"),
+                                            if (attendance["classesNeeded"] !=
+                                                null)
+                                              Text(
+                                                "Status: ${attendance["statusMessage"]}",
+                                                style: const TextStyle(
+                                                    color: Colors.red),
+                                              )
+                                            else
+                                              Text(
+                                                "Status: ${attendance["statusMessage"]}",
+                                                style: const TextStyle(
+                                                    color: Colors.green),
+                                              ),
                                           ],
                                         ),
                                         actions: [
