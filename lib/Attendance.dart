@@ -112,7 +112,6 @@ class _AttendancePageState extends State<AttendancePage> {
         title: const Text('Attendance Summary'),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>?>(
-        // Load attendance data
         future: _attendanceData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -135,11 +134,11 @@ class _AttendancePageState extends State<AttendancePage> {
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12.0),
+                    borderRadius: BorderRadius.circular(50.0),
                     child: DataTable(
                       columnSpacing: 32.0,
                       headingRowHeight: 48.0,
-                      dataRowHeight: 60.0,
+                      dataRowMaxHeight: 60.0,
                       columns: const [
                         DataColumn(
                           label: Text('Subject',
@@ -175,8 +174,8 @@ class _AttendancePageState extends State<AttendancePage> {
                                     backgroundColor: Colors.transparent,
                                     foregroundColor: Colors.black,
                                     shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                          color: Colors.grey.shade300),
+                                      side:
+                                          BorderSide(color: Colors.transparent),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
