@@ -64,7 +64,6 @@ class _AttendancePageState extends State<AttendancePage> {
       String percentage = record["Percentage"] ?? "0";
       int newpercentage = int.tryParse(record["Percentage"] ?? "0%") ?? 0;
 
-      // Split subject and course code
       String courseCode = fullName.split(":").length > 1
           ? fullName.split(":")[0].trim()
           : "Unknown Code";
@@ -73,7 +72,6 @@ class _AttendancePageState extends State<AttendancePage> {
           ? fullName.split(":")[1].trim()
           : fullName;
 
-      // Calculate attended and missed classes based on the available data
       int totalClasses = int.tryParse(record["Total"] ?? "0") ?? 0;
       int attendedClasses = int.tryParse(record["Present"] ?? "0") ?? 0;
       int missedClasses = totalClasses - attendedClasses;

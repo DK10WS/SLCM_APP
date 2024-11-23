@@ -25,7 +25,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages = [
-      timetable(),
+      Timetable(newCookies: widget.newCookies),
       HomeScreen(newCookies: widget.newCookies),
       Information(newCookies: widget.newCookies),
     ];
@@ -62,7 +62,7 @@ class _HomePageState extends State<HomePage> {
         onTap: _onItemTapped,
         items: const [
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
+            icon: Icon(Icons.book),
             label: 'Time Table',
           ),
           BottomNavigationBarItem(
@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.book),
+            icon: Icon(Icons.person),
             label: 'Me',
           ),
         ],

@@ -155,7 +155,7 @@ class _MyLoginState extends State<MyLogin> {
           child: Stack(
             children: [
               Container(
-                padding: const EdgeInsets.only(top: 200),
+                padding: const EdgeInsets.only(top: 150),
                 alignment: Alignment.topCenter,
                 child: const Text(
                   "Login",
@@ -166,7 +166,7 @@ class _MyLoginState extends State<MyLogin> {
                 ),
               ),
               Container(
-                padding: const EdgeInsets.only(top: 300),
+                padding: const EdgeInsets.only(top: 220),
                 alignment: Alignment.topCenter,
                 child: const Text(
                   "Better Slcm",
@@ -178,74 +178,50 @@ class _MyLoginState extends State<MyLogin> {
               ),
               Container(
                 padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.5,
-                  right: 35,
-                  left: 35,
+                  top: MediaQuery.of(context).size.height * 0.4,
+                  left: 30,
+                  right: 30,
                 ),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _usernameController,
-                      decoration: InputDecoration(
-                        hintText: "name.registration",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color:
+                        Colors.white.withOpacity(0.8), // Translucent background
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.5),
+                        spreadRadius: 5,
+                        blurRadius: 7,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    children: [
+                      TextField(
+                        controller: _usernameController,
+                        decoration: InputDecoration(
+                          hintText: "name.registration",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    TextField(
-                      controller: _passwordController,
-                      obscureText: true,
-                      decoration: InputDecoration(
-                        hintText: "Password",
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(50),
+                      const SizedBox(height: 20),
+                      TextField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          hintText: "Password",
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(50),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 50),
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.cyan,
-                      child: _isLoading
-                          ? const CircularProgressIndicator(color: Colors.white)
-                          : IconButton(
-                              onPressed: () async {
-                                _toggleLoading(true);
-                                String username = _usernameController.text;
-                                String password = _passwordController.text;
-
-                                Map<String, String>? loginResult =
-                                    await _login(username, password);
-                                _toggleLoading(false);
-
-                                if (loginResult != null) {
-                                  String name = loginResult['name']!;
-                                  String newCookies =
-                                      loginResult['newCookies']!;
-
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => HomePage(
-                                        name: name,
-                                        newCookies: newCookies,
-                                      ),
-                                    ),
-                                  );
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.arrow_forward,
-                                color: Colors.white,
-                              ),
-                            ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        TextButton(
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: TextButton(
                           onPressed: () async {
                             const url =
                                 'https://passwordreset.microsoftonline.com/';
@@ -257,15 +233,38 @@ class _MyLoginState extends State<MyLogin> {
                             }
                           },
                           child: const Text(
-                            "Forgot Password",
+                            "Forgot Password?",
                             style: TextStyle(
                               decoration: TextDecoration.underline,
+                              color: Colors.blue,
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: 30),
+                      CircleAvatar(
+                        radius: 40,
+                        backgroundColor: Colors.cyan,
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : IconButton(
+                                onPressed: () async {
+                                  _toggleLoading(true);
+                                  String username = _usernameController.text;
+                                  String password = _passwordController.text;
+
+                                  _toggleLoading(false);
+                                },
+                                icon: const Icon(
+                                  Icons.arrow_forward,
+                                  color: Colors.white,
+                                ),
+                              ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ],
