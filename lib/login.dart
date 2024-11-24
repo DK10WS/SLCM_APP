@@ -149,6 +149,7 @@ class _MyLoginState extends State<MyLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1A1A19),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -158,7 +159,7 @@ class _MyLoginState extends State<MyLogin> {
                 padding: const EdgeInsets.only(top: 150),
                 alignment: Alignment.topCenter,
                 child: const Text(
-                  "Login",
+                  "",
                   style: TextStyle(
                     color: Colors.amber,
                     fontSize: 33,
@@ -178,27 +179,36 @@ class _MyLoginState extends State<MyLogin> {
               ),
               Container(
                 padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.4,
+                  top: MediaQuery.of(context).size.height * 0.35,
                   left: 30,
                   right: 30,
                 ),
                 child: Container(
                   decoration: BoxDecoration(
                     color:
-                        Colors.white.withOpacity(0.8), // Translucent background
+                        Colors.white.withOpacity(0.9), // Translucent background
                     borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
-                        color: Colors.grey.withOpacity(0.5),
-                        spreadRadius: 5,
-                        blurRadius: 7,
-                        offset: const Offset(0, 3),
+                        color: Color.fromARGB(0, 140, 59, 59),
+                        spreadRadius: 10,
+                        blurRadius: 20,
+                        offset: Offset(0, 3),
                       ),
                     ],
                   ),
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
+                      // "Login" text inside the login container
+                      Text(
+                        "Login",
+                        style: TextStyle(
+                          color: Colors.amber,
+                          fontSize: 33,
+                        ),
+                      ),
+                      const SizedBox(height: 30),
                       TextField(
                         controller: _usernameController,
                         decoration: InputDecoration(
@@ -255,7 +265,27 @@ class _MyLoginState extends State<MyLogin> {
                                   String username = _usernameController.text;
                                   String password = _passwordController.text;
 
+                                  // Attempt login
+                                  final result =
+                                      await _login(username, password);
+
                                   _toggleLoading(false);
+
+                                  if (result != null) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => HomePage(
+                                          name: result['name'].toString(),
+                                          newCookies:
+                                              result['newCookies'] ?? '',
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    _showError(
+                                        "Login failed. Please check your credentials.");
+                                  }
                                 },
                                 icon: const Icon(
                                   Icons.arrow_forward,

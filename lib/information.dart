@@ -67,23 +67,27 @@ class _InformationState extends State<Information> {
         }
       }
 
-      setState(() {
-        userInfo = {
-          "Name": name ?? "N/A",
-          "Registration Number": registrationNumber ?? "N/A",
-          "Section": section ?? "N/A",
-          "Program": program ?? "N/A",
-          "Semester": semester ?? "N/A",
-          "Batch": batch ?? "N/A",
-          "Class Coordinator": classCoordinator ?? "N/A",
-        };
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          userInfo = {
+            "Name": name ?? "N/A",
+            "Registration Number": registrationNumber ?? "N/A",
+            "Section": section ?? "N/A",
+            "Program": program ?? "N/A",
+            "Semester": semester ?? "N/A",
+            "Batch": batch ?? "N/A",
+            "Class Coordinator": classCoordinator ?? "N/A",
+          };
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        userInfo = {"Error": "Failed to fetch data. Please try again later."};
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          userInfo = {"Error": "Failed to fetch data. Please try again later."};
+          isLoading = false;
+        });
+      }
     }
   }
 
