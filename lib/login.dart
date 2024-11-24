@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
+import 'package:shared_preferences/shared_preferences.dart'; // Add this
 import 'home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'session_manager.dart';
@@ -19,11 +20,38 @@ class _MyLoginState extends State<MyLogin> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  @override
+  void initState() {
+    super.initState();
+    _loadSavedCredentials(); // Load saved username and password
+  }
+
+  // Function to load saved credentials
+  Future<void> _loadSavedCredentials() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedUsername = prefs.getString('username') ?? '';
+    final savedPassword = prefs.getString('password') ?? '';
+
+    setState(() {
+      _usernameController.text = savedUsername;
+      _passwordController.text = savedPassword;
+    });
+  }
+
+  // Function to save credentials
+  Future<void> _saveCredentials(String username, String password) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('username', username);
+    await prefs.setString('password', password);
+  }
+
+  // Function to extract session ID
   String extractSessionId(String cookie) {
     final parts = cookie.split(';');
     return parts.isNotEmpty ? parts[0].trim() : '';
   }
 
+  // Function to log in
   Future<Map<String, String>?> _login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       _showError('Please fill in both fields.');
@@ -109,6 +137,9 @@ class _MyLoginState extends State<MyLogin> {
                 .querySelector('.kt-user-card__name')
                 ?.text
                 .trim();
+
+            // Save the new credentials
+            _saveCredentials(username, password);
 
             SessionManager.setSession(cleanedCookies + '; ' + cleanedAPI);
 
@@ -200,7 +231,6 @@ class _MyLoginState extends State<MyLogin> {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      // "Login" text inside the login container
                       Text(
                         "Login",
                         style: TextStyle(
@@ -265,7 +295,6 @@ class _MyLoginState extends State<MyLogin> {
                                   String username = _usernameController.text;
                                   String password = _passwordController.text;
 
-                                  // Attempt login
                                   final result =
                                       await _login(username, password);
 
@@ -278,17 +307,14 @@ class _MyLoginState extends State<MyLogin> {
                                         builder: (context) => HomePage(
                                           name: result['name'].toString(),
                                           newCookies:
-                                              result['newCookies'] ?? '',
+                                              result['newCookies'] ?? "",
                                         ),
                                       ),
                                     );
-                                  } else {
-                                    _showError(
-                                        "Login failed. Please check your credentials.");
                                   }
                                 },
                                 icon: const Icon(
-                                  Icons.arrow_forward,
+                                  Icons.arrow_forward_ios,
                                   color: Colors.white,
                                 ),
                               ),

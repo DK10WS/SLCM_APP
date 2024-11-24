@@ -34,6 +34,7 @@ dependencies:
   html: ^0.15.0
   html_unescape: ^2.0.0
   http: ^1.2.2
+  shared_preferences: ^2.3.3
 
 dev_dependencies:
   flutter_lints: ^4.0.0

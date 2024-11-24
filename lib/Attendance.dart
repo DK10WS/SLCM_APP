@@ -146,14 +146,6 @@ class _AttendancePageState extends State<AttendancePage> {
                           label: Text('Attendance %',
                               style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                        DataColumn(
-                          label: Text('Attended Classes',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                        DataColumn(
-                          label: Text('Missed Classes',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
-                        ),
                       ],
                       rows: attendanceList.map((attendance) {
                         final subject = attendance["subject"];
@@ -231,26 +223,6 @@ class _AttendancePageState extends State<AttendancePage> {
                                 width: 100.0,
                                 child: Text(
                                   percentage,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              SizedBox(
-                                width: 150.0,
-                                child: Text(
-                                  "$attendedClasses",
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                              ),
-                            ),
-                            DataCell(
-                              SizedBox(
-                                width: 150.0,
-                                child: Text(
-                                  "$missedClasses",
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(fontSize: 16),
                                 ),
