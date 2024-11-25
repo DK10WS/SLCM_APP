@@ -37,14 +37,25 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  String capitalizeFirstName(String fullName) {
+    if (fullName.isEmpty) return fullName;
+    String firstName = fullName.split(' ')[0];
+    return firstName[0].toUpperCase() + firstName.substring(1).toLowerCase();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text("Better Slcm"),
+        backgroundColor: Colors.black,
+        title: Text(
+          "Welcome ${capitalizeFirstName(widget.name)}",
+          style: TextStyle(color: Colors.white, fontFamily: "Gotham"),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: () {
               SessionManager.clearSession();
               Navigator.pushAndRemoveUntil(
@@ -58,8 +69,11 @@ class _HomePageState extends State<HomePage> {
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.black,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
+        selectedItemColor: Colors.cyan,
+        unselectedItemColor: Colors.white,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.book),
@@ -93,7 +107,7 @@ class HomeScreen extends StatelessWidget {
         children: [
           const Text(
             "New Features Coming Soon ....",
-            style: TextStyle(fontSize: 20),
+            style: TextStyle(fontSize: 20, color: Colors.white),
           ),
           const SizedBox(height: 30),
           Center(
@@ -117,7 +131,10 @@ class HomeScreen extends StatelessWidget {
                 },
                 child: const Text(
                   "Attendance",
-                  style: TextStyle(fontFamily: "DancingScript"),
+                  style: TextStyle(
+                    fontFamily: "DancingScript",
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),

@@ -101,16 +101,35 @@ class _TimetableState extends State<Timetable> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: Text("${eventDetails['CourseID']}"),
+          backgroundColor: Colors.black,
+          title: Text(
+            "${eventDetails['CourseID']}",
+            style: const TextStyle(color: Colors.white),
+          ),
           content: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Program Code: ${eventDetails['ProgramCode']}"),
-                Text("Course ID: ${eventDetails['CourseID']}"),
-                Text("Semester: ${eventDetails['Semester']}"),
-                Text("Attendance Type: ${eventDetails['AttendanceType']}"),
-                Text("Time: ${eventDetails['SlotScheme']}"),
+                Text(
+                  "Program Code: ${eventDetails['ProgramCode']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Course ID: ${eventDetails['CourseID']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Semester: ${eventDetails['Semester']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Attendance Type: ${eventDetails['AttendanceType']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Time: ${eventDetails['SlotScheme']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
               ],
             ),
           ),
@@ -119,7 +138,10 @@ class _TimetableState extends State<Timetable> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text("Close"),
+              child: const Text(
+                "Close",
+                style: TextStyle(color: Colors.cyan), // Cyan button text
+              ),
             ),
           ],
         );
@@ -161,7 +183,7 @@ class _TimetableState extends State<Timetable> {
         children: [
           const Text(
             "Timetable",
-            style: TextStyle(fontSize: 24),
+            style: TextStyle(fontSize: 24, color: Colors.white), // White text
           ),
           const SizedBox(height: 10),
           // Legend for colors
@@ -174,19 +196,22 @@ class _TimetableState extends State<Timetable> {
             ],
           ),
           const SizedBox(height: 20),
-
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.cyan, // Cyan button for visibility
+                foregroundColor: Colors.black, // Black text on button
+              ),
               onPressed: () => _selectDate(context),
               child: Text(
                 selectedDate == null
                     ? "Select Date"
                     : "${selectedDate!.day.toString().padLeft(2, '0')}/${selectedDate!.month.toString().padLeft(2, '0')}/${selectedDate!.year}",
+                style: const TextStyle(color: Colors.black), // Black text
               ),
             ),
           ),
-
           const SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
@@ -218,7 +243,10 @@ class _TimetableState extends State<Timetable> {
                     child: ListTile(
                       title: Text(
                         events[index]['Description']!,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white, // White text on buttons
+                        ),
                       ),
                     ),
                   ),
@@ -240,7 +268,10 @@ class _TimetableState extends State<Timetable> {
           color: color,
         ),
         const SizedBox(width: 8),
-        Text(label),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white), // White text in legend
+        ),
       ],
     );
   }

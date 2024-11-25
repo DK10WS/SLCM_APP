@@ -106,18 +106,38 @@ class _AttendancePageState extends State<AttendancePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
-        title: const Text('Attendance Summary'),
+        backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(
+          color: Colors.white,
+        ),
+        title: const Text(
+          'Attendance Summary',
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: FutureBuilder<List<Map<String, dynamic>>?>(
         future: _attendanceData,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(color: Colors.cyan),
+            );
           } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
+            return Center(
+              child: Text(
+                'Error: ${snapshot.error}',
+                style: const TextStyle(color: Colors.white),
+              ),
+            );
           } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No attendance data available'));
+            return const Center(
+              child: Text(
+                'No attendance data available',
+                style: TextStyle(color: Colors.white),
+              ),
+            );
           } else {
             final attendanceList = snapshot.data!;
 
@@ -128,23 +148,38 @@ class _AttendancePageState extends State<AttendancePage> {
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.90,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey, width: 1.0),
+                    border: Border.all(
+                        color: Colors.white, width: 1.0), // White border
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: ClipRRect(
-                    borderRadius: BorderRadius.circular(50.0),
+                    borderRadius: BorderRadius.circular(12.0),
                     child: DataTable(
                       columnSpacing: 32.0,
                       headingRowHeight: 48.0,
                       dataRowMaxHeight: 60.0,
+                      headingRowColor: MaterialStateProperty.resolveWith(
+                          (states) => Colors.grey[900]), // Dark header row
+                      dataRowColor: MaterialStateProperty.resolveWith(
+                          (states) => Colors.black), // Black rows
                       columns: const [
                         DataColumn(
-                          label: Text('Subject',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: Text(
+                            'Subject',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                         DataColumn(
-                          label: Text('Attendance %',
-                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          label: Text(
+                            'Attendance %',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ],
                       rows: attendanceList.map((attendance) {
@@ -161,11 +196,11 @@ class _AttendancePageState extends State<AttendancePage> {
                                 width: 200,
                                 child: TextButton(
                                   style: TextButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    foregroundColor: Colors.black,
+                                    backgroundColor: Colors.grey[850],
+                                    foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       side:
-                                          BorderSide(color: Colors.transparent),
+                                          const BorderSide(color: Colors.white),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
@@ -173,17 +208,37 @@ class _AttendancePageState extends State<AttendancePage> {
                                     showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: Text(subject),
+                                        backgroundColor: Colors.black,
+                                        title: Text(
+                                          subject,
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
                                         content: Column(
+                                          mainAxisSize: MainAxisSize.min,
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text("Course Code: $courseCode"),
-                                            Text("Attendance: $percentage %"),
                                             Text(
-                                                "Attended Classes: $attendedClasses"),
+                                              "Course Code: $courseCode",
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
                                             Text(
-                                                "Missed Classes: $missedClasses"),
+                                              "Attendance: $percentage %",
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            Text(
+                                              "Attended Classes: $attendedClasses",
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
+                                            Text(
+                                              "Missed Classes: $missedClasses",
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            ),
                                             if (attendance["classesNeeded"] !=
                                                 null)
                                               Text(
@@ -203,7 +258,11 @@ class _AttendancePageState extends State<AttendancePage> {
                                           TextButton(
                                             onPressed: () =>
                                                 Navigator.pop(context),
-                                            child: const Text("Close"),
+                                            child: const Text(
+                                              "Close",
+                                              style:
+                                                  TextStyle(color: Colors.cyan),
+                                            ),
                                           ),
                                         ],
                                       ),
@@ -224,7 +283,10 @@ class _AttendancePageState extends State<AttendancePage> {
                                 child: Text(
                                   percentage,
                                   textAlign: TextAlign.center,
-                                  style: const TextStyle(fontSize: 16),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),

@@ -94,11 +94,20 @@ class _InformationState extends State<Information> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black, // Set the background to black
       appBar: AppBar(
-        title: const Text("Information"),
+        backgroundColor: Colors.black,
+        title: const Text(
+          "Information",
+          style: TextStyle(color: Colors.white),
+        ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(
+                color: Colors.cyan, // Make the loading indicator visible
+              ),
+            )
           : Padding(
               padding: const EdgeInsets.all(16.0),
               child: ListView(
@@ -111,6 +120,7 @@ class _InformationState extends State<Information> {
                         style: const TextStyle(
                           fontSize: 24, // Big text
                           fontWeight: FontWeight.bold,
+                          color: Colors.white, // Text color to white
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -118,16 +128,19 @@ class _InformationState extends State<Information> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
-                          color: Colors.blue[50],
+                          color: Colors.grey[900], // Dark grey background
                           border: Border.all(
-                            color: Colors.blue,
+                            color: Colors.cyan, // Cyan border for contrast
                             width: 2.0,
                           ),
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         child: Text(
                           entry.value,
-                          style: const TextStyle(fontSize: 18),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.white, // Text color to white
+                          ),
                         ),
                       ),
                       const SizedBox(height: 20),

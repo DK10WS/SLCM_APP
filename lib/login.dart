@@ -23,10 +23,9 @@ class _MyLoginState extends State<MyLogin> {
   @override
   void initState() {
     super.initState();
-    _loadSavedCredentials(); // Load saved username and password
+    _loadSavedCredentials();
   }
 
-  // Function to load saved credentials
   Future<void> _loadSavedCredentials() async {
     final prefs = await SharedPreferences.getInstance();
     final savedUsername = prefs.getString('username') ?? '';
@@ -38,20 +37,17 @@ class _MyLoginState extends State<MyLogin> {
     });
   }
 
-  // Function to save credentials
   Future<void> _saveCredentials(String username, String password) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('username', username);
     await prefs.setString('password', password);
   }
 
-  // Function to extract session ID
   String extractSessionId(String cookie) {
     final parts = cookie.split(';');
     return parts.isNotEmpty ? parts[0].trim() : '';
   }
 
-  // Function to log in
   Future<Map<String, String>?> _login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       _showError('Please fill in both fields.');
@@ -138,7 +134,6 @@ class _MyLoginState extends State<MyLogin> {
                 ?.text
                 .trim();
 
-            // Save the new credentials
             _saveCredentials(username, password);
 
             SessionManager.setSession(cleanedCookies + '; ' + cleanedAPI);
@@ -170,7 +165,6 @@ class _MyLoginState extends State<MyLogin> {
     );
   }
 
-  // Toggle loading spinner
   void _toggleLoading(bool isLoading) {
     setState(() {
       _isLoading = isLoading;
@@ -180,7 +174,7 @@ class _MyLoginState extends State<MyLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A19),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -234,8 +228,9 @@ class _MyLoginState extends State<MyLogin> {
                       Text(
                         "Login",
                         style: TextStyle(
+                          fontFamily: "poppins",
                           color: Colors.amber,
-                          fontSize: 33,
+                          fontSize: 40,
                         ),
                       ),
                       const SizedBox(height: 30),
