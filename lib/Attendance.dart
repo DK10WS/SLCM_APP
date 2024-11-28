@@ -148,8 +148,7 @@ class _AttendancePageState extends State<AttendancePage> {
                 child: Container(
                   width: MediaQuery.of(context).size.width * 0.90,
                   decoration: BoxDecoration(
-                    border: Border.all(
-                        color: Colors.white, width: 1.0), // White border
+                    border: Border.all(color: Colors.white, width: 1.0),
                     borderRadius: BorderRadius.circular(12.0),
                   ),
                   child: ClipRRect(

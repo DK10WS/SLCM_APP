@@ -12,13 +12,20 @@ class Timetable extends StatefulWidget {
 }
 
 class _TimetableState extends State<Timetable> {
-  DateTime? selectedDate;
+  DateTime selectedDate = DateTime.now(); // Default to current date
   List<Map<String, dynamic>> events = [];
+  bool isLoading = false; // Loading indicator state
+
+  @override
+  void initState() {
+    super.initState();
+    fetchEventsForDate(selectedDate); // Load events for current date
+  }
 
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: selectedDate ?? DateTime.now(),
+      initialDate: selectedDate,
       firstDate: DateTime(2020),
       lastDate: DateTime(2101),
     );
@@ -31,8 +38,20 @@ class _TimetableState extends State<Timetable> {
     }
   }
 
+  void _changeDate(int days) {
+    setState(() {
+      selectedDate = selectedDate.add(Duration(days: days));
+      events = [];
+    });
+    fetchEventsForDate(selectedDate);
+  }
+
   Future<void> fetchEventsForDate(DateTime? date) async {
     if (date == null) return;
+
+    setState(() {
+      isLoading = true;
+    });
 
     String formattedDate =
         "${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}";
@@ -49,29 +68,36 @@ class _TimetableState extends State<Timetable> {
     var url =
         "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetStudentCalenderEventList";
 
-    var response = await http.post(Uri.parse(url),
-        headers: _buildHeaders(newCookies), body: parameters);
+    try {
+      var response = await http.post(Uri.parse(url),
+          headers: _buildHeaders(newCookies), body: parameters);
 
-    List<dynamic> data = jsonDecode(response.body);
-    List<Map<String, dynamic>> result = [];
+      List<dynamic> data = jsonDecode(response.body);
+      List<Map<String, dynamic>> result = [];
 
-    for (var entry in data) {
-      String entryNo = entry['EntryNo'] ?? "Unknown";
-      String description = entry['Description'] ?? "No Description";
+      for (var entry in data) {
+        String entryNo = entry['EntryNo'] ?? "Unknown";
+        String fullDescription = entry['Description'] ?? "No Description";
+        String subjectName = fullDescription.split(',')[0];
+        Map<String, dynamic> eventDetails = await fetchEventDetails(entryNo);
 
-      // Fetch detailed event data
-      Map<String, dynamic> eventDetails = await fetchEventDetails(entryNo);
+        result.add({
+          'Description': subjectName,
+          'EntryNo': entryNo,
+          ...eventDetails,
+        });
+      }
 
-      result.add({
-        'Description': description,
-        'EntryNo': entryNo,
-        ...eventDetails,
+      setState(() {
+        events = result;
+      });
+    } catch (e) {
+      print("Error fetching events: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
       });
     }
-
-    setState(() {
-      events = result;
-    });
   }
 
   Future<Map<String, dynamic>> fetchEventDetails(String entryNo) async {
@@ -85,68 +111,13 @@ class _TimetableState extends State<Timetable> {
         headers: _buildHeaders(newCookies), body: newParameters);
 
     var eventDetails = jsonDecode(response.body);
-
     return {
       'AttendanceType': eventDetails['AttendanceType'] ?? "",
       'ProgramCode': eventDetails['ProgramCode'] ?? "N/A",
-      'CourseID': eventDetails['CourseID'] ?? "N/A",
+      'CourseID': (eventDetails['CourseID'] ?? "N/A"),
       'Semester': eventDetails['Semester'] ?? "N/A",
       'Time': eventDetails['SlotScheme'] ?? "N/A",
     };
-  }
-
-  void showEventDetailsPopup(
-      BuildContext context, Map<String, dynamic> eventDetails) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          backgroundColor: Colors.black,
-          title: Text(
-            "${eventDetails['CourseID']}",
-            style: const TextStyle(color: Colors.white),
-          ),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Program Code: ${eventDetails['ProgramCode']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Course ID: ${eventDetails['CourseID']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Semester: ${eventDetails['Semester']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Attendance Type: ${eventDetails['AttendanceType']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Time: ${eventDetails['SlotScheme']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text(
-                "Close",
-                style: TextStyle(color: Colors.cyan), // Cyan button text
-              ),
-            ),
-          ],
-        );
-      },
-    );
   }
 
   Map<String, String> _buildHeaders(String cookies) {
@@ -175,6 +146,60 @@ class _TimetableState extends State<Timetable> {
     };
   }
 
+  void showEventDetailsPopup(
+      BuildContext context, Map<String, dynamic> eventDetails) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          title: Text(
+            "${eventDetails['CourseID'].split(":")[1]}",
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Program Code: ${eventDetails['ProgramCode']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Course ID: ${eventDetails['CourseID'].split(":")[0]}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Semester: ${eventDetails['Semester']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Attendance Type: ${eventDetails['AttendanceType']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Time: ${eventDetails['Time']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "Close",
+                style: TextStyle(color: Colors.cyan),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -183,10 +208,10 @@ class _TimetableState extends State<Timetable> {
         children: [
           const Text(
             "Timetable",
-            style: TextStyle(fontSize: 24, color: Colors.white), // White text
+            style: TextStyle(
+                fontFamily: "gotham", fontSize: 24, color: Colors.white),
           ),
           const SizedBox(height: 10),
-          // Legend for colors
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -196,64 +221,75 @@ class _TimetableState extends State<Timetable> {
             ],
           ),
           const SizedBox(height: 20),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.cyan, // Cyan button for visibility
-                foregroundColor: Colors.black, // Black text on button
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () => _changeDate(-1),
               ),
-              onPressed: () => _selectDate(context),
-              child: Text(
-                selectedDate == null
-                    ? "Select Date"
-                    : "${selectedDate!.day.toString().padLeft(2, '0')}/${selectedDate!.month.toString().padLeft(2, '0')}/${selectedDate!.year}",
-                style: const TextStyle(color: Colors.black), // Black text
+              SizedBox(
+                width: MediaQuery.of(context).size.width * 0.6,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.cyan,
+                    foregroundColor: Colors.black,
+                  ),
+                  onPressed: () => _selectDate(context),
+                  child: Text(
+                    "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ),
               ),
-            ),
+              IconButton(
+                icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                onPressed: () => _changeDate(1),
+              ),
+            ],
           ),
           const SizedBox(height: 20),
-          Expanded(
-            child: ListView.builder(
-              itemCount: events.length,
-              itemBuilder: (context, index) {
-                String attendanceType = events[index]['AttendanceType'] ?? "";
-                Color buttonColor;
+          isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Expanded(
+                  child: ListView.builder(
+                    itemCount: events.length,
+                    itemBuilder: (context, index) {
+                      String attendanceType =
+                          events[index]['AttendanceType'] ?? "";
+                      Color buttonColor;
 
-                if (attendanceType == "Present") {
-                  buttonColor = Colors.green;
-                } else if (attendanceType == "Absent") {
-                  buttonColor = Colors.red;
-                } else {
-                  buttonColor = Colors.grey;
-                }
+                      if (attendanceType == "Present") {
+                        buttonColor = Colors.green;
+                      } else if (attendanceType == "Absent") {
+                        buttonColor = Colors.red;
+                      } else {
+                        buttonColor = Colors.grey;
+                      }
 
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: buttonColor,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                    ),
-                    onPressed: () {
-                      showEventDetailsPopup(context, events[index]);
-                    },
-                    child: ListTile(
-                      title: Text(
-                        events[index]['Description']!,
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white, // White text on buttons
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: buttonColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            fixedSize: const Size.fromHeight(90),
+                          ),
+                          onPressed: () {
+                            showEventDetailsPopup(context, events[index]);
+                          },
+                          child: Text(
+                            events[index]['Description'],
+                            style: TextStyle(color: Colors.white, fontSize: 17),
+                            textAlign: TextAlign.left,
+                          ),
                         ),
-                      ),
-                    ),
+                      );
+                    },
                   ),
-                );
-              },
-            ),
-          ),
+                ),
         ],
       ),
     );
@@ -263,15 +299,12 @@ class _TimetableState extends State<Timetable> {
     return Row(
       children: [
         Container(
-          width: 16,
-          height: 16,
+          width: 20,
+          height: 20,
           color: color,
         ),
-        const SizedBox(width: 8),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white), // White text in legend
-        ),
+        const SizedBox(width: 5),
+        Text(label, style: const TextStyle(color: Colors.white)),
       ],
     );
   }

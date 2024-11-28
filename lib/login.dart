@@ -197,6 +197,7 @@ class _MyLoginState extends State<MyLogin> {
                 child: const Text(
                   "Better Slcm",
                   style: TextStyle(
+                    fontFamily: "gotham",
                     color: Colors.cyan,
                     fontSize: 33,
                   ),

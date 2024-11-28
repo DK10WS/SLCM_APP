@@ -94,18 +94,18 @@ class _InformationState extends State<Information> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black, // Set the background to black
+      backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.black,
         title: const Text(
           "Information",
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(fontFamily: "gotham", color: Colors.white),
         ),
       ),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(
-                color: Colors.cyan, // Make the loading indicator visible
+                color: Colors.cyan,
               ),
             )
           : Padding(
@@ -118,9 +118,9 @@ class _InformationState extends State<Information> {
                       Text(
                         entry.key,
                         style: const TextStyle(
-                          fontSize: 24, // Big text
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white, // Text color to white
+                          color: Colors.white,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -128,9 +128,9 @@ class _InformationState extends State<Information> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(16.0),
                         decoration: BoxDecoration(
-                          color: Colors.grey[900], // Dark grey background
+                          color: Colors.grey[900],
                           border: Border.all(
-                            color: Colors.cyan, // Cyan border for contrast
+                            color: Colors.cyan,
                             width: 2.0,
                           ),
                           borderRadius: BorderRadius.circular(8.0),
@@ -139,7 +139,7 @@ class _InformationState extends State<Information> {
                           entry.value,
                           style: const TextStyle(
                             fontSize: 18,
-                            color: Colors.white, // Text color to white
+                            color: Colors.white,
                           ),
                         ),
                       ),
