@@ -211,8 +211,7 @@ class _MyLoginState extends State<MyLogin> {
                 ),
                 child: Container(
                   decoration: BoxDecoration(
-                    color:
-                        Colors.white.withOpacity(0.9), // Translucent background
+                    color: Colors.white.withOpacity(0.9),
                     borderRadius: BorderRadius.circular(15),
                     boxShadow: const [
                       BoxShadow(

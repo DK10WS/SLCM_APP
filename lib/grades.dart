@@ -1,9 +1,10 @@
-import 'dart:convert';
+import 'dart:convert'; // Import for JSON decoding
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class Grades extends StatefulWidget {
   final String newCookies;
+
   const Grades({super.key, required this.newCookies});
 
   @override
@@ -12,17 +13,20 @@ class Grades extends StatefulWidget {
 
 class _GradesState extends State<Grades> {
   Map<String, dynamic>? gradesData;
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchGrades();
-  }
+  bool isLoading = false;
+  String errorMessage = '';
+  String? selectedSemester;
 
   Future<void> fetchGrades() async {
+    if (selectedSemester == null) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
     final url =
-        "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetCGPAGPAForFaculty";
+        "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetGradesForFaculty";
+
     final Map<String, String> headers = {
       "Accept": "application/json, text/javascript, */*; q=0.01",
       "Accept-Encoding": "gzip, deflate, br, zstd",
@@ -33,7 +37,7 @@ class _GradesState extends State<Grades> {
       "Host": "mujslcm.jaipur.manipal.edu:122",
       "Origin": "https://mujslcm.jaipur.manipal.edu:122",
       "Referer":
-          "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/CGPAGPAForStudent",
+          "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GradesForStudent",
       "Sec-Fetch-Dest": "empty",
       "Sec-Fetch-Mode": "cors",
       "Sec-Fetch-Site": "same-origin",
@@ -45,282 +49,202 @@ class _GradesState extends State<Grades> {
       "sec-ch-ua-mobile": "?0",
       "sec-ch-ua-platform": '"Windows"',
     };
+
     final Map<String, String> body = {
       "Enrollment": "",
-      "AcademicYear": "",
-      "ProgramCode": "",
+      "Semester": selectedSemester!
     };
 
     try {
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
+      final session = http.Client();
+      var response =
+          await session.post(Uri.parse(url), headers: headers, body: body);
+      session.close();
+
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
         setState(() {
-          gradesData = data["InternalMarksList"][0];
+          gradesData = jsonDecode(response.body);
           isLoading = false;
         });
       } else {
-        throw Exception("Failed to load data");
+        throw Exception('Failed to fetch grades');
       }
     } catch (e) {
       setState(() {
         isLoading = false;
+        errorMessage = 'Error fetching grades: $e';
       });
-      debugPrint("Error fetching data: $e");
     }
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
-      backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
-          "Grades",
+          'Grades',
           style: TextStyle(color: Colors.white),
         ),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
         backgroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.cyan))
-          : gradesData == null
-              ? const Center(
-                  child: Text(
-                    "No data available",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Total CGPA: ${gradesData?['CGPA']}",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        "Total Credits: ${gradesData?['TotalCredits']}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      _buildScrollableTable(
-                          context, "GPA Per Semester", _buildGPATableRows()),
-                      const SizedBox(height: 16),
-                      _buildScrollableTable(context, "Credits Per Semester",
-                          _buildCreditsTableRows()),
-                    ],
-                  ),
-                ),
-    );
-  }
-
-  Widget _buildScrollableTable(
-      BuildContext context, String title, List<TableRow> rows) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Center(
-          child: SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minWidth: MediaQuery.of(context).size.width * 0.8,
-              ),
-              child: Table(
-                border: TableBorder.all(
-                  color: Colors.cyan,
-                  width: 1.5,
-                ),
-                columnWidths: const {
-                  0: FlexColumnWidth(2),
-                  1: FlexColumnWidth(1),
+      body: Container(
+        color: Colors.black,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: DropdownButton<String>(
+                value: selectedSemester,
+                hint: Text('Select Semester',
+                    style: TextStyle(color: Colors.white)),
+                dropdownColor: Colors.black,
+                style: TextStyle(color: Colors.white),
+                iconEnabledColor: Colors.white,
+                items: ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
+                    .map((semester) => DropdownMenuItem<String>(
+                          value: semester,
+                          child: Text('Semester $semester',
+                              style: TextStyle(color: Colors.white)),
+                        ))
+                    .toList(),
+                onChanged: (value) {
+                  setState(() {
+                    selectedSemester = value;
+                    gradesData = null;
+                    isLoading = false;
+                  });
+                  fetchGrades();
                 },
-                children: rows,
               ),
             ),
-          ),
+            if (selectedSemester == null)
+              const Expanded(
+                child: Center(
+                  child: Text('Please select a semester to view grades',
+                      style: TextStyle(color: Colors.white)),
+                ),
+              )
+            else ...[
+              if (isLoading && selectedSemester != null)
+                const Expanded(
+                    child: Center(child: CircularProgressIndicator())),
+              if (errorMessage.isNotEmpty)
+                Center(
+                    child: Text(errorMessage,
+                        style: TextStyle(color: Colors.white))),
+              if (gradesData == null ||
+                  gradesData!['InternalMarksList'] == null ||
+                  gradesData!['InternalMarksList'].isEmpty)
+                const Expanded(
+                  child: Center(
+                      child: Text('No data available for this semester',
+                          style: TextStyle(color: Colors.white))),
+                ),
+              if (gradesData != null &&
+                  gradesData!['InternalMarksList'] != null &&
+                  gradesData!['InternalMarksList'].isNotEmpty)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: gradesData!['InternalMarksList'].length +
+                        1, // Adding 1 for the Total Credits
+                    itemBuilder: (context, index) {
+                      if (index == 0) {
+                        // "Total Credits" box
+                        double totalCredits = gradesData!['InternalMarksList']
+                            .fold(0, (sum, course) {
+                          return sum +
+                              (double.tryParse(course['Credits'].toString()) ??
+                                  0);
+                        });
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
+                          elevation: 3,
+                          color: Colors.cyan,
+                          child: Container(
+                            width: screenWidth * 0.9,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(10),
+                              title: Text(
+                                'Total Credits',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              subtitle: Text(
+                                'Credits: $totalCredits',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      // Course information
+                      var course = gradesData!['InternalMarksList'][index - 1];
+
+                      String courseName =
+                          course['CourseID'] ?? 'No Course Name';
+                      String grade = course['Grade'] ?? 'No Grade';
+                      String credits = course['Credits'] ?? 'No Credits';
+
+                      if (courseName.isEmpty || courseName == 'Total') {
+                        return SizedBox.shrink();
+                      } else {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(
+                              vertical: 5, horizontal: 10),
+                          elevation: 3,
+                          color: Colors.cyan,
+                          child: Container(
+                            width: screenWidth * 0.9,
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.all(10),
+                              title: Text(
+                                courseName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Grade: $grade',
+                                    style: const TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                  Text(
+                                    'Credits: $credits',
+                                    style: const TextStyle(
+                                        fontSize: 14, color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+            ],
+          ],
         ),
-      ],
+      ),
     );
-  }
-
-  List<TableRow> _buildGPATableRows() {
-    final List<TableRow> rows = [
-      const TableRow(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              "Semester",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              "GPA",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    ];
-
-    final semesters = {
-      "Semester I": gradesData?["GPASemesterI"],
-      "Semester II": gradesData?["GPASemesterII"],
-      "Semester III": gradesData?["GPASemesterIII"],
-      "Semester IV": gradesData?["GPASemesterIV"],
-      "Semester V": gradesData?["GPASemesterV"],
-      "Semester VI": gradesData?["GPASemesterVI"],
-      "Semester VII": gradesData?["GPASemesterVII"],
-      "Semester VIII": gradesData?["GPASemesterVIII"],
-    };
-
-    semesters.forEach((semester, gpa) {
-      if (gpa != null && gpa != "-" && gpa != 0.00) {
-        rows.add(
-          TableRow(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  semester,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  gpa.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-    });
-
-    return rows;
-  }
-
-  List<TableRow> _buildCreditsTableRows() {
-    final List<TableRow> rows = [
-      const TableRow(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              "Semester",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              "Credits",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    ];
-
-    final credits = {
-      "Semester I": gradesData?["CreditsSemesterI"],
-      "Semester II": gradesData?["CreditsSemesterII"],
-      "Semester III": gradesData?["CreditsSemesterIII"],
-      "Semester IV": gradesData?["CreditsSemesterIV"],
-      "Semester V": gradesData?["CreditsSemesterV"],
-      "Semester VI": gradesData?["CreditsSemesterVI"],
-      "Semester VII": gradesData?["CreditsSemesterVII"],
-      "Semester VIII": gradesData?["CreditsSemesterVIII"],
-    };
-
-    credits.forEach((semester, credit) {
-      if (credit != null && credit != "-") {
-        rows.add(
-          TableRow(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  semester,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  credit.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-    });
-
-    return rows;
   }
 }

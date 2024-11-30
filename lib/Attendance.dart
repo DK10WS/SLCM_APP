@@ -146,7 +146,6 @@ class _AttendancePageState extends State<AttendancePage> {
               child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Container(
-                  width: MediaQuery.of(context).size.width * 0.90,
                   decoration: BoxDecoration(
                     border: Border.all(color: Colors.white, width: 1.0),
                     borderRadius: BorderRadius.circular(12.0),
@@ -154,7 +153,7 @@ class _AttendancePageState extends State<AttendancePage> {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12.0),
                     child: DataTable(
-                      columnSpacing: 32.0,
+                      columnSpacing: 24.0, // Adjust spacing between columns
                       headingRowHeight: 48.0,
                       dataRowMaxHeight: 60.0,
                       headingRowColor: MaterialStateProperty.resolveWith(
@@ -163,20 +162,26 @@ class _AttendancePageState extends State<AttendancePage> {
                           (states) => Colors.black), // Black rows
                       columns: const [
                         DataColumn(
-                          label: Text(
-                            'Subject',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          label: Expanded(
+                            child: Text(
+                              'Subject',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.left,
                             ),
                           ),
                         ),
                         DataColumn(
-                          label: Text(
-                            'Attendance %',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                          label: Expanded(
+                            child: Text(
+                              'Attendance %',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
@@ -192,7 +197,8 @@ class _AttendancePageState extends State<AttendancePage> {
                           cells: [
                             DataCell(
                               SizedBox(
-                                width: 200,
+                                width:
+                                    180, // Responsive size to prevent overflow
                                 child: TextButton(
                                   style: TextButton.styleFrom(
                                     backgroundColor: Colors.grey[850],
@@ -277,8 +283,7 @@ class _AttendancePageState extends State<AttendancePage> {
                               ),
                             ),
                             DataCell(
-                              SizedBox(
-                                width: 100.0,
+                              Center(
                                 child: Text(
                                   percentage,
                                   textAlign: TextAlign.center,
