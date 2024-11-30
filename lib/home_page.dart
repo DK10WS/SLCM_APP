@@ -131,7 +131,7 @@ class HomeScreen extends StatelessWidget {
             ChatButton(
               label: "Internal Marks",
               icon: Icons.grade,
-              onTap: () => _navigateTo(context, marks(newCookies: newCookies)),
+              onTap: () => _navigateTo(context, Marks(newCookies: newCookies)),
             ),
             ChatButton(
               label: "CGPA/GPA and Credits",
