@@ -214,9 +214,9 @@ class _CircularIconWrapper extends StatelessWidget {
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: Colors.cyan.withOpacity(0.2),
+        color: Colors.cyan,
       ),
-      child: Icon(icon, size: 28, color: Colors.cyan),
+      child: Icon(icon, size: 28, color: Colors.white),
     );
   }
 }
