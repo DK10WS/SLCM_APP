@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:mujslcm/Login.dart';
 import 'package:mujslcm/home_page.dart';
 import 'session_manager.dart';
+import 'package:flutter/services.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: _initialRoute(),

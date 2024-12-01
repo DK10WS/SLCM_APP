@@ -31,6 +31,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter:
     sdk: flutter
+  flutter_svg: ^2.0.16
   html: ^0.15.0
   html_unescape: ^2.0.0
   http: ^1.2.2
@@ -46,19 +47,31 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter packages.
 flutter:
+  assets:
+    - assets/images/timetable-icon.svg
+    - assets/images/attendance-svgrepo-com.svg
+    - assets/images/grades.svg
+    - assets/images/attendance.svg
+    - assets/images/CGPA.svg
+    - assets/images/marks.svg
+
   fonts:
-      - family: poppins
-        fonts:
-          - asset: assets/fonts/Poppins-Regular.ttf
-            weight: 700
-      - family: playfair
-        fonts:
-          - asset: assets/fonts/PlayfairDisplay-VariableFont_wght.ttf
-            weight: 700
-      - family: Gotham
-        fonts:
-          - asset: assets/fonts/Gotham-Black.otf
-            weight: 700
+    - family: poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+          weight: 700
+    - family: playfair
+      fonts:
+        - asset: assets/fonts/PlayfairDisplay-VariableFont_wght.ttf
+          weight: 700
+    - family: Gotham
+      fonts:
+        - asset: assets/fonts/Gotham-Black.otf
+          weight: 700
+    - family: Monserat
+      fonts:
+        - asset: assets/fonts/Montserrat-Bold.ttf
+          weight: 700
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

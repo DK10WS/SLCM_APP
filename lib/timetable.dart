@@ -46,7 +46,7 @@ class _TimetableState extends State<Timetable> {
     fetchEventsForDate(selectedDate);
   }
 
-  Future<void> fetchEventsForDate(DateTime? date) async {
+  Future<void> fetchEventsForDate(DateTime date) async {
     if (date == null) return;
 
     setState(() {
@@ -55,7 +55,6 @@ class _TimetableState extends State<Timetable> {
 
     String formattedDate =
         "${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}";
-    String newCookies = widget.newCookies;
 
     final Map<String, String> parameters = {
       "year": "",
@@ -70,27 +69,32 @@ class _TimetableState extends State<Timetable> {
 
     try {
       var response = await http.post(Uri.parse(url),
-          headers: _buildHeaders(newCookies), body: parameters);
+          headers: _buildHeaders(widget.newCookies), body: parameters);
 
-      List<dynamic> data = jsonDecode(response.body);
-      List<Map<String, dynamic>> result = [];
+      if (response.statusCode == 200) {
+        List<dynamic> data = jsonDecode(response.body);
+        List<Map<String, dynamic>> result = [];
 
-      for (var entry in data) {
-        String entryNo = entry['EntryNo'] ?? "Unknown";
-        String fullDescription = entry['Description'] ?? "No Description";
-        String subjectName = fullDescription.split(',')[0];
-        Map<String, dynamic> eventDetails = await fetchEventDetails(entryNo);
+        for (var entry in data) {
+          String entryNo = entry['EntryNo'] ?? "Unknown";
+          String fullDescription = entry['Description'] ?? "No Description";
+          String subjectName = fullDescription.split(',')[0];
+          Map<String, dynamic> eventDetails = await fetchEventDetails(entryNo);
 
-        result.add({
-          'Description': subjectName,
-          'EntryNo': entryNo,
-          ...eventDetails,
+          result.add({
+            'Description': subjectName,
+            'EntryNo': entryNo,
+            ...eventDetails,
+          });
+        }
+
+        setState(() {
+          events = result;
         });
+      } else {
+        // Handle server error
+        print("Error: ${response.statusCode}");
       }
-
-      setState(() {
-        events = result;
-      });
     } catch (e) {
       print("Error fetching events: $e");
     } finally {
@@ -101,23 +105,32 @@ class _TimetableState extends State<Timetable> {
   }
 
   Future<Map<String, dynamic>> fetchEventDetails(String entryNo) async {
-    var newCookies = widget.newCookies;
     var newParameters = {"EventID": entryNo};
 
     var newUrl =
         "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetEventDetailStudent";
 
-    var response = await http.post(Uri.parse(newUrl),
-        headers: _buildHeaders(newCookies), body: newParameters);
+    try {
+      var response = await http.post(Uri.parse(newUrl),
+          headers: _buildHeaders(widget.newCookies), body: newParameters);
 
-    var eventDetails = jsonDecode(response.body);
-    return {
-      'AttendanceType': eventDetails['AttendanceType'] ?? "",
-      'ProgramCode': eventDetails['ProgramCode'] ?? "N/A",
-      'CourseID': (eventDetails['CourseID'] ?? "N/A"),
-      'Semester': eventDetails['Semester'] ?? "N/A",
-      'Time': eventDetails['SlotScheme'] ?? "N/A",
-    };
+      if (response.statusCode == 200) {
+        var eventDetails = jsonDecode(response.body);
+        return {
+          'AttendanceType': eventDetails['AttendanceType'] ?? "",
+          'ProgramCode': eventDetails['ProgramCode'] ?? "N/A",
+          'CourseID': (eventDetails['CourseID'] ?? "N/A"),
+          'Semester': eventDetails['Semester'] ?? "N/A",
+          'Time': eventDetails['SlotScheme'] ?? "N/A",
+        };
+      } else {
+        // Handle error in fetching event details
+        return {};
+      }
+    } catch (e) {
+      print("Error fetching event details: $e");
+      return {};
+    }
   }
 
   Map<String, String> _buildHeaders(String cookies) {
@@ -228,17 +241,21 @@ class _TimetableState extends State<Timetable> {
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () => _changeDate(-1),
               ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.cyan,
-                    foregroundColor: Colors.black,
-                  ),
-                  onPressed: () => _selectDate(context),
-                  child: Text(
-                    "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
-                    style: const TextStyle(color: Colors.black),
+              Expanded(
+                child: SizedBox(
+                  width: double
+                      .infinity, // Ensures the button expands to available space
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.cyan,
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () => _selectDate(context),
+                    child: Text(
+                      "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
                   ),
                 ),
               ),
@@ -250,42 +267,16 @@ class _TimetableState extends State<Timetable> {
           ),
           const SizedBox(height: 20),
           isLoading
-              ? const Center(child: CircularProgressIndicator())
+              ? const CircularProgressIndicator()
               : Expanded(
                   child: ListView.builder(
                     itemCount: events.length,
                     itemBuilder: (context, index) {
-                      String attendanceType =
-                          events[index]['AttendanceType'] ?? "";
-                      Color buttonColor;
-
-                      if (attendanceType == "Present") {
-                        buttonColor = Colors.green;
-                      } else if (attendanceType == "Absent") {
-                        buttonColor = Colors.red;
-                      } else {
-                        buttonColor = Colors.grey;
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: buttonColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            fixedSize: const Size.fromHeight(90),
-                          ),
-                          onPressed: () {
-                            showEventDetailsPopup(context, events[index]);
-                          },
-                          child: Text(
-                            events[index]['Description'],
-                            style: TextStyle(color: Colors.white, fontSize: 17),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
+                      return EventTile(
+                        event: events[index],
+                        onPressed: () {
+                          showEventDetailsPopup(context, events[index]);
+                        },
                       );
                     },
                   ),
@@ -299,13 +290,49 @@ class _TimetableState extends State<Timetable> {
     return Row(
       children: [
         Container(
-          width: 20,
-          height: 20,
+          height: 15,
+          width: 15,
           color: color,
         ),
         const SizedBox(width: 5),
-        Text(label, style: const TextStyle(color: Colors.white)),
+        Text(
+          label,
+          style: const TextStyle(fontFamily: "gotham", color: Colors.white),
+        ),
       ],
+    );
+  }
+}
+
+class EventTile extends StatelessWidget {
+  final Map<String, dynamic> event;
+  final VoidCallback onPressed;
+
+  const EventTile({Key? key, required this.event, required this.onPressed})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Card(
+        margin: const EdgeInsets.symmetric(vertical: 10),
+        color: Colors.black,
+        child: ListTile(
+          title: Text(
+            event['Description'] ?? 'No Description',
+            style: const TextStyle(color: Colors.white),
+          ),
+          subtitle: Text(
+            event['EntryNo'] ?? 'No Entry Number',
+            style: const TextStyle(color: Colors.white),
+          ),
+          trailing: Icon(
+            Icons.info,
+            color: Colors.white,
+          ),
+        ),
+      ),
     );
   }
 }
