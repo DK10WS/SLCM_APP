@@ -94,59 +94,78 @@ class _InformationState extends State<Information> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: const Text(
-          "Information",
-          style: TextStyle(fontFamily: "gotham", color: Colors.white),
-        ),
-      ),
+      backgroundColor: Color(0xFF121316),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(
                 color: Colors.cyan,
               ),
             )
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ListView(
-                children: userInfo.entries.map((entry) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        entry.key,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
+          : Container(
+              decoration: const BoxDecoration(
+                color: Color(0xFF232531),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(40),
+                  topRight: Radius.circular(40),
+                ),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Information",
+                      style: TextStyle(
+                        fontFamily: "Gotham",
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
                       ),
-                      const SizedBox(height: 8),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16.0),
-                        decoration: BoxDecoration(
-                          color: Colors.grey[900],
-                          border: Border.all(
-                            color: Colors.cyan,
-                            width: 2.0,
-                          ),
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                        child: Text(
-                          entry.value,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
-                          ),
-                        ),
+                    ),
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: ListView(
+                        children: userInfo.entries.map((entry) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                entry.key,
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[900],
+                                  border: Border.all(
+                                    color: Colors.cyan,
+                                    width: 2.0,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: Text(
+                                  entry.value,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          );
+                        }).toList(),
                       ),
-                      const SizedBox(height: 20),
-                    ],
-                  );
-                }).toList(),
+                    ),
+                  ],
+                ),
               ),
             ),
     );

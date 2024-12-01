@@ -1,9 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
-import 'package:shared_preferences/shared_preferences.dart'; // Add this
+import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'session_manager.dart';
@@ -174,148 +173,120 @@ class _MyLoginState extends State<MyLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
-      resizeToAvoidBottomInset: true,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Stack(
+      backgroundColor: const Color(0xFF121316),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.only(top: 150),
-                alignment: Alignment.topCenter,
-                child: const Text(
-                  "",
-                  style: TextStyle(
-                    color: Colors.amber,
-                    fontSize: 33,
+              const Text(
+                'Hello,',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 36,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Welcome to MUJ Switch',
+                style: TextStyle(
+                  color: Colors.grey,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 32),
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFF24272B),
+                  hintText: 'Name.registration',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.email, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: _passwordController,
+                obscureText: true,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color(0xFF24272B),
+                  hintText: 'Enter your password',
+                  hintStyle: const TextStyle(color: Colors.grey),
+                  prefixIcon: const Icon(Icons.lock, color: Colors.grey),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+                style: const TextStyle(color: Colors.white),
+              ),
+              const SizedBox(height: 16),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () async {
+                    const url = 'https://passwordreset.microsoftonline.com/';
+                    if (await canLaunchUrl(Uri.parse(url))) {
+                      await launchUrl(Uri.parse(url),
+                          mode: LaunchMode.externalApplication);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(color: Colors.yellow),
                   ),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.only(top: 220),
-                alignment: Alignment.topCenter,
-                child: const Text(
-                  "Better Slcm",
-                  style: TextStyle(
-                    fontFamily: "gotham",
-                    color: Colors.cyan,
-                    fontSize: 33,
+              const SizedBox(height: 16),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.yellow,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
                   ),
-                ),
-              ),
-              Container(
-                padding: EdgeInsets.only(
-                  top: MediaQuery.of(context).size.height * 0.35,
-                  left: 30,
-                  right: 30,
-                ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color.fromARGB(0, 140, 59, 59),
-                        spreadRadius: 10,
-                        blurRadius: 20,
-                        offset: Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    children: [
-                      Text(
-                        "Login",
-                        style: TextStyle(
-                          fontFamily: "poppins",
-                          color: Colors.amber,
-                          fontSize: 40,
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      TextField(
-                        controller: _usernameController,
-                        decoration: InputDecoration(
-                          hintText: "name.registration",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
+                  onPressed: () async {
+                    _toggleLoading(true);
+                    String username = _usernameController.text;
+                    String password = _passwordController.text;
+
+                    final result = await _login(username, password);
+                    _toggleLoading(false);
+
+                    if (result != null) {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => HomePage(
+                            name: result['name'] ?? "",
+                            newCookies: result['newCookies'] ?? "",
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 20),
-                      TextField(
-                        controller: _passwordController,
-                        obscureText: true,
-                        decoration: InputDecoration(
-                          hintText: "Password",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(50),
-                          ),
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton(
-                          onPressed: () async {
-                            const url =
-                                'https://passwordreset.microsoftonline.com/';
-                            if (await canLaunchUrl(Uri.parse(url))) {
-                              await launchUrl(Uri.parse(url),
-                                  mode: LaunchMode.externalApplication);
-                            } else {
-                              throw 'Could not launch $url';
-                            }
-                          },
-                          child: const Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              decoration: TextDecoration.underline,
-                              color: Colors.blue,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 30),
-                      CircleAvatar(
-                        radius: 40,
-                        backgroundColor: Colors.cyan,
-                        child: _isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white,
-                              )
-                            : IconButton(
-                                onPressed: () async {
-                                  _toggleLoading(true);
-                                  String username = _usernameController.text;
-                                  String password = _passwordController.text;
-
-                                  final result =
-                                      await _login(username, password);
-
-                                  _toggleLoading(false);
-
-                                  if (result != null) {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => HomePage(
-                                          name: result['name'].toString(),
-                                          newCookies:
-                                              result['newCookies'] ?? "",
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                icon: const Icon(
-                                  Icons.arrow_forward_ios,
-                                  color: Colors.white,
-                                ),
-                              ),
-                      ),
-                    ],
-                  ),
+                      );
+                    }
+                  },
+                  child: _isLoading
+                      ? const CircularProgressIndicator(
+                          color: Colors.black,
+                        )
+                      : const Text('Login'),
                 ),
               ),
             ],

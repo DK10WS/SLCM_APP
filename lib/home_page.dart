@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
     _pages = [
       Information(newCookies: widget.newCookies),
       HomeScreen(name: widget.name, newCookies: widget.newCookies),
-      settings(newCookies: widget.newCookies),
+      Settings(newCookies: widget.newCookies),
     ];
   }
 
@@ -156,6 +156,9 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Padding(
       padding: const EdgeInsets.all(20.0),
       child: SingleChildScrollView(
@@ -169,14 +172,16 @@ class HomeScreen extends StatelessWidget {
             ),
             Text(
               "${capitalizeFirstName(name)}",
-              style: const TextStyle(
-                  fontSize: 40, color: Colors.white, fontFamily: "poppins"),
+              style: TextStyle(
+                  fontSize: screenWidth * 0.1,
+                  color: Colors.white,
+                  fontFamily: "poppins"),
             ),
             const SizedBox(height: 20),
             Center(
               child: Container(
-                height: 200,
-                width: MediaQuery.of(context).size.width * 0.9,
+                height: screenWidth * 0.44,
+                width: screenWidth * 0.9,
                 margin: const EdgeInsets.only(bottom: 20),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -196,8 +201,8 @@ class HomeScreen extends StatelessWidget {
                         right: 0,
                         child: SvgPicture.asset(
                           'assets/images/timetable-icon.svg',
-                          height: 270,
-                          width: 100,
+                          height: screenWidth * 0.60,
+                          width: screenWidth * 0.10,
                           color: const Color(0xFF232531),
                         ),
                       ),
@@ -224,10 +229,10 @@ class HomeScreen extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
-                _attendanceCard(context),
-                _marksCard(context),
-                _cgpaCard(context),
-                _gradesCard(context),
+                _attendanceCard(context, screenWidth),
+                _marksCard(context, screenWidth),
+                _cgpaCard(context, screenWidth),
+                _gradesCard(context, screenWidth),
               ],
             ),
           ],
@@ -236,28 +241,28 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _attendanceCard(BuildContext context) {
+  Widget _attendanceCard(BuildContext context, double screenWidth) {
     return InkWell(
       onTap: () => _navigateTo(context, AttendancePage(newCookies: newCookies)),
       child: Container(
-        height: 200,
-        width: MediaQuery.of(context).size.width * 0.9,
+        height: screenWidth * 0.6,
+        width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFfc894b), // Match the background color
-          borderRadius: BorderRadius.circular(20), // Match the rounded corners
+          color: const Color(0xFFfc894b),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
             Positioned(
-              top: -50,
-              left: -15,
+              top: -31,
+              left: -10,
               child: SvgPicture.asset(
                 'assets/images/attendance.svg',
-                height: 190,
-                width: 300,
-                color: const Color(0xFF232531), // Adjust icon color as needed
+                height: screenWidth * 0.35,
+                width: screenWidth * 0.6,
+                color: const Color(0xFF232531),
               ),
             ),
             const Positioned(
@@ -277,16 +282,16 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _marksCard(BuildContext context) {
+  Widget _marksCard(BuildContext context, double screenWidth) {
     return InkWell(
       onTap: () => _navigateTo(context, Marks(newCookies: newCookies)),
       child: Container(
-        height: 200,
-        width: MediaQuery.of(context).size.width * 0.9,
+        height: screenWidth * 0.6,
+        width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFb6f36a), // Match the background color
-          borderRadius: BorderRadius.circular(20), // Match the rounded corners
+          color: const Color(0xFFb6f36a),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -295,15 +300,15 @@ class HomeScreen extends StatelessWidget {
               top: 0,
               child: SvgPicture.asset(
                 'assets/images/marks.svg',
-                height: 140,
-                width: 100,
-                color: const Color(0xFF232531), // Adjust icon color as needed
+                height: screenWidth * 0.29,
+                width: screenWidth * 0.6,
+                color: const Color(0xFF232531),
               ),
             ),
             const Positioned(
               bottom: 10,
               child: Text(
-                "Internal Marks",
+                "Marks",
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
@@ -317,28 +322,27 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _cgpaCard(BuildContext context) {
+  Widget _cgpaCard(BuildContext context, double screenWidth) {
     return InkWell(
       onTap: () => _navigateTo(context, CGPA(newCookies: newCookies)),
       child: Container(
-        height: 200,
-        width: MediaQuery.of(context).size.width * 0.9,
+        height: screenWidth * 0.6,
+        width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFc9a0ff), // Match the background color
-          borderRadius: BorderRadius.circular(20), // Match the rounded corners
+          color: const Color(0xFFfd6297),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
             Positioned(
-              top: 0,
-              left: -10,
+              top: -4,
               child: SvgPicture.asset(
                 'assets/images/CGPA.svg',
-                height: 210,
-                width: 200,
-                color: const Color(0xFF232531), // Adjust icon color as needed
+                height: screenWidth * 0.3,
+                width: screenWidth * 0.2,
+                color: const Color(0xFF232531),
               ),
             ),
             const Positioned(
@@ -358,28 +362,28 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _gradesCard(BuildContext context) {
+  Widget _gradesCard(BuildContext context, double screenWidth) {
     return InkWell(
       onTap: () => _navigateTo(context, Grades(newCookies: newCookies)),
       child: Container(
-        height: 200,
-        width: MediaQuery.of(context).size.width * 0.9,
+        height: screenWidth * 0.6,
+        width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFF95dbfa), // Match the background color
-          borderRadius: BorderRadius.circular(20), // Match the rounded corners
+          color: const Color(0xFF9b77e5),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
             Positioned(
-              top: -50,
+              top: -30,
               right: -20,
               child: SvgPicture.asset(
                 'assets/images/grades.svg',
-                height: 190,
-                width: 200,
-                color: const Color(0xFF232531), // Adjust icon color as needed
+                height: screenWidth * 0.36,
+                width: screenWidth * 0.2,
+                color: const Color(0xFF232531),
               ),
             ),
             const Positioned(
