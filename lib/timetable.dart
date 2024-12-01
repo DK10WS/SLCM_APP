@@ -12,14 +12,14 @@ class Timetable extends StatefulWidget {
 }
 
 class _TimetableState extends State<Timetable> {
-  DateTime selectedDate = DateTime.now(); // Default to current date
+  DateTime selectedDate = DateTime.now();
   List<Map<String, dynamic>> events = [];
-  bool isLoading = false; // Loading indicator state
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    fetchEventsForDate(selectedDate); // Load events for current date
+    fetchEventsForDate(selectedDate);
   }
 
   Future<void> _selectDate(BuildContext context) async {
@@ -202,95 +202,127 @@ class _TimetableState extends State<Timetable> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        children: [
-          const Text(
-            "Timetable",
-            style: TextStyle(
-                fontFamily: "gotham", fontSize: 24, color: Colors.white),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _buildLegendItem(Colors.green, "Present"),
-              _buildLegendItem(Colors.red, "Absent"),
-              _buildLegendItem(Colors.grey, "Not Marked"),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () => _changeDate(-1),
-              ),
-              SizedBox(
-                width: MediaQuery.of(context).size.width * 0.6,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.cyan,
-                    foregroundColor: Colors.black,
-                  ),
-                  onPressed: () => _selectDate(context),
-                  child: Text(
-                    "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
-                    style: const TextStyle(color: Colors.black),
+    return Scaffold(
+      backgroundColor: const Color(0xFF232531),
+      appBar: AppBar(
+        title: const Text("Timetable", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF121316),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildLegendItem(Colors.green, "Present"),
+                _buildLegendItem(Colors.red, "Absent"),
+                _buildLegendItem(Colors.grey, "Not Marked"),
+              ],
+            ),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => _changeDate(-1),
+                ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.cyan,
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () => _selectDate(context),
+                    child: Text(
+                      "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
+                      style: const TextStyle(color: Colors.black),
+                    ),
                   ),
                 ),
-              ),
-              IconButton(
-                icon: const Icon(Icons.arrow_forward, color: Colors.white),
-                onPressed: () => _changeDate(1),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Expanded(
-                  child: ListView.builder(
-                    itemCount: events.length,
-                    itemBuilder: (context, index) {
-                      String attendanceType =
-                          events[index]['AttendanceType'] ?? "";
-                      Color buttonColor;
-
-                      if (attendanceType == "Present") {
-                        buttonColor = Colors.green;
-                      } else if (attendanceType == "Absent") {
-                        buttonColor = Colors.red;
-                      } else {
-                        buttonColor = Colors.grey;
-                      }
-
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 10.0),
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: buttonColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            fixedSize: const Size.fromHeight(90),
-                          ),
-                          onPressed: () {
-                            showEventDetailsPopup(context, events[index]);
-                          },
-                          child: Text(
-                            events[index]['Description'],
-                            style: TextStyle(color: Colors.white, fontSize: 17),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                  onPressed: () => _changeDate(1),
                 ),
-        ],
+              ],
+            ),
+            const SizedBox(height: 20),
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: events.length,
+                      itemBuilder: (context, index) {
+                        String attendanceType =
+                            events[index]['AttendanceType'] ?? "";
+                        Color buttonColor;
+
+                        if (attendanceType == "Present") {
+                          buttonColor = Colors.green;
+                        } else if (attendanceType == "Absent") {
+                          buttonColor = Colors.red;
+                        } else {
+                          buttonColor = Colors.grey;
+                        }
+
+                        String time = events[index]['Time'] ?? "N/A";
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                time,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              const SizedBox(height: 5),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width *
+                                    0.9, // 90% width of the screen
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: buttonColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 20.0,
+                                        horizontal:
+                                            16.0), // Adjusted padding for height
+                                  ),
+                                  onPressed: () => showEventDetailsPopup(
+                                      context, events[index]),
+                                  child: Text(
+                                    "${events[index]['Description']}",
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18, // Increased text size
+                                    ),
+                                    textAlign:
+                                        TextAlign.center, // Center the text
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+          ],
+        ),
       ),
     );
   }
@@ -299,12 +331,15 @@ class _TimetableState extends State<Timetable> {
     return Row(
       children: [
         Container(
-          width: 20,
-          height: 20,
+          width: 16,
+          height: 16,
           color: color,
         ),
         const SizedBox(width: 5),
-        Text(label, style: const TextStyle(color: Colors.white)),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white),
+        ),
       ],
     );
   }

@@ -187,7 +187,7 @@ class HomeScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFfede67),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(40),
                     ),
                   ),
                   onPressed: () {
@@ -225,7 +225,7 @@ class HomeScreen extends StatelessWidget {
             GridView.count(
               crossAxisCount: 2,
               crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
+              mainAxisSpacing: 0,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               children: [
@@ -250,7 +250,7 @@ class HomeScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
           color: const Color(0xFFfc894b),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(40),
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -291,7 +291,7 @@ class HomeScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
           color: const Color(0xFFb6f36a),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(40),
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -331,7 +331,7 @@ class HomeScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
           color: const Color(0xFFfd6297),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(40),
         ),
         child: Stack(
           alignment: Alignment.center,
@@ -371,7 +371,7 @@ class HomeScreen extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
           color: const Color(0xFF9b77e5),
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(40),
         ),
         child: Stack(
           alignment: Alignment.center,
