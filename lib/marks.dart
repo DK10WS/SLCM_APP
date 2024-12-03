@@ -155,22 +155,22 @@ class _MarksState extends State<Marks> {
                       child: ListTile(
                         title: Text('Course: ${course['CourseID']}',
                             style: const TextStyle(
-                                color: Colors.white,
+                                color: Colors.black,
                                 fontFamily: "poppins",
                                 fontSize: 20)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('CWS: ${course['CWS']}',
-                                style: const TextStyle(color: Colors.white)),
+                                style: const TextStyle(color: Colors.black)),
                             Text('MTE1: ${course['MTE1']}',
-                                style: const TextStyle(color: Colors.white)),
+                                style: const TextStyle(color: Colors.black)),
                             Text('MTE2: ${course['MTE2']}',
-                                style: const TextStyle(color: Colors.white)),
+                                style: const TextStyle(color: Colors.black)),
                             Text('Ressional: ${course['Ressional']}',
-                                style: const TextStyle(color: Colors.white)),
+                                style: const TextStyle(color: Colors.black)),
                             Text('Total: ${course['Total']}',
-                                style: const TextStyle(color: Colors.white)),
+                                style: const TextStyle(color: Colors.black)),
                           ],
                         ),
                       ),

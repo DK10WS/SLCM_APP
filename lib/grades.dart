@@ -146,7 +146,7 @@ class _GradesState extends State<Grades> {
                 const Expanded(
                   child: Center(
                       child: Text('No data available for this semester',
-                          style: TextStyle(color: Colors.white))),
+                          style: TextStyle(color: Colors.black))),
                 ),
               if (gradesData != null &&
                   gradesData!['InternalMarksList'] != null &&
@@ -179,12 +179,12 @@ class _GradesState extends State<Grades> {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 18,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                 ),
                               ),
                               subtitle: Text(
                                 'Credits: $totalCredits',
-                                style: const TextStyle(color: Colors.white),
+                                style: const TextStyle(color: Colors.black),
                               ),
                             ),
                           ),
@@ -216,7 +216,7 @@ class _GradesState extends State<Grades> {
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                 ),
                               ),
                               subtitle: Column(
@@ -225,12 +225,12 @@ class _GradesState extends State<Grades> {
                                   Text(
                                     'Grade: $grade',
                                     style: const TextStyle(
-                                        fontSize: 14, color: Colors.white),
+                                        fontSize: 14, color: Colors.black),
                                   ),
                                   Text(
                                     'Credits: $credits',
                                     style: const TextStyle(
-                                        fontSize: 14, color: Colors.white),
+                                        fontSize: 14, color: Colors.black),
                                   ),
                                 ],
                               ),
