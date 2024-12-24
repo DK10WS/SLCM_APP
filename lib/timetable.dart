@@ -66,7 +66,7 @@ class _TimetableState extends State<Timetable> {
     };
 
     var url =
-        "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetStudentCalenderEventList";
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetStudentCalenderEventList";
 
     try {
       var response = await http.post(Uri.parse(url),

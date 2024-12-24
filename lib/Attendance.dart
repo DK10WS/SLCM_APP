@@ -22,7 +22,7 @@ class _AttendancePageState extends State<AttendancePage> {
 
   Future<List<Map<String, dynamic>>?> fetchAttendance(String newCookies) async {
     final Map<String, String> headers = {
-      "Host": "mujslcm.jaipur.manipal.edu:122",
+      "Host": "mujslcm.jaipur.manipal.edu",
       "User-Agent":
           "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0",
       "Cookie": newCookies,
@@ -43,7 +43,7 @@ class _AttendancePageState extends State<AttendancePage> {
     final Map<String, String> body = {"StudentCode": ""};
 
     const attendanceUrl =
-        "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetAttendanceSummaryList";
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetAttendanceSummaryList";
 
     final session = http.Client();
     final response = await session.post(Uri.parse(attendanceUrl),

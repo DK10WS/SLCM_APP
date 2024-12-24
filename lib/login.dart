@@ -53,8 +53,8 @@ class _MyLoginState extends State<MyLogin> {
       return null;
     }
 
-    const url = "https://mujslcm.jaipur.manipal.edu:122/";
-    const baseurl = "https://mujslcm.jaipur.manipal.edu:122";
+    const url = "https://mujslcm.jaipur.manipal.edu";
+    const baseurl = "https://mujslcm.jaipur.manipal.edu";
 
     final headers = {
       "User-Agent":

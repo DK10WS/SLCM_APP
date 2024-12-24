@@ -22,7 +22,7 @@ class _GradesState extends State<CGPA> {
 
   Future<void> fetchGrades() async {
     final url =
-        "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetCGPAGPAForFaculty";
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetCGPAGPAForFaculty";
     final Map<String, String> headers = {
       "Accept": "application/json, text/javascript, */*; q=0.01",
       "Accept-Encoding": "gzip, deflate, br, zstd",

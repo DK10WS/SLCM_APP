@@ -25,7 +25,7 @@ class _GradesState extends State<Grades> {
     });
 
     final url =
-        "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetGradesForFaculty";
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetGradesForFaculty";
 
     final Map<String, String> headers = {
       "Accept": "application/json, text/javascript, */*; q=0.01",

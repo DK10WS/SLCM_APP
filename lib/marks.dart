@@ -59,7 +59,7 @@ class _MarksState extends State<Marks> {
     final Map<String, String> body = {"Enrollment": "", "Semester": semester};
 
     final url =
-        "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetInternalMarkForFaculty";
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetInternalMarkForFaculty";
 
     var session = http.Client();
 

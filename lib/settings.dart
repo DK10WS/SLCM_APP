@@ -95,8 +95,7 @@ class Settings extends StatelessWidget {
                 leading: const Icon(Icons.web, color: Colors.yellow),
                 title: const Text('Visit MUJ Website',
                     style: TextStyle(color: Colors.white)),
-                onTap: () =>
-                    _launchURL('https://mujslcm.jaipur.manipal.edu:122/'),
+                onTap: () => _launchURL('https://mujslcm.jaipur.manipal.edu'),
               ),
               const SizedBox(height: 24),
               const Divider(color: Colors.grey),
