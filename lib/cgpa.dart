@@ -60,7 +60,7 @@ class _GradesState extends State<CGPA> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
-          "Grades",
+          "CGPA/GPA",
           style: TextStyle(color: Colors.white),
         ),
         iconTheme: const IconThemeData(

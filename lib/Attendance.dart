@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:fl_chart/fl_chart.dart'; // Import fl_chart
+import 'package:fl_chart/fl_chart.dart';
 
 class AttendancePage extends StatefulWidget {
   final String newCookies;
@@ -108,15 +108,15 @@ class _AttendancePageState extends State<AttendancePage> {
           ),
         ),
         body: Padding(
-          padding: const EdgeInsets.only(top: 16.0), // Add padding from the top
+          padding: const EdgeInsets.only(top: 16.0),
           child: Container(
             width: double.infinity,
             height: double.infinity,
             decoration: BoxDecoration(
-              color: Color(0xFF232531), // Background color of the body
+              color: Color(0xFF232531),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20.0), // Rounded top-left corner
-                topRight: Radius.circular(20.0), // Rounded top-right corner
+                topLeft: Radius.circular(20.0),
+                topRight: Radius.circular(20.0),
               ),
             ),
             child: FutureBuilder<List<Map<String, dynamic>>?>(
@@ -144,7 +144,7 @@ class _AttendancePageState extends State<AttendancePage> {
                   final attendanceList = snapshot.data!;
 
                   return Padding(
-                    padding: const EdgeInsets.all(10.0),
+                    padding: const EdgeInsets.all(15.0),
                     child: ListView.builder(
                       itemCount: attendanceList.length,
                       itemBuilder: (context, index) {

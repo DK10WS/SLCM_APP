@@ -1,4 +1,4 @@
-import 'dart:convert'; // Import for JSON decoding
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -60,9 +60,24 @@ class _GradesState extends State<Grades> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
+  Color getGradeColor(String grade) {
+    switch (grade) {
+      case 'A':
+      case 'S':
+      case 'A+':
+        return Colors.green;
+      case 'B':
+      case 'B+':
+        return Colors.blue;
+      case 'C':
+      case 'C+':
+        return Colors.orange;
+      case 'D':
+      case 'E':
+        return Colors.red;
+      default:
+        return Colors.red;
+    }
   }
 
   @override
@@ -70,163 +85,194 @@ class _GradesState extends State<Grades> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Grades',
-          style: TextStyle(color: Colors.white),
-        ),
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      body: Container(
-        color: Colors.black,
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                value: selectedSemester,
-                hint: Text('Select Semester',
-                    style: TextStyle(color: Colors.white)),
-                dropdownColor: Colors.black,
-                style: TextStyle(color: Colors.white),
-                iconEnabledColor: Colors.white,
-                items: ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
-                    .map((semester) => DropdownMenuItem<String>(
-                          value: semester,
-                          child: Text('Semester $semester',
-                              style: TextStyle(color: Colors.white)),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedSemester = value;
-                    gradesData = null;
-                    isLoading = false;
-                  });
-                  fetchGrades();
-                },
+      backgroundColor: const Color(0xFF121316),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            pinned: true,
+            floating: false,
+            snap: false,
+            backgroundColor: const Color(0xFF121316),
+            title: const Text(
+              "Grades",
+              style: TextStyle(color: Colors.white),
+            ),
+            iconTheme: const IconThemeData(color: Colors.white),
+            elevation: 0,
+          ),
+          SliverToBoxAdapter(
+            child: Container(
+              height: MediaQuery.of(context).size.height,
+              decoration: const BoxDecoration(
+                color: Color(0xFF232531),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(40),
+                  topRight: Radius.circular(40),
+                ),
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 30),
+                  Center(
+                    child: Container(
+                      width: screenWidth * 0.90,
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF121316),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: DropdownButton<String>(
+                        value: selectedSemester,
+                        hint: const Text('Select Semester',
+                            style: TextStyle(color: Colors.white)),
+                        dropdownColor: const Color(0xFF121316),
+                        style: const TextStyle(color: Colors.white),
+                        iconEnabledColor: Colors.white,
+                        isExpanded: true,
+                        underline: const SizedBox(),
+                        borderRadius: BorderRadius.circular(30),
+                        items: [
+                          'I',
+                          'II',
+                          'III',
+                          'IV',
+                          'V',
+                          'VI',
+                          'VII',
+                          'VIII'
+                        ]
+                            .map((semester) => DropdownMenuItem<String>(
+                                  value: semester,
+                                  child: Text('Semester $semester',
+                                      style:
+                                          const TextStyle(color: Colors.white)),
+                                ))
+                            .toList(),
+                        onChanged: (value) {
+                          setState(() {
+                            selectedSemester = value;
+                            gradesData = null;
+                            isLoading = false;
+                          });
+                          fetchGrades();
+                        },
+                      ),
+                    ),
+                  ),
+                  if (selectedSemester == null)
+                    const Expanded(
+                      child: Center(
+                        child: Text('Please select a semester to view grades',
+                            style: TextStyle(color: Colors.white)),
+                      ),
+                    )
+                  else ...[
+                    if (isLoading && selectedSemester != null)
+                      const Expanded(
+                          child: Center(child: CircularProgressIndicator())),
+                    if (errorMessage.isNotEmpty)
+                      Center(
+                          child: Text(errorMessage,
+                              style: const TextStyle(color: Colors.white))),
+                    if (gradesData == null ||
+                        gradesData!['InternalMarksList'] == null ||
+                        gradesData!['InternalMarksList'].isEmpty)
+                      const Expanded(
+                        child: Center(
+                            child: Text('No data available for this semester',
+                                style: TextStyle(color: Colors.white))),
+                      ),
+                    if (gradesData != null &&
+                        gradesData!['InternalMarksList'] != null &&
+                        gradesData!['InternalMarksList'].isNotEmpty)
+                      Expanded(
+                        child: ListView.builder(
+                          primary: false, // Ensures no conflict with AppBar
+                          itemCount: gradesData!['InternalMarksList'].length,
+                          itemBuilder: (context, index) {
+                            var course =
+                                gradesData!['InternalMarksList'][index];
+                            String courseName =
+                                course['CourseID'] ?? 'No Course Name';
+                            String grade = course['Grade'] ?? 'No Grade';
+                            String credits = course['Credits'] ?? 'No Credits';
+
+                            if (courseName.isEmpty || courseName == 'Total') {
+                              return const SizedBox.shrink();
+                            } else {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 10, horizontal: 15),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[900],
+                                    borderRadius: BorderRadius.circular(15),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Colors.black45,
+                                        spreadRadius: 2,
+                                        blurRadius: 4,
+                                      ),
+                                    ],
+                                  ),
+                                  width: screenWidth * 0.95,
+                                  padding: const EdgeInsets.all(15),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 50,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: getGradeColor(grade),
+                                          shape: BoxShape.circle,
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            grade,
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 18),
+                                          ),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 15),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              courseName,
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 18),
+                                            ),
+                                            const SizedBox(height: 10),
+                                            Text(
+                                              'Credits: $credits',
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 14),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
+                  ],
+                ],
               ),
             ),
-            if (selectedSemester == null)
-              const Expanded(
-                child: Center(
-                  child: Text('Please select a semester to view grades',
-                      style: TextStyle(color: Colors.white)),
-                ),
-              )
-            else ...[
-              if (isLoading && selectedSemester != null)
-                const Expanded(
-                    child: Center(child: CircularProgressIndicator())),
-              if (errorMessage.isNotEmpty)
-                Center(
-                    child: Text(errorMessage,
-                        style: TextStyle(color: Colors.white))),
-              if (gradesData == null ||
-                  gradesData!['InternalMarksList'] == null ||
-                  gradesData!['InternalMarksList'].isEmpty)
-                const Expanded(
-                  child: Center(
-                      child: Text('No data available for this semester',
-                          style: TextStyle(color: Colors.black))),
-                ),
-              if (gradesData != null &&
-                  gradesData!['InternalMarksList'] != null &&
-                  gradesData!['InternalMarksList'].isNotEmpty)
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: gradesData!['InternalMarksList'].length +
-                        1, // Adding 1 for the Total Credits
-                    itemBuilder: (context, index) {
-                      if (index == 0) {
-                        // "Total Credits" box
-                        double totalCredits = gradesData!['InternalMarksList']
-                            .fold(0, (sum, course) {
-                          return sum +
-                              (double.tryParse(course['Credits'].toString()) ??
-                                  0);
-                        });
-
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 10),
-                          elevation: 3,
-                          color: Colors.cyan,
-                          child: Container(
-                            width: screenWidth * 0.9,
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(10),
-                              title: Text(
-                                'Total Credits',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              subtitle: Text(
-                                'Credits: $totalCredits',
-                                style: const TextStyle(color: Colors.black),
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-
-                      // Course information
-                      var course = gradesData!['InternalMarksList'][index - 1];
-
-                      String courseName =
-                          course['CourseID'] ?? 'No Course Name';
-                      String grade = course['Grade'] ?? 'No Grade';
-                      String credits = course['Credits'] ?? 'No Credits';
-
-                      if (courseName.isEmpty || courseName == 'Total') {
-                        return SizedBox.shrink();
-                      } else {
-                        return Card(
-                          margin: const EdgeInsets.symmetric(
-                              vertical: 5, horizontal: 10),
-                          elevation: 3,
-                          color: Colors.cyan,
-                          child: Container(
-                            width: screenWidth * 0.9,
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.all(10),
-                              title: Text(
-                                courseName,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 16,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Grade: $grade',
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                  Text(
-                                    'Credits: $credits',
-                                    style: const TextStyle(
-                                        fontSize: 14, color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        );
-                      }
-                    },
-                  ),
-                ),
-            ],
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
