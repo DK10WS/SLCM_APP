@@ -49,9 +49,6 @@ class _MarksState extends State<Marks> {
   Future<List<Map<String, dynamic>>> parseMarks(
       String newCookies, String semester) async {
     final Map<String, String> headers = {
-      'Accept': 'application/json, text/javascript, */*; q=0.01',
-      'Accept-Encoding': 'gzip, deflate, br, zstd',
-      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
       'Cookie': newCookies,
       'User-Agent': 'Mozilla/5.0',
     };

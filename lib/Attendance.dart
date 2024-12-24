@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:fl_chart/fl_chart.dart'; // Import fl_chart
 
 class AttendancePage extends StatefulWidget {
   final String newCookies;
@@ -22,22 +23,9 @@ class _AttendancePageState extends State<AttendancePage> {
 
   Future<List<Map<String, dynamic>>?> fetchAttendance(String newCookies) async {
     final Map<String, String> headers = {
-      "Host": "mujslcm.jaipur.manipal.edu",
       "User-Agent":
           "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0",
       "Cookie": newCookies,
-      "Accept": "application/json, text/javascript, */*; q=0.01",
-      "Accept-Language": "en-US,en;q=0.5",
-      "Accept-Encoding": "gzip, deflate, br, zstd",
-      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      "X-Requested-With": "XMLHttpRequest",
-      "Origin": "https://mujslcm.jaipur.manipal.edu:122",
-      "DNT": "1",
-      "Referer":
-          "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/AttendanceSummaryForStudent",
-      "Sec-Fetch-Dest": "empty",
-      "Sec-Fetch-Mode": "cors",
-      "Sec-Fetch-Site": "same-origin",
     };
 
     final Map<String, String> body = {"StudentCode": ""};
@@ -105,206 +93,226 @@ class _AttendancePageState extends State<AttendancePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
-        title: const Text(
-          'Attendance Summary',
-          style: TextStyle(color: Colors.white),
-        ),
-      ),
-      body: FutureBuilder<List<Map<String, dynamic>>?>(
-        future: _attendanceData,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(color: Colors.cyan),
-            );
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Text(
-                'Error: ${snapshot.error}',
-                style: const TextStyle(color: Colors.white),
-              ),
-            );
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-              child: Text(
-                'No attendance data available',
-                style: TextStyle(color: Colors.white),
-              ),
-            );
-          } else {
-            final attendanceList = snapshot.data!;
+    final double boxWidth = MediaQuery.of(context).size.width * 0.95;
 
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.white, width: 1.0),
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12.0),
-                    child: DataTable(
-                      columnSpacing: 24.0, // Adjust spacing between columns
-                      headingRowHeight: 48.0,
-                      dataRowMaxHeight: 60.0,
-                      headingRowColor: MaterialStateProperty.resolveWith(
-                          (states) => Colors.grey[900]), // Dark header row
-                      dataRowColor: MaterialStateProperty.resolveWith(
-                          (states) => Colors.black), // Black rows
-                      columns: const [
-                        DataColumn(
-                          label: Expanded(
-                            child: Text(
-                              'Subject',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.left,
-                            ),
-                          ),
-                        ),
-                        DataColumn(
-                          label: Expanded(
-                            child: Text(
-                              'Attendance %',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ],
-                      rows: attendanceList.map((attendance) {
+    return Scaffold(
+        backgroundColor: const Color(0xFF121316),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF121316),
+          iconTheme: const IconThemeData(
+            color: Colors.white,
+          ),
+          title: const Text(
+            'Attendance Summary',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.only(top: 16.0), // Add padding from the top
+          child: Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              color: Color(0xFF232531), // Background color of the body
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20.0), // Rounded top-left corner
+                topRight: Radius.circular(20.0), // Rounded top-right corner
+              ),
+            ),
+            child: FutureBuilder<List<Map<String, dynamic>>?>(
+              future: _attendanceData,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: Colors.cyan),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'Error: ${snapshot.error}',
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  );
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(
+                    child: Text(
+                      'No attendance data available',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  );
+                } else {
+                  final attendanceList = snapshot.data!;
+
+                  return Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ListView.builder(
+                      itemCount: attendanceList.length,
+                      itemBuilder: (context, index) {
+                        final attendance = attendanceList[index];
                         final subject = attendance["subject"];
                         final percentage = attendance["percentage"];
                         final attendedClasses = attendance["attendedClasses"];
                         final missedClasses = attendance["missedClasses"];
+                        final totalClasses = attendance["totalClasses"];
                         final courseCode = attendance["courseCode"];
 
-                        return DataRow(
-                          cells: [
-                            DataCell(
-                              SizedBox(
-                                width:
-                                    180, // Responsive size to prevent overflow
-                                child: TextButton(
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: Colors.grey[850],
-                                    foregroundColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      side:
-                                          const BorderSide(color: Colors.white),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
+                        double attendedPercentage =
+                            attendedClasses / totalClasses;
+                        double missedPercentage = missedClasses / totalClasses;
+
+                        return Container(
+                          width: boxWidth,
+                          margin: const EdgeInsets.symmetric(vertical: 8.0),
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[900],
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => AlertDialog(
+                                  backgroundColor: Color(0xFF232531),
+                                  title: Text(
+                                    subject,
+                                    style: const TextStyle(color: Colors.white),
                                   ),
-                                  onPressed: () {
-                                    showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        backgroundColor: Colors.black,
-                                        title: Text(
-                                          subject,
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        "Course Code: $courseCode",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      Text(
+                                        "Attendance: $percentage %",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      Text(
+                                        "Attended Classes: $attendedClasses",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      Text(
+                                        "Missed Classes: $missedClasses",
+                                        style: const TextStyle(
+                                            color: Colors.white),
+                                      ),
+                                      if (attendance["classesNeeded"] != null)
+                                        Text(
+                                          "Status: ${attendance["statusMessage"]}",
                                           style: const TextStyle(
-                                              color: Colors.white),
+                                              color: Colors.red),
+                                        )
+                                      else
+                                        Text(
+                                          "Status: ${attendance["statusMessage"]}",
+                                          style: const TextStyle(
+                                              color: Colors.green),
                                         ),
-                                        content: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "Course Code: $courseCode",
-                                              style: const TextStyle(
-                                                  color: Colors.white),
+                                    ],
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(context),
+                                      child: const Text(
+                                        "Close",
+                                        style: TextStyle(color: Colors.cyan),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        subject,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 10.0),
+                                      Text(
+                                        "Attended: $attendedClasses | Missed Classes: $missedClasses ",
+                                        style: const TextStyle(
+                                          color: Colors.cyan,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                SizedBox(
+                                  width: 80,
+                                  height: 80,
+                                  child: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      PieChart(
+                                        PieChartData(
+                                          sectionsSpace: 0,
+                                          borderData: FlBorderData(show: false),
+                                          sections: [
+                                            PieChartSectionData(
+                                              value: attendedPercentage * 100,
+                                              color: Colors.green,
+                                              showTitle: false,
+                                              radius: 45,
                                             ),
-                                            Text(
-                                              "Attendance: $percentage %",
-                                              style: const TextStyle(
-                                                  color: Colors.white),
+                                            PieChartSectionData(
+                                              value: missedPercentage * 100,
+                                              color: Colors.red,
+                                              showTitle: false,
+                                              radius: 45,
                                             ),
-                                            Text(
-                                              "Attended Classes: $attendedClasses",
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            Text(
-                                              "Missed Classes: $missedClasses",
-                                              style: const TextStyle(
-                                                  color: Colors.white),
-                                            ),
-                                            if (attendance["classesNeeded"] !=
-                                                null)
-                                              Text(
-                                                "Status: ${attendance["statusMessage"]}",
-                                                style: const TextStyle(
-                                                    color: Colors.red),
-                                              )
-                                            else
-                                              Text(
-                                                "Status: ${attendance["statusMessage"]}",
-                                                style: const TextStyle(
-                                                    color: Colors.green),
-                                              ),
                                           ],
                                         ),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: const Text(
-                                              "Close",
-                                              style:
-                                                  TextStyle(color: Colors.cyan),
-                                            ),
-                                          ),
-                                        ],
                                       ),
-                                    );
-                                  },
-                                  child: Text(
-                                    subject,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: const TextStyle(fontSize: 14),
+                                      Container(
+                                        width: 60,
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[900],
+                                          shape: BoxShape.circle,
+                                        ),
+                                      ),
+                                      Text(
+                                        '$percentage%',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ),
+                              ],
                             ),
-                            DataCell(
-                              Center(
-                                child: Text(
-                                  percentage,
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
+                          ),
                         );
-                      }).toList(),
+                      },
                     ),
-                  ),
-                ),
-              ),
-            );
-          }
-        },
-      ),
-    );
+                  );
+                }
+              },
+            ),
+          ),
+        ));
   }
 }

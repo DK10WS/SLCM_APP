@@ -122,27 +122,9 @@ class _TimetableState extends State<Timetable> {
 
   Map<String, String> _buildHeaders(String cookies) {
     return {
-      "Accept": "application/json, text/javascript, */*; q=0.01",
-      "Accept-Encoding": "gzip, deflate, br, zstd",
-      "Accept-Language": "en-US,en;q=0.8",
-      "Connection": "keep-alive",
-      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
       "Cookie": cookies,
-      "Host": "mujslcm.jaipur.manipal.edu:122",
-      "Origin": "https://mujslcm.jaipur.manipal.edu:122",
-      "Referer":
-          "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/ViewTimeTableForStudent",
-      "Sec-Fetch-Dest": "empty",
-      "Sec-Fetch-Mode": "cors",
-      "Sec-Fetch-Site": "same-origin",
-      "Sec-GPC": "1",
       "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "X-Requested-With": "XMLHttpRequest",
-      "sec-ch-ua":
-          "\"Brave\";v=\"131\", \"Chromium\";v=\"131\", \"Not_A Brand\";v=\"24\"",
-      "sec-ch-ua-mobile": "?0",
-      "sec-ch-ua-platform": "\"Windows\"",
     };
   }
 
