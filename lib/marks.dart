@@ -1,6 +1,7 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
+import 'package:fl_chart/fl_chart.dart';
 
 class Marks extends StatefulWidget {
   final String newCookies;
@@ -14,167 +15,259 @@ class Marks extends StatefulWidget {
 class _MarksState extends State<Marks> {
   List<Map<String, dynamic>> marksData = [];
   bool isLoading = false;
-  String? errorMessage;
+  String errorMessage = '';
   String? selectedSemester;
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Future<void> fetchMarksData() async {
     if (selectedSemester == null) return;
 
     setState(() {
       isLoading = true;
-      errorMessage = null;
     });
-
-    try {
-      List<Map<String, dynamic>> courses =
-          await parseMarks(widget.newCookies, selectedSemester!);
-
-      setState(() {
-        marksData = courses;
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        errorMessage = 'Error fetching marks: $e';
-        isLoading = false;
-      });
-    }
-  }
-
-  Future<List<Map<String, dynamic>>> parseMarks(
-      String newCookies, String semester) async {
-    final Map<String, String> headers = {
-      'Cookie': newCookies,
-      'User-Agent': 'Mozilla/5.0',
-    };
-
-    final Map<String, String> body = {"Enrollment": "", "Semester": semester};
 
     final url =
         "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetInternalMarkForFaculty";
 
-    var session = http.Client();
+    final Map<String, String> headers = {
+      "Cookie": widget.newCookies,
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    };
+
+    final Map<String, String> body = {
+      "Enrollment": "",
+      "Semester": selectedSemester!
+    };
 
     try {
+      final session = http.Client();
       var response =
           await session.post(Uri.parse(url), headers: headers, body: body);
+      session.close();
 
-      List<dynamic> marksList = jsonDecode(response.body)["InternalMarksList"];
-      List<Map<String, dynamic>> courses = marksList.map((course) {
-        return {
-          'CourseID': course['CourseID'],
-          'CourseName': course['CourseName'] ?? 'N/A',
-          'CWS': course['CWS'],
-          'MTE1': course['MTE1'],
-          'MTE2': course['MTE2'] ?? 'N/A',
-          'Ressional': course["RESESSION"] ?? 'N/A',
-          'Total': course['Total'],
-        };
-      }).toList();
-
-      return courses;
+      if (response.statusCode == 200) {
+        setState(() {
+          marksData = List<Map<String, dynamic>>.from(
+              jsonDecode(response.body)["InternalMarksList"]);
+          isLoading = false;
+        });
+      } else {
+        throw Exception('Failed to fetch marks');
+      }
     } catch (e) {
-      print("Error fetching marks: $e");
-      return [];
+      setState(() {
+        isLoading = false;
+        errorMessage = 'Error fetching marks: $e';
+      });
     }
+  }
+
+  Color getGradeColor(double total) {
+    return total >= 50 ? Colors.green : Colors.red;
   }
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
+      backgroundColor: const Color(0xFF121316),
       appBar: AppBar(
-        title:
-            const Text('Marks Details', style: TextStyle(color: Colors.white)),
-        backgroundColor: Colors.black,
+        title: Text(
+          "Marks Details",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color(0xFF121316),
         iconTheme: const IconThemeData(color: Colors.white),
+        elevation: 0,
+        shadowColor: Colors.transparent,
       ),
       body: Container(
-        color: Colors.black,
+        height: MediaQuery.of(context).size.height,
+        decoration: const BoxDecoration(
+          color: Color(0xFF232531),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(40),
+            topRight: Radius.circular(40),
+          ),
+        ),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: DropdownButton<String>(
-                value: selectedSemester,
-                hint: const Text('Select Semester',
-                    style: TextStyle(color: Colors.white)),
-                dropdownColor: Colors.black,
-                style: const TextStyle(color: Colors.white),
-                iconEnabledColor: Colors.white,
-                items: ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
-                    .map((semester) => DropdownMenuItem<String>(
-                          value: semester,
-                          child: Text('Semester $semester',
-                              style: const TextStyle(color: Colors.white)),
-                        ))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    selectedSemester = value;
-                    marksData = [];
-                    fetchMarksData();
-                  });
-                },
-              ),
-            ),
-            if (isLoading)
-              const Expanded(child: Center(child: CircularProgressIndicator())),
-            if (errorMessage != null)
-              Expanded(
-                child: Center(
-                  child: Text(errorMessage!,
-                      style: const TextStyle(color: Colors.white)),
+            const SizedBox(height: 30),
+            Center(
+              child: Container(
+                width: screenWidth * 0.90,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF121316),
+                  borderRadius: BorderRadius.circular(20),
                 ),
-              ),
-            if (!isLoading && errorMessage == null && marksData.isEmpty)
-              const Expanded(
-                child: Center(
-                  child: Text('No data available for this semester',
+                child: DropdownButton<String>(
+                  value: selectedSemester,
+                  hint: const Text('Select Semester',
                       style: TextStyle(color: Colors.white)),
-                ),
-              ),
-            if (!isLoading && marksData.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: marksData.length,
-                  itemBuilder: (context, index) {
-                    final course = marksData[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 5, horizontal: 10),
-                      elevation: 3,
-                      color: Colors.cyan,
-                      child: ListTile(
-                        title: Text('Course: ${course['CourseID']}',
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontFamily: "poppins",
-                                fontSize: 20)),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('CWS: ${course['CWS']}',
-                                style: const TextStyle(color: Colors.black)),
-                            Text('MTE1: ${course['MTE1']}',
-                                style: const TextStyle(color: Colors.black)),
-                            Text('MTE2: ${course['MTE2']}',
-                                style: const TextStyle(color: Colors.black)),
-                            Text('Ressional: ${course['Ressional']}',
-                                style: const TextStyle(color: Colors.black)),
-                            Text('Total: ${course['Total']}',
-                                style: const TextStyle(color: Colors.black)),
-                          ],
-                        ),
-                      ),
-                    );
+                  dropdownColor: const Color(0xFF121316),
+                  style: const TextStyle(color: Colors.white),
+                  iconEnabledColor: Colors.white,
+                  isExpanded: true,
+                  underline: const SizedBox(),
+                  borderRadius: BorderRadius.circular(30),
+                  items: ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII']
+                      .map((semester) => DropdownMenuItem<String>(
+                            value: semester,
+                            child: Text('Semester $semester',
+                                style: const TextStyle(color: Colors.white)),
+                          ))
+                      .toList(),
+                  onChanged: (value) {
+                    setState(() {
+                      selectedSemester = value;
+                      marksData = [];
+                      isLoading = false;
+                    });
+                    fetchMarksData();
                   },
                 ),
               ),
+            ),
+            if (selectedSemester == null)
+              const Expanded(
+                child: Center(
+                  child: Text('Please select a semester to view marks',
+                      style: TextStyle(color: Colors.white)),
+                ),
+              )
+            else ...[
+              if (isLoading && selectedSemester != null)
+                const Expanded(
+                    child: Center(child: CircularProgressIndicator())),
+              if (errorMessage.isNotEmpty)
+                Center(
+                    child: Text(errorMessage,
+                        style: const TextStyle(color: Colors.white))),
+              if (marksData.isEmpty)
+                const Expanded(
+                  child: Center(
+                      child: Text('No data available for this semester',
+                          style: TextStyle(color: Colors.white))),
+                ),
+              if (marksData.isNotEmpty)
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: marksData.length,
+                    itemBuilder: (context, index) {
+                      var course = marksData[index];
+                      String courseName = course['CourseID'];
+                      double total = course['Total'] != "-"
+                          ? double.parse(course['Total'].toString())
+                          : 0.0;
+                      double maxMarks = 60;
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 15),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[900],
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          width: screenWidth * 0.95,
+                          padding: const EdgeInsets.all(15),
+                          child: Row(
+                            children: [
+                              SizedBox(
+                                width: 80,
+                                height: 80,
+                                child: Stack(
+                                  alignment: Alignment.center,
+                                  children: [
+                                    PieChart(
+                                      PieChartData(
+                                        sectionsSpace: 0,
+                                        borderData: FlBorderData(show: false),
+                                        sections: [
+                                          PieChartSectionData(
+                                            value: total / maxMarks * 100,
+                                            color: Colors.green,
+                                            showTitle: false,
+                                            radius: 45,
+                                          ),
+                                          PieChartSectionData(
+                                            value:
+                                                100 - (total / maxMarks * 100),
+                                            color: Colors.red,
+                                            showTitle: false,
+                                            radius: 45,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 60,
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[900],
+                                        shape: BoxShape.circle,
+                                      ),
+                                    ),
+                                    Text(
+                                      total != 0
+                                          ? '${total.toStringAsFixed(1)}'
+                                          : "N/A",
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 16.0),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 8.0),
+                                    Text('Course: $courseName',
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 18)),
+                                    const SizedBox(height: 8.0),
+                                    if (course['CWS'] != "-")
+                                      Text('CWS: ${course['CWS']}',
+                                          style: const TextStyle(
+                                              color: Colors.cyan)),
+                                    if (course['MTE1'] != "-")
+                                      Text('MTE1: ${course['MTE1']}',
+                                          style: const TextStyle(
+                                              color: Colors.cyan)),
+                                    if (course['MTE2'] != "-")
+                                      Text('MTE2: ${course['MTE2']}',
+                                          style: const TextStyle(
+                                              color: Colors.cyan)),
+                                    if (course['RESESSION'] != "-")
+                                      Text('Ressional: ${course['RESESSION']}',
+                                          style: const TextStyle(
+                                              color: Colors.cyan)),
+                                    if (course['PRS'] != "-")
+                                      Text('PRS: ${course['PRS']}',
+                                          style: const TextStyle(
+                                              color: Colors.cyan)),
+                                    if (course['Total'] != "-")
+                                      Text('Total: ${course['Total']}/60',
+                                          style: const TextStyle(
+                                              color: Colors.cyan)),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+            ],
           ],
         ),
       ),

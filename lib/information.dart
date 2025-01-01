@@ -51,10 +51,12 @@ class _InformationState extends State<Information> {
 
       var rows = document.querySelectorAll('table#kt_View tr');
       String? classCoordinator;
+      String? classCoordinatoremail;
       for (var row in rows) {
         var cells = row.querySelectorAll('td');
         if (cells.length > 1 && cells[1].text.trim() == "Class Coordinator") {
           classCoordinator = cells[2].text.trim();
+          classCoordinatoremail = cells[3].text.trim();
           break;
         }
       }
@@ -69,6 +71,7 @@ class _InformationState extends State<Information> {
             "Semester": semester ?? "N/A",
             "Batch": batch ?? "N/A",
             "Class Coordinator": classCoordinator ?? "N/A",
+            "Class Coordinator Email": classCoordinatoremail ?? "N/A",
           };
           isLoading = false;
         });
@@ -122,7 +125,7 @@ class _InformationState extends State<Information> {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              SelectableText(
                                 entry.key,
                                 style: const TextStyle(
                                   fontSize: 24,
@@ -142,7 +145,7 @@ class _InformationState extends State<Information> {
                                   ),
                                   borderRadius: BorderRadius.circular(8.0),
                                 ),
-                                child: Text(
+                                child: SelectableText(
                                   entry.value,
                                   style: const TextStyle(
                                     fontSize: 18,
