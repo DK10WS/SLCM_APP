@@ -70,13 +70,6 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            onPressed: _logout,
-            icon: Icon(
-              Icons.notifications,
-              color: Colors.white,
-            ),
-          ),
-          IconButton(
             icon: const Icon(Icons.logout, color: Colors.white),
             onPressed: _logout,
           ),
