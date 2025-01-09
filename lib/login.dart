@@ -22,10 +22,10 @@ class _MyLoginState extends State<MyLogin> {
   @override
   void initState() {
     super.initState();
-    _loadSavedCredentials();
+    _loadSavedCredentialsAndLogin();
   }
 
-  Future<void> _loadSavedCredentials() async {
+  Future<void> _loadSavedCredentialsAndLogin() async {
     final prefs = await SharedPreferences.getInstance();
     final savedUsername = prefs.getString('username') ?? '';
     final savedPassword = prefs.getString('password') ?? '';
@@ -34,6 +34,31 @@ class _MyLoginState extends State<MyLogin> {
       _usernameController.text = savedUsername;
       _passwordController.text = savedPassword;
     });
+
+    // Prevent auto-login if loggedOut is true
+    if (!SessionManager.loggedOut &&
+        savedUsername.isNotEmpty &&
+        savedPassword.isNotEmpty) {
+      _toggleLoading(true);
+      final result = await _login(savedUsername, savedPassword);
+      _toggleLoading(false);
+
+      if (result != null) {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomePage(
+                name: result['name'] ?? "",
+                newCookies: result['newCookies'] ?? "",
+              ),
+            ),
+          );
+        }
+      } else {
+        _showError("Auto-login failed. Please log in manually.");
+      }
+    }
   }
 
   Future<void> _saveCredentials(String username, String password) async {
@@ -134,6 +159,7 @@ class _MyLoginState extends State<MyLogin> {
 
             _saveCredentials(username, password);
 
+            // Reset logout state and set session cookies
             SessionManager.setSession(cleanedCookies + '; ' + cleanedAPI);
 
             return {'name': name ?? '', 'newCookies': newCookies};
@@ -270,20 +296,22 @@ class _MyLoginState extends State<MyLogin> {
                     _toggleLoading(false);
 
                     if (result != null) {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => HomePage(
-                            name: result['name'] ?? "",
-                            newCookies: result['newCookies'] ?? "",
+                      if (mounted) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomePage(
+                              name: result['name'] ?? "",
+                              newCookies: result['newCookies'] ?? "",
+                            ),
                           ),
-                        ),
-                      );
+                        );
+                      }
                     }
                   },
                   child: _isLoading
                       ? const CircularProgressIndicator(
-                          color: Colors.black,
+                          valueColor: AlwaysStoppedAnimation(Colors.black),
                         )
                       : const Text('Login'),
                 ),

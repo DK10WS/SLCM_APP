@@ -12,169 +12,228 @@ class Timetable extends StatefulWidget {
 }
 
 class _TimetableState extends State<Timetable> {
-  DateTime selectedDate = DateTime.now();
-  List<Map<String, dynamic>> events = [];
-  bool isLoading = false;
+  List<String> weekDates = [];
+  Map<String, List<dynamic>> eventsByDate = {};
+  bool isLoading = true;
+  String selectedDate = "";
+  DateTime currentSelectedDate = DateTime.now();
+  ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    fetchEventsForDate(selectedDate);
+    initializeWeek(currentSelectedDate);
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: selectedDate,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-    );
-    if (picked != null && picked != selectedDate) {
-      setState(() {
-        selectedDate = picked;
-        events = [];
-      });
-      await fetchEventsForDate(picked);
-    }
-  }
-
-  void _changeDate(int days) {
+  void initializeWeek(DateTime startDate) {
     setState(() {
-      selectedDate = selectedDate.add(Duration(days: days));
-      events = [];
+      weekDates = getWeekDates(startDate);
+      selectedDate = formatDate(currentSelectedDate);
     });
-    fetchEventsForDate(selectedDate);
+    fetchAllEvents();
   }
 
-  Future<void> fetchEventsForDate(DateTime? date) async {
-    if (date == null) return;
+  List<String> getWeekDates(DateTime date) {
+    DateTime startOfWeek =
+        date.subtract(Duration(days: date.weekday == 7 ? 6 : date.weekday - 1));
+    return List.generate(
+      7,
+      (index) => formatDate(startOfWeek.add(Duration(days: index))),
+    );
+  }
 
+  String formatDate(DateTime date) {
+    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+  }
+
+  String formatDateWithMonth(DateTime date) {
+    List<String> daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return "${daysOfWeek[date.weekday - 1]}, ${date.day.toString().padLeft(2, '0')} ${getMonthName(date.month)}";
+  }
+
+  String getMonthName(int month) {
+    List<String> monthNames = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return monthNames[month - 1];
+  }
+
+  Future<void> fetchAllEvents() async {
     setState(() {
       isLoading = true;
     });
 
-    String formattedDate =
-        "${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}";
-    String newCookies = widget.newCookies;
+    Map<String, List<dynamic>> allEvents = {};
 
-    final Map<String, String> parameters = {
-      "year": "",
-      "month": "",
-      "type": "agendaDay",
-      "dated": formattedDate,
-      "preNext": "2"
-    };
+    for (String date in weekDates) {
+      var data = await fetchEventsForDate(date);
+      if (data != null) {
+        allEvents[date] = data;
+      } else {
+        allEvents[date] = [];
+      }
+    }
 
+    setState(() {
+      eventsByDate = allEvents;
+      isLoading = false;
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      scrollToSelectedDate();
+    });
+  }
+
+  Future<List<dynamic>?> fetchEventsForDate(String selectedDate) async {
     var url =
         "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetStudentCalenderEventList";
+    Map<String, String> payload = {
+      "Year": "",
+      "Month": "",
+      "Type": "agendaDay",
+      "Dated": selectedDate,
+      "PreNext": "2"
+    };
 
-    try {
-      var response = await http.post(Uri.parse(url),
-          headers: _buildHeaders(newCookies), body: parameters);
+    Map<String, String> headers = {
+      "user-agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Cookie": widget.newCookies,
+    };
 
-      List<dynamic> data = jsonDecode(response.body);
-      List<Map<String, dynamic>> result = [];
+    var response = await http.post(
+      Uri.parse(url),
+      headers: headers,
+      body: payload,
+    );
 
-      for (var entry in data) {
-        String entryNo = entry['EntryNo'] ?? "Unknown";
-        String fullDescription = entry['Description'] ?? "No Description";
-        String subjectName = fullDescription.split(',')[0];
-        Map<String, dynamic> eventDetails = await fetchEventDetails(entryNo);
+    if (response.statusCode == 200) {
+      var decodedData = json.decode(response.body) as List<dynamic>;
 
-        result.add({
-          'Description': subjectName,
-          'EntryNo': entryNo,
-          ...eventDetails,
-        });
+      for (var event in decodedData) {
+        String entryNo = event['EntryNo'] ?? '';
+        if (entryNo.isNotEmpty) {
+          var attendanceType = await fetchAttendanceType(entryNo);
+          event['AttendanceType'] = attendanceType ?? 'Unknown';
+        } else {
+          event['AttendanceType'] = 'Unknown';
+        }
       }
-
-      setState(() {
-        events = result;
-      });
-    } catch (e) {
-      print("Error fetching events: $e");
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
+      return decodedData;
+    } else {
+      print('Failed to fetch data: ${response.statusCode}');
+      return null;
     }
   }
 
-  Future<Map<String, dynamic>> fetchEventDetails(String entryNo) async {
-    var newCookies = widget.newCookies;
-    var newParameters = {"EventID": entryNo};
-
-    var newUrl =
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetEventDetailStudent";
-
-    var response = await http.post(Uri.parse(newUrl),
-        headers: _buildHeaders(newCookies), body: newParameters);
-
-    var eventDetails = jsonDecode(response.body);
-    return {
-      'AttendanceType': eventDetails['AttendanceType'] ?? "",
-      'ProgramCode': eventDetails['ProgramCode'] ?? "N/A",
-      'CourseID': (eventDetails['CourseID'] ?? "N/A"),
-      'Semester': eventDetails['Semester'] ?? "N/A",
-      'Time': eventDetails['SlotScheme'] ?? "N/A",
-    };
-  }
-
-  Map<String, String> _buildHeaders(String cookies) {
-    return {
-      "Cookie": cookies,
-      "User-Agent":
+  Future<String?> fetchAttendanceType(String entryNo) async {
+    var newUrl = Uri.parse(
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetEventDetailStudent");
+    Map<String, String> newPayload = {"EventID": entryNo};
+    Map<String, String> headers = {
+      "user-agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Cookie": widget.newCookies,
     };
+
+    var response = await http.post(
+      newUrl,
+      body: newPayload,
+      headers: headers,
+    );
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      return data['AttendanceType'];
+    } else {
+      print("Failed to fetch attendance type: ${response.statusCode}");
+      return null;
+    }
   }
 
-  void showEventDetailsPopup(
+  Future<void> selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: currentSelectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null && picked != currentSelectedDate) {
+      setState(() {
+        currentSelectedDate = picked;
+        initializeWeek(picked);
+        selectedDate = formatDate(picked);
+      });
+
+      int index = weekDates.indexOf(selectedDate);
+      if (index != -1) {
+        _scrollController.animateTo(
+          index * 80.0,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeInOut,
+        );
+      }
+    }
+  }
+
+  String formatTime(String time) {
+    if (time == null || time.isEmpty) return 'N/A';
+    final DateTime parsedTime = DateTime.parse(time);
+    final String formattedTime =
+        "${parsedTime.hour.toString().padLeft(2, '0')}:${parsedTime.minute.toString().padLeft(2, '0')}";
+    return formattedTime;
+  }
+
+  void scrollToSelectedDate() {
+    int index = weekDates.indexOf(selectedDate);
+    if (index != -1) {
+      _scrollController.animateTo(
+        index * 80.0,
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeInOut,
+      );
+    }
+  }
+
+  void showSubjectDetailsDialog(
       BuildContext context, Map<String, dynamic> eventDetails) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (BuildContext context) {
         return AlertDialog(
-          backgroundColor: Colors.black,
           title: Text(
-            "${eventDetails['CourseID'].split(":")[1]}",
-            style: const TextStyle(color: Colors.white),
+              eventDetails['Description'].split(",")[0] ?? 'Subject Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text("Program Code: ${eventDetails['ProgramCode'] ?? 'N/A'}"),
+              Text("Course ID: ${eventDetails['CourseID'] ?? 'N/A'}"),
+              Text("Semester: ${eventDetails['Semester'] ?? 'N/A'}"),
+              Text(
+                  "Attendance Type: ${eventDetails['AttendanceType'] ?? 'N/A'}"),
+              Text(
+                  "Time: ${formatTime(eventDetails['StartDate'] ?? 'N/A')} to ${formatTime(eventDetails['EndDate'] ?? 'N/A')}"),
+            ],
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Program Code: ${eventDetails['ProgramCode']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Course ID: ${eventDetails['CourseID'].split(":")[0]}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Semester: ${eventDetails['Semester']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Attendance Type: ${eventDetails['AttendanceType']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                Text(
-                  "Time: ${eventDetails['Time']}",
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-          actions: [
+          actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: const Text(
-                "Close",
-                style: TextStyle(color: Colors.cyan),
-              ),
+              child: Text('Close'),
             ),
           ],
         );
@@ -185,141 +244,128 @@ class _TimetableState extends State<Timetable> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF232531),
-      appBar: AppBar(
-        title: const Text("Timetable", style: TextStyle(color: Colors.white)),
-        backgroundColor: const Color(0xFF121316),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      appBar: AppBar(title: Text('Weekly Timetable')),
+      body: SingleChildScrollView(
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildLegendItem(Colors.green, "Present"),
-                _buildLegendItem(Colors.red, "Absent"),
-                _buildLegendItem(Colors.grey, "Not Marked"),
-              ],
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: ElevatedButton(
+                onPressed: () => selectDate(context),
+                child: Text('Select Date'),
+              ),
             ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () => _changeDate(-1),
-                ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow,
-                      foregroundColor: Colors.black,
+            Container(
+              height: 60,
+              child: ListView.builder(
+                controller: _scrollController,
+                scrollDirection: Axis.horizontal,
+                itemCount: weekDates.length,
+                itemBuilder: (context, index) {
+                  String date = weekDates[index];
+                  DateTime dateTime = DateTime.parse(date);
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedDate = date;
+                      });
+
+                      _scrollController.animateTo(
+                        index * 80.0,
+                        duration: Duration(milliseconds: 500),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    child: Container(
+                      margin: EdgeInsets.symmetric(horizontal: 8),
+                      padding:
+                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
+                      decoration: BoxDecoration(
+                        color: selectedDate == date
+                            ? Colors.blue
+                            : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Center(
+                        child: Text(
+                          formatDateWithMonth(dateTime),
+                          style: TextStyle(
+                            color: selectedDate == date
+                                ? Colors.white
+                                : Colors.black,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
                     ),
-                    onPressed: () => _selectDate(context),
-                    child: Text(
-                      "${selectedDate.day.toString().padLeft(2, '0')}/${selectedDate.month.toString().padLeft(2, '0')}/${selectedDate.year}",
-                      style: const TextStyle(color: Colors.black),
-                    ),
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.arrow_forward, color: Colors.white),
-                  onPressed: () => _changeDate(1),
-                ),
-              ],
+                  );
+                },
+              ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : Expanded(
-                    child: ListView.builder(
-                      itemCount: events.length,
-                      itemBuilder: (context, index) {
-                        String attendanceType =
-                            events[index]['AttendanceType'] ?? "";
-                        Color buttonColor;
+                ? Center(child: CircularProgressIndicator())
+                : Column(
+                    children: [
+                      if (eventsByDate[selectedDate]?.isEmpty ?? true)
+                        ListTile(
+                          title: Text("No events available for $selectedDate"),
+                        )
+                      else
+                        ...eventsByDate[selectedDate]!.map((event) {
+                          String attendanceType =
+                              event['AttendanceType']?.toLowerCase() ?? '';
+                          Color boxColor;
 
-                        if (attendanceType == "Present") {
-                          buttonColor = Colors.green;
-                        } else if (attendanceType == "Absent") {
-                          buttonColor = Colors.red;
-                        } else {
-                          buttonColor = Colors.grey;
-                        }
+                          if (attendanceType == "absent") {
+                            boxColor = Colors.red;
+                          } else if (attendanceType == "present") {
+                            boxColor = Colors.green;
+                          } else {
+                            boxColor = Colors.grey;
+                          }
 
-                        String time = events[index]['Time'] ?? "N/A";
+                          String startTime = event['StartDate'] ?? 'N/A';
+                          String endTime = event['EndDate'] ?? 'N/A';
+                          String formattedTime =
+                              "${formatTime(startTime)} to ${formatTime(endTime)}";
 
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 10.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          return Column(
                             children: [
-                              Text(
-                                time,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 5.0),
+                                child: Text(
+                                  formattedTime,
+                                  style: TextStyle(
+                                    color: Colors
+                                        .black, // Black color for the time
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.9,
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: buttonColor,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                              GestureDetector(
+                                onTap: () {
+                                  showSubjectDetailsDialog(context, event);
+                                },
+                                child: Card(
+                                  color: boxColor,
+                                  child: ListTile(
+                                    title: Text(
+                                      event['Description'].split(",")[0] ??
+                                          'No Description Available',
                                     ),
-                                    padding: EdgeInsets.symmetric(
-                                        vertical: 20.0, horizontal: 16.0),
-                                  ),
-                                  onPressed: () => showEventDetailsPopup(
-                                      context, events[index]),
-                                  child: Text(
-                                    "${events[index]['Description']}",
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontSize: 18, // Increased text size
-                                    ),
-                                    textAlign:
-                                        TextAlign.center, // Center the text
                                   ),
                                 ),
                               ),
                             ],
-                          ),
-                        );
-                      },
-                    ),
+                          );
+                        }).toList(),
+                    ],
                   ),
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildLegendItem(Color color, String label) {
-    return Row(
-      children: [
-        Container(
-          width: 16,
-          height: 16,
-          color: color,
-        ),
-        const SizedBox(width: 5),
-        Text(
-          label,
-          style: const TextStyle(color: Colors.white),
-        ),
-      ],
     );
   }
 }
