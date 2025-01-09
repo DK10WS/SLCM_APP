@@ -105,7 +105,7 @@ class _TimetableState extends State<Timetable> {
     var newParameters = {"EventID": entryNo};
 
     var newUrl =
-        "https://mujslcm.jaipur.manipal.edu:122/Student/Academic/GetEventDetailStudent";
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetEventDetailStudent";
 
     var response = await http.post(Uri.parse(newUrl),
         headers: _buildHeaders(newCookies), body: newParameters);
@@ -271,8 +271,7 @@ class _TimetableState extends State<Timetable> {
                               ),
                               const SizedBox(height: 5),
                               SizedBox(
-                                width: MediaQuery.of(context).size.width *
-                                    0.9, // 90% width of the screen
+                                width: MediaQuery.of(context).size.width * 0.9,
                                 child: ElevatedButton(
                                   style: ElevatedButton.styleFrom(
                                     backgroundColor: buttonColor,
@@ -280,9 +279,7 @@ class _TimetableState extends State<Timetable> {
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     padding: EdgeInsets.symmetric(
-                                        vertical: 20.0,
-                                        horizontal:
-                                            16.0), // Adjusted padding for height
+                                        vertical: 20.0, horizontal: 16.0),
                                   ),
                                   onPressed: () => showEventDetailsPopup(
                                       context, events[index]),
