@@ -5,7 +5,6 @@ import 'package:mujslcm/information.dart';
 import 'package:mujslcm/marks.dart';
 import 'package:mujslcm/settings.dart';
 import 'package:mujslcm/timetable.dart';
-import 'package:mujslcm/about.dart';
 import 'package:mujslcm/cgpa.dart';
 import 'login.dart';
 import 'session_manager.dart';

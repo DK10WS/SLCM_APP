@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'dart:convert';
 
 class Timetable extends StatefulWidget {
@@ -12,357 +13,288 @@ class Timetable extends StatefulWidget {
 }
 
 class _TimetableState extends State<Timetable> {
-  List<String> weekDates = [];
-  Map<String, List<dynamic>> eventsByDate = {};
-  bool isLoading = true;
-  String selectedDate = "";
-  DateTime currentSelectedDate = DateTime.now();
-  ScrollController _scrollController = ScrollController();
+  late String selectedDate;
+  late List<String> weekDates;
+  Map<String, List<Map<String, dynamic>>> eventsByDate = {};
+  Map<String, String> attendanceCache = {}; // Cache for attendance types
 
   @override
   void initState() {
     super.initState();
-    initializeWeek(currentSelectedDate);
+    selectedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    weekDates = _getWeekDates(DateTime.now());
+    fetchWeekEvents(); // Fetch events for the current date
   }
 
-  void initializeWeek(DateTime startDate) {
-    setState(() {
-      weekDates = getWeekDates(startDate);
-      selectedDate = formatDate(currentSelectedDate);
-    });
-    fetchAllEvents();
-  }
+  List<String> _getWeekDates(DateTime currentDate) {
+    int currentDay = currentDate.weekday;
+    DateTime startOfWeek = currentDate.subtract(Duration(days: currentDay - 1));
+    List<String> weekDatesList = [];
 
-  List<String> getWeekDates(DateTime date) {
-    DateTime startOfWeek =
-        date.subtract(Duration(days: date.weekday == 7 ? 6 : date.weekday - 1));
-    return List.generate(
-      7,
-      (index) => formatDate(startOfWeek.add(Duration(days: index))),
-    );
-  }
-
-  String formatDate(DateTime date) {
-    return "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
-  }
-
-  String formatDateWithMonth(DateTime date) {
-    List<String> daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    return "${daysOfWeek[date.weekday - 1]}, ${date.day.toString().padLeft(2, '0')} ${getMonthName(date.month)}";
-  }
-
-  String getMonthName(int month) {
-    List<String> monthNames = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ];
-    return monthNames[month - 1];
-  }
-
-  Future<void> fetchAllEvents() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    Map<String, List<dynamic>> allEvents = {};
-
-    for (String date in weekDates) {
-      var data = await fetchEventsForDate(date);
-      if (data != null) {
-        allEvents[date] = data;
-      } else {
-        allEvents[date] = [];
-      }
+    for (int i = 0; i < 7; i++) {
+      DateTime currentDay = startOfWeek.add(Duration(days: i));
+      weekDatesList.add(DateFormat('yyyy-MM-dd').format(currentDay));
     }
 
-    setState(() {
-      eventsByDate = allEvents;
-      isLoading = false;
-    });
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollToSelectedDate();
-    });
+    return weekDatesList;
   }
 
-  Future<List<dynamic>?> fetchEventsForDate(String selectedDate) async {
+  Future<void> fetchWeekEvents() async {
+    var data = await weekTT(widget.newCookies);
+    if (data != null) {
+      setState(() {
+        eventsByDate = data;
+      });
+    }
+  }
+
+  Future<Map<String, List<Map<String, dynamic>>>> weekTT(
+      String newCookies) async {
     var url =
         "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetStudentCalenderEventList";
     Map<String, String> payload = {
       "Year": "",
       "Month": "",
-      "Type": "agendaDay",
+      "Type": "agendaWeek",
       "Dated": selectedDate,
       "PreNext": "2"
     };
-
     Map<String, String> headers = {
       "user-agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Cookie": widget.newCookies,
+      "Cookie": newCookies,
     };
 
-    var response = await http.post(
-      Uri.parse(url),
-      headers: headers,
-      body: payload,
-    );
-
+    var response =
+        await http.post(Uri.parse(url), headers: headers, body: payload);
     if (response.statusCode == 200) {
-      var decodedData = json.decode(response.body) as List<dynamic>;
-
-      for (var event in decodedData) {
-        String entryNo = event['EntryNo'] ?? '';
-        if (entryNo.isNotEmpty) {
-          var attendanceType = await fetchAttendanceType(entryNo);
-          event['AttendanceType'] = attendanceType ?? 'Unknown';
-        } else {
-          event['AttendanceType'] = 'Unknown';
+      List<dynamic> rawEvents = json.decode(response.body);
+      Map<String, List<Map<String, dynamic>>> groupedEvents = {};
+      for (var event in rawEvents) {
+        String date = event['StartDate'].split('T')[0];
+        if (!groupedEvents.containsKey(date)) {
+          groupedEvents[date] = [];
         }
+        groupedEvents[date]!.add(event);
       }
-      return decodedData;
+      return groupedEvents;
     } else {
       print('Failed to fetch data: ${response.statusCode}');
-      return null;
+      return {};
     }
   }
 
-  Future<String?> fetchAttendanceType(String entryNo) async {
-    var newUrl = Uri.parse(
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetEventDetailStudent");
-    Map<String, String> newPayload = {"EventID": entryNo};
+  Future<Map<String, String>> fetchEventDetails(
+      String entryNo, String newCookies) async {
+    var newUrl =
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetEventDetailStudent";
+    Map<String, String> newParameters = {"EventID": entryNo};
     Map<String, String> headers = {
       "user-agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Cookie": widget.newCookies,
+      "Cookie": newCookies,
     };
-
-    var response = await http.post(
-      newUrl,
-      body: newPayload,
-      headers: headers,
-    );
-
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      return data['AttendanceType'];
-    } else {
-      print("Failed to fetch attendance type: ${response.statusCode}");
-      return null;
-    }
+    var response = await http.post(Uri.parse(newUrl),
+        headers: headers, body: newParameters);
+    var eventDetails = jsonDecode(response.body);
+    return {
+      'AttendanceType': eventDetails['AttendanceType'] ?? "",
+      'ProgramCode': eventDetails['ProgramCode'] ?? "N/A",
+      'CourseID': eventDetails['CourseID'] ?? "N/A",
+      'Semester': eventDetails['Semester'] ?? "N/A",
+      'Time': eventDetails['SlotScheme'] ?? "N/A",
+    };
   }
 
-  Future<void> selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime? pickedDate = await showDatePicker(
       context: context,
-      initialDate: currentSelectedDate,
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
+      initialDate: DateTime.parse(selectedDate),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
     );
 
-    if (picked != null && picked != currentSelectedDate) {
+    if (pickedDate != null) {
       setState(() {
-        currentSelectedDate = picked;
-        initializeWeek(picked);
-        selectedDate = formatDate(picked);
+        selectedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
+        weekDates =
+            _getWeekDates(pickedDate); // Update weekDates when date changes
       });
+      fetchWeekEvents(); // Fetch events for the newly selected date
+    }
+  }
 
-      int index = weekDates.indexOf(selectedDate);
-      if (index != -1) {
-        _scrollController.animateTo(
-          index * 80.0,
-          duration: Duration(milliseconds: 500),
-          curve: Curves.easeInOut,
-        );
+  void _showSubjectDetails(BuildContext context, Map<String, dynamic> event) {
+    String entryNo = event['EntryNo'].toString();
+    fetchEventDetails(entryNo, widget.newCookies).then((eventDetails) {
+      String attendanceType = eventDetails['AttendanceType'] ?? 'Not Marked';
+      Color attendanceColor;
+
+      // Determine the attendance color
+      if (attendanceType == 'Absent') {
+        attendanceColor = Colors.red;
+      } else if (attendanceType == 'Present') {
+        attendanceColor = Colors.green;
+      } else {
+        attendanceColor = Colors.grey;
       }
-    }
-  }
 
-  String formatTime(String time) {
-    if (time == null || time.isEmpty) return 'N/A';
-    final DateTime parsedTime = DateTime.parse(time);
-    final String formattedTime =
-        "${parsedTime.hour.toString().padLeft(2, '0')}:${parsedTime.minute.toString().padLeft(2, '0')}";
-    return formattedTime;
-  }
-
-  void scrollToSelectedDate() {
-    int index = weekDates.indexOf(selectedDate);
-    if (index != -1) {
-      _scrollController.animateTo(
-        index * 80.0,
-        duration: Duration(milliseconds: 500),
-        curve: Curves.easeInOut,
-      );
-    }
-  }
-
-  void showSubjectDetailsDialog(
-      BuildContext context, Map<String, dynamic> eventDetails) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(
-              eventDetails['Description'].split(",")[0] ?? 'Subject Details'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text("Program Code: ${eventDetails['ProgramCode'] ?? 'N/A'}"),
-              Text("Course ID: ${eventDetails['CourseID'] ?? 'N/A'}"),
-              Text("Semester: ${eventDetails['Semester'] ?? 'N/A'}"),
-              Text(
-                  "Attendance Type: ${eventDetails['AttendanceType'] ?? 'N/A'}"),
-              Text(
-                  "Time: ${formatTime(eventDetails['StartDate'] ?? 'N/A')} to ${formatTime(eventDetails['EndDate'] ?? 'N/A')}"),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Close'),
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              "${eventDetails['CourseID']?.split(":")[1] ?? 'N/A'}",
+              style: const TextStyle(color: Colors.black),
             ),
-          ],
-        );
-      },
-    );
+            content: SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text(
+                    "Program Code: ${eventDetails['ProgramCode'] ?? 'N/A'}",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                  Text(
+                    "Course ID: ${eventDetails['CourseID']?.split(":")[0] ?? 'N/A'}",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                  Text(
+                    "Semester: ${eventDetails['Semester'] ?? 'N/A'}",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                  Text(
+                    "Attendance Type: ${eventDetails['AttendanceType'] ?? 'Not Marked'}",
+                    style: TextStyle(color: attendanceColor),
+                  ),
+                  Text(
+                    "Time: ${eventDetails['Time'] ?? 'N/A'}",
+                    style: const TextStyle(color: Colors.black),
+                  ),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Close'),
+              ),
+            ],
+          );
+        },
+      );
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Weekly Timetable')),
-      body: SingleChildScrollView(
+      appBar: AppBar(title: Text('Timetable')),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: ElevatedButton(
-                onPressed: () => selectDate(context),
-                child: Text('Select Date'),
-              ),
+            ElevatedButton(
+              onPressed: () => _selectDate(context),
+              child: Text('Select a Date'),
             ),
+            SizedBox(height: 16),
             Container(
-              height: 60,
-              child: ListView.builder(
-                controller: _scrollController,
+              height: 120.0,
+              child: SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
-                itemCount: weekDates.length,
-                itemBuilder: (context, index) {
-                  String date = weekDates[index];
-                  DateTime dateTime = DateTime.parse(date);
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        selectedDate = date;
-                      });
+                child: Row(
+                  children: weekDates.map((date) {
+                    DateTime day = DateTime.parse(date);
+                    String formattedDate = DateFormat('EEE, dd/MM').format(day);
 
-                      _scrollController.animateTo(
-                        index * 80.0,
-                        duration: Duration(milliseconds: 500),
-                        curve: Curves.easeInOut,
-                      );
-                    },
-                    child: Container(
-                      margin: EdgeInsets.symmetric(horizontal: 8),
-                      padding:
-                          EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                      decoration: BoxDecoration(
-                        color: selectedDate == date
-                            ? Colors.blue
-                            : Colors.grey[300],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Center(
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            selectedDate = date;
+                          });
+                          fetchWeekEvents(); // Fetch events for the selected date
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 10.0),
+                          backgroundColor: Colors.blueAccent,
+                          minimumSize: Size(120, 60),
+                        ),
                         child: Text(
-                          formatDateWithMonth(dateTime),
+                          formattedDate,
                           style: TextStyle(
-                            color: selectedDate == date
-                                ? Colors.white
-                                : Colors.black,
+                            fontSize: 18.0,
+                            color: Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ),
-                  );
-                },
+                    );
+                  }).toList(),
+                ),
               ),
             ),
-            SizedBox(height: 20),
-            isLoading
-                ? Center(child: CircularProgressIndicator())
-                : Column(
-                    children: [
-                      if (eventsByDate[selectedDate]?.isEmpty ?? true)
-                        ListTile(
-                          title: Text("No events available for $selectedDate"),
-                        )
-                      else
-                        ...eventsByDate[selectedDate]!.map((event) {
-                          String attendanceType =
-                              event['AttendanceType']?.toLowerCase() ?? '';
-                          Color boxColor;
+            Expanded(
+              child: eventsByDate.isEmpty
+                  ? Center(child: Text("No events available"))
+                  : ListView.builder(
+                      itemCount: eventsByDate[selectedDate]?.length ?? 0,
+                      itemBuilder: (context, index) {
+                        var event = eventsByDate[selectedDate]![index];
+                        String entryNo = event['EntryNo'].toString();
 
-                          if (attendanceType == "absent") {
-                            boxColor = Colors.red;
-                          } else if (attendanceType == "present") {
-                            boxColor = Colors.green;
-                          } else {
-                            boxColor = Colors.grey;
-                          }
-
-                          String startTime = event['StartDate'] ?? 'N/A';
-                          String endTime = event['EndDate'] ?? 'N/A';
-                          String formattedTime =
-                              "${formatTime(startTime)} to ${formatTime(endTime)}";
-
-                          return Column(
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 5.0),
-                                child: Text(
-                                  formattedTime,
-                                  style: TextStyle(
-                                    color: Colors
-                                        .black, // Black color for the time
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                        // Fetch event details and determine the attendance status color
+                        return FutureBuilder<Map<String, String>>(
+                          future: fetchEventDetails(entryNo, widget.newCookies),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Card(
+                                child: ListTile(
+                                  title: Text('Loading...'),
                                 ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  showSubjectDetailsDialog(context, event);
-                                },
-                                child: Card(
-                                  color: boxColor,
-                                  child: ListTile(
-                                    title: Text(
-                                      event['Description'].split(",")[0] ??
-                                          'No Description Available',
-                                    ),
-                                  ),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Card(
+                                child: ListTile(
+                                  title: Text('Error fetching data'),
                                 ),
-                              ),
-                            ],
-                          );
-                        }).toList(),
-                    ],
-                  ),
+                              );
+                            } else {
+                              Map<String, String> eventDetails = snapshot.data!;
+                              String attendanceType =
+                                  eventDetails['AttendanceType'] ??
+                                      'Not Marked';
+                              Color boxColor;
+
+                              if (attendanceType == 'Absent') {
+                                boxColor = Colors.red!;
+                              } else if (attendanceType == 'Present') {
+                                boxColor = Colors.green!;
+                              } else {
+                                boxColor = Colors.grey!;
+                              }
+
+                              return Card(
+                                color: boxColor,
+                                child: ListTile(
+                                  title: Text(
+                                    event['Description'].split(",")[0] ??
+                                        'No Description',
+                                  ),
+                                  onTap: () =>
+                                      _showSubjectDetails(context, event),
+                                ),
+                              );
+                            }
+                          },
+                        );
+                      },
+                    ),
+            ),
           ],
         ),
       ),

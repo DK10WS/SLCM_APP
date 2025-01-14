@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "20351027014",
+    "firebase_url": "https://mujslcm-93ace-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "mujslcm-93ace",
+    "storage_bucket": "mujslcm-93ace.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:20351027014:android:7a10bd6ff55787eef6c747",
+        "android_client_info": {
+          "package_name": "com.example.mujslcm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpHUkh5X1xzjGX3N6nt2ZCwnOVPoddEuE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
