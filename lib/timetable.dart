@@ -13,291 +13,316 @@ class Timetable extends StatefulWidget {
 }
 
 class _TimetableState extends State<Timetable> {
-  late String selectedDate;
-  late List<String> weekDates;
-  Map<String, List<Map<String, dynamic>>> eventsByDate = {};
-  Map<String, String> attendanceCache = {}; // Cache for attendance types
+  DateTime selectedDate = DateTime.now();
+  List<Map<String, dynamic>> events = [];
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    selectedDate = DateFormat('yyyy-MM-dd').format(DateTime.now());
-    weekDates = _getWeekDates(DateTime.now());
-    fetchWeekEvents(); // Fetch events for the current date
+    fetchEventsForDate(selectedDate);
   }
 
-  List<String> _getWeekDates(DateTime currentDate) {
-    int currentDay = currentDate.weekday;
-    DateTime startOfWeek = currentDate.subtract(Duration(days: currentDay - 1));
-    List<String> weekDatesList = [];
-
-    for (int i = 0; i < 7; i++) {
-      DateTime currentDay = startOfWeek.add(Duration(days: i));
-      weekDatesList.add(DateFormat('yyyy-MM-dd').format(currentDay));
-    }
-
-    return weekDatesList;
-  }
-
-  Future<void> fetchWeekEvents() async {
-    var data = await weekTT(widget.newCookies);
-    if (data != null) {
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != selectedDate) {
       setState(() {
-        eventsByDate = data;
+        selectedDate = picked;
+        events = [];
+      });
+      await fetchEventsForDate(picked);
+    }
+  }
+
+  void _changeDate(int days) {
+    setState(() {
+      selectedDate = selectedDate.add(Duration(days: days));
+      events = [];
+    });
+    fetchEventsForDate(selectedDate);
+  }
+
+  Future<void> fetchEventsForDate(DateTime? date) async {
+    if (date == null) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    String formattedDate =
+        "${date.month.toString().padLeft(2, '0')}/${date.day.toString().padLeft(2, '0')}/${date.year}";
+    String newCookies = widget.newCookies;
+
+    final Map<String, String> parameters = {
+      "year": "",
+      "month": "",
+      "type": "agendaDay",
+      "dated": formattedDate,
+      "preNext": "2"
+    };
+
+    var url =
+        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetStudentCalenderEventList";
+
+    try {
+      var response = await http.post(Uri.parse(url),
+          headers: _buildHeaders(newCookies), body: parameters);
+
+      List<dynamic> data = jsonDecode(response.body);
+      List<Map<String, dynamic>> result = [];
+
+      for (var entry in data) {
+        String entryNo = entry['EntryNo'] ?? "Unknown";
+        String fullDescription = entry['Description'] ?? "No Description";
+        String subjectName = fullDescription.split(',')[0];
+        Map<String, dynamic> eventDetails = await fetchEventDetails(entryNo);
+
+        result.add({
+          'Description': subjectName,
+          'EntryNo': entryNo,
+          ...eventDetails,
+        });
+      }
+
+      setState(() {
+        events = result;
+      });
+    } catch (e) {
+      print("Error fetching events: $e");
+    } finally {
+      setState(() {
+        isLoading = false;
       });
     }
   }
 
-  Future<Map<String, List<Map<String, dynamic>>>> weekTT(
-      String newCookies) async {
-    var url =
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetStudentCalenderEventList";
-    Map<String, String> payload = {
-      "Year": "",
-      "Month": "",
-      "Type": "agendaWeek",
-      "Dated": selectedDate,
-      "PreNext": "2"
-    };
-    Map<String, String> headers = {
-      "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Cookie": newCookies,
-    };
+  Future<Map<String, dynamic>> fetchEventDetails(String entryNo) async {
+    var newCookies = widget.newCookies;
+    var newParameters = {"EventID": entryNo};
 
-    var response =
-        await http.post(Uri.parse(url), headers: headers, body: payload);
-    if (response.statusCode == 200) {
-      List<dynamic> rawEvents = json.decode(response.body);
-      Map<String, List<Map<String, dynamic>>> groupedEvents = {};
-      for (var event in rawEvents) {
-        String date = event['StartDate'].split('T')[0];
-        if (!groupedEvents.containsKey(date)) {
-          groupedEvents[date] = [];
-        }
-        groupedEvents[date]!.add(event);
-      }
-      return groupedEvents;
-    } else {
-      print('Failed to fetch data: ${response.statusCode}');
-      return {};
-    }
-  }
-
-  Future<Map<String, String>> fetchEventDetails(
-      String entryNo, String newCookies) async {
     var newUrl =
         "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetEventDetailStudent";
-    Map<String, String> newParameters = {"EventID": entryNo};
-    Map<String, String> headers = {
-      "user-agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Cookie": newCookies,
-    };
+
     var response = await http.post(Uri.parse(newUrl),
-        headers: headers, body: newParameters);
+        headers: _buildHeaders(newCookies), body: newParameters);
+
     var eventDetails = jsonDecode(response.body);
     return {
       'AttendanceType': eventDetails['AttendanceType'] ?? "",
       'ProgramCode': eventDetails['ProgramCode'] ?? "N/A",
-      'CourseID': eventDetails['CourseID'] ?? "N/A",
+      'CourseID': (eventDetails['CourseID'] ?? "N/A"),
       'Semester': eventDetails['Semester'] ?? "N/A",
       'Time': eventDetails['SlotScheme'] ?? "N/A",
     };
   }
 
-  Future<void> _selectDate(BuildContext context) async {
-    DateTime? pickedDate = await showDatePicker(
-      context: context,
-      initialDate: DateTime.parse(selectedDate),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2101),
-    );
-
-    if (pickedDate != null) {
-      setState(() {
-        selectedDate = DateFormat('yyyy-MM-dd').format(pickedDate);
-        weekDates =
-            _getWeekDates(pickedDate); // Update weekDates when date changes
-      });
-      fetchWeekEvents(); // Fetch events for the newly selected date
-    }
+  Map<String, String> _buildHeaders(String cookies) {
+    return {
+      "Cookie": cookies,
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    };
   }
 
-  void _showSubjectDetails(BuildContext context, Map<String, dynamic> event) {
-    String entryNo = event['EntryNo'].toString();
-    fetchEventDetails(entryNo, widget.newCookies).then((eventDetails) {
-      String attendanceType = eventDetails['AttendanceType'] ?? 'Not Marked';
-      Color attendanceColor;
-
-      // Determine the attendance color
-      if (attendanceType == 'Absent') {
-        attendanceColor = Colors.red;
-      } else if (attendanceType == 'Present') {
-        attendanceColor = Colors.green;
-      } else {
-        attendanceColor = Colors.grey;
-      }
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text(
-              "${eventDetails['CourseID']?.split(":")[1] ?? 'N/A'}",
-              style: const TextStyle(color: Colors.black),
+  void showEventDetailsPopup(
+      BuildContext context, Map<String, dynamic> eventDetails) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: Colors.black,
+          title: Text(
+            "${eventDetails['CourseID'].split(":")[1]}",
+            style: const TextStyle(color: Colors.white),
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Program Code: ${eventDetails['ProgramCode']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Course ID: ${eventDetails['CourseID'].split(":")[0]}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Semester: ${eventDetails['Semester']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Attendance Type: ${eventDetails['AttendanceType']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                Text(
+                  "Time: ${eventDetails['Time']}",
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
             ),
-            content: SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text(
-                    "Program Code: ${eventDetails['ProgramCode'] ?? 'N/A'}",
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    "Course ID: ${eventDetails['CourseID']?.split(":")[0] ?? 'N/A'}",
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    "Semester: ${eventDetails['Semester'] ?? 'N/A'}",
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                  Text(
-                    "Attendance Type: ${eventDetails['AttendanceType'] ?? 'Not Marked'}",
-                    style: TextStyle(color: attendanceColor),
-                  ),
-                  Text(
-                    "Time: ${eventDetails['Time'] ?? 'N/A'}",
-                    style: const TextStyle(color: Colors.black),
-                  ),
-                ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text(
+                "Close",
+                style: TextStyle(color: Colors.cyan),
               ),
             ),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text('Close'),
-              ),
-            ],
-          );
-        },
-      );
-    });
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    String formattedDateWithDay =
+        DateFormat('EEEE, dd/MM/yyyy').format(selectedDate);
+
     return Scaffold(
-      appBar: AppBar(title: Text('Timetable')),
+      backgroundColor: const Color(0xFF232531),
+      appBar: AppBar(
+        title: const Text("Timetable", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF121316),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            ElevatedButton(
-              onPressed: () => _selectDate(context),
-              child: Text('Select a Date'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildLegendItem(Colors.green, "Present"),
+                _buildLegendItem(Colors.red, "Absent"),
+                _buildLegendItem(Colors.grey, "Not Marked"),
+              ],
             ),
-            SizedBox(height: 16),
-            Container(
-              height: 120.0,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: weekDates.map((date) {
-                    DateTime day = DateTime.parse(date);
-                    String formattedDate = DateFormat('EEE, dd/MM').format(day);
-
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            selectedDate = date;
-                          });
-                          fetchWeekEvents(); // Fetch events for the selected date
-                        },
-                        style: ElevatedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 10.0),
-                          backgroundColor: Colors.blueAccent,
-                          minimumSize: Size(120, 60),
-                        ),
-                        child: Text(
-                          formattedDate,
-                          style: TextStyle(
-                            fontSize: 18.0,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => _changeDate(-1),
                 ),
-              ),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.yellow,
+                      foregroundColor: Colors.black,
+                    ),
+                    onPressed: () => _selectDate(context),
+                    child: Text(
+                      formattedDateWithDay,
+                      style: const TextStyle(fontSize: 18, color: Colors.black),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.arrow_forward, color: Colors.white),
+                  onPressed: () => _changeDate(1),
+                ),
+              ],
             ),
-            Expanded(
-              child: eventsByDate.isEmpty
-                  ? Center(child: Text("No events available"))
-                  : ListView.builder(
-                      itemCount: eventsByDate[selectedDate]?.length ?? 0,
+            const SizedBox(height: 20),
+            isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : Expanded(
+                    child: ListView.builder(
+                      itemCount: events.length,
                       itemBuilder: (context, index) {
-                        var event = eventsByDate[selectedDate]![index];
-                        String entryNo = event['EntryNo'].toString();
+                        String attendanceType =
+                            events[index]['AttendanceType'] ?? "";
+                        Color buttonColor;
 
-                        // Fetch event details and determine the attendance status color
-                        return FutureBuilder<Map<String, String>>(
-                          future: fetchEventDetails(entryNo, widget.newCookies),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Card(
-                                child: ListTile(
-                                  title: Text('Loading...'),
+                        if (attendanceType == "Present") {
+                          buttonColor = Colors.green;
+                        } else if (attendanceType == "Absent") {
+                          buttonColor = Colors.red;
+                        } else {
+                          buttonColor = Colors.grey;
+                        }
+
+                        String time = events[index]['Time'] ?? "N/A";
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                time,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
                                 ),
-                              );
-                            } else if (snapshot.hasError) {
-                              return Card(
-                                child: ListTile(
-                                  title: Text('Error fetching data'),
-                                ),
-                              );
-                            } else {
-                              Map<String, String> eventDetails = snapshot.data!;
-                              String attendanceType =
-                                  eventDetails['AttendanceType'] ??
-                                      'Not Marked';
-                              Color boxColor;
-
-                              if (attendanceType == 'Absent') {
-                                boxColor = Colors.red!;
-                              } else if (attendanceType == 'Present') {
-                                boxColor = Colors.green!;
-                              } else {
-                                boxColor = Colors.grey!;
-                              }
-
-                              return Card(
-                                color: boxColor,
-                                child: ListTile(
-                                  title: Text(
-                                    event['Description'].split(",")[0] ??
-                                        'No Description',
+                              ),
+                              const SizedBox(height: 5),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.9,
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: buttonColor,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 20.0, horizontal: 16.0),
                                   ),
-                                  onTap: () =>
-                                      _showSubjectDetails(context, event),
+                                  onPressed: () => showEventDetailsPopup(
+                                      context, events[index]),
+                                  child: Text(
+                                    "${events[index]['Description']}",
+                                    style: const TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 18,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
                                 ),
-                              );
-                            }
-                          },
+                              ),
+                            ],
+                          ),
                         );
                       },
                     ),
-            ),
+                  ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildLegendItem(Color color, String label) {
+    return Row(
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          color: color,
+        ),
+        const SizedBox(width: 5),
+        Text(
+          label,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ],
     );
   }
 }
