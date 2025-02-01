@@ -78,10 +78,14 @@ class _TimetableState extends State<Timetable> {
 
   Duration parseTime(String timeString) {
     try {
-      String startTime = timeString.split('To')[0];
+      String startTime = timeString.split('To')[0].trim();
       List<String> startParts = startTime.split(':');
       int startHour = int.parse(startParts[0]);
       int startMinute = int.parse(startParts[1]);
+
+      if (startHour < 8) {
+        startHour += 12;
+      }
 
       return Duration(hours: startHour, minutes: startMinute);
     } catch (e) {
@@ -237,7 +241,7 @@ class _TimetableState extends State<Timetable> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(top: 30),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
