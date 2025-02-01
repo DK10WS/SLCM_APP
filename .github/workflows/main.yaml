@@ -4,11 +4,10 @@ on:
   pull_request:
     branches:
       - flutter_app
-      - events
   push:
     branches:
       - flutter_app
-      - events
+  workflow_dispatch:
 
 jobs: 
   build:
@@ -18,6 +17,9 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      
+      - name: Set Gradle Java Home
+        run: sed -i '$d' android/gradle.properties
 
       - name: Set Up Java
         uses: actions/setup-java@v3
@@ -26,15 +28,12 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Set JAVA_HOME for Gradle
-        run: echo "JAVA_HOME=${{ env.JAVA_HOME_17_X64 }}" >> $GITHUB_ENV
-
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.2'
           channel: 'stable'
-          cache: true
+          cache: true 
 
       - name: Install Dependencies
         run: flutter pub get
@@ -47,3 +46,31 @@ jobs:
         with:
           name: release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: release-apk
+          path: artifacts/
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/app-release.apk
+          tag_name: v1.0.${{ github.run_number }}
+          name: "Release v1.0.${{ github.run_number }}"
+          body: "Automated release for commit ${{ github.sha }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

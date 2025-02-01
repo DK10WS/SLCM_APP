@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mujslcm/Login.dart';
-import 'package:mujslcm/home_page.dart';
+import 'package:mujslcm/login.dart';
 import 'session_manager.dart';
 import 'package:flutter/services.dart';
 

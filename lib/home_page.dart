@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mujslcm/attendance.dart';
+import 'package:mujslcm/Attendance.dart';
 import 'package:mujslcm/grades.dart';
 import 'package:mujslcm/information.dart';
 import 'package:mujslcm/marks.dart';
