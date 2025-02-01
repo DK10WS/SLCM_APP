@@ -17,19 +17,24 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set Up Java
         uses: actions/setup-java@v3
         with:
           distribution: 'oracle'
           java-version: '17'
+          cache: gradle
+
+      - name: Set JAVA_HOME for Gradle
+        run: echo "JAVA_HOME=${{ env.JAVA_HOME_17_X64 }}" >> $GITHUB_ENV
 
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.27.2'
           channel: 'stable'
+          cache: true
 
       - name: Install Dependencies
         run: flutter pub get
