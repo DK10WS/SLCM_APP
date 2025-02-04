@@ -1,19 +1,23 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:fl_chart/fl_chart.dart';
+import 'app_colors.dart';
 
 class CGPA extends StatefulWidget {
   final String newCookies;
   const CGPA({super.key, required this.newCookies});
 
   @override
-  _GradesState createState() => _GradesState();
+  _CGPAState createState() => _CGPAState();
 }
 
-class _GradesState extends State<CGPA> {
+class _CGPAState extends State<CGPA> {
   Map<String, dynamic>? gradesData;
   bool isLoading = true;
   int selectedIndex = 0;
+
+  get bottomTitleWidgets => null;
 
   @override
   void initState() {
@@ -55,286 +59,357 @@ class _GradesState extends State<CGPA> {
     }
   }
 
+  Widget _buildCGPAGraph() {
+    final List<String> semesters = [
+      "Semester 1",
+      "Semester 2",
+      "Semester 3",
+      "Semester 4",
+      "Semester 5",
+      "Semester 6",
+      "Semester 7",
+      "Semester 8"
+    ];
+
+    final List<double?> rawCgpas = [
+      _parseCGPA(gradesData?["GPASemesterI"]),
+      _parseCGPA(gradesData?["GPASemesterII"]),
+      _parseCGPA(gradesData?["GPASemesterIII"]),
+      _parseCGPA(gradesData?["GPASemesterIV"]),
+      _parseCGPA(gradesData?["GPASemesterV"]),
+      _parseCGPA(gradesData?["GPASemesterVI"]),
+      _parseCGPA(gradesData?["GPASemesterVII"]),
+      _parseCGPA(gradesData?["GPASemesterVIII"]),
+    ];
+
+    final List<FlSpot> spots = [];
+    for (int i = 0; i < rawCgpas.length; i++) {
+      if (rawCgpas[i] != 0.0) {
+        spots.add(FlSpot(i.toDouble(), rawCgpas[i]!));
+      }
+    }
+
+    if (spots.isEmpty) {
+      return Center(child: Text("No CGPA data available"));
+    }
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 16.0),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Color(0xFF232531),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.8,
+          height: 270,
+          child: LineChart(
+            LineChartData(
+              gridData: FlGridData(
+                show: true,
+                drawVerticalLine: true,
+                drawHorizontalLine: true,
+                horizontalInterval: 1,
+                verticalInterval: 1,
+                getDrawingHorizontalLine: (value) => const FlLine(
+                  color: AppColors.mainGridLineColor,
+                  strokeWidth: 1,
+                ),
+                getDrawingVerticalLine: (value) => const FlLine(
+                  color: AppColors.mainGridLineColor,
+                  strokeWidth: 1,
+                ),
+              ),
+              borderData: FlBorderData(
+                show: true,
+                border: Border(
+                  left: const BorderSide(color: Color(0xff37434d)),
+                  bottom: const BorderSide(color: Color(0xff37434d)),
+                  right: BorderSide.none,
+                  top: BorderSide.none,
+                ),
+              ),
+              minX: 0,
+              maxX: spots.length.toDouble() - 1,
+              minY: 6,
+              maxY: 10,
+              lineBarsData: [
+                LineChartBarData(
+                  spots: spots,
+                  isCurved: true,
+                  gradient: LinearGradient(
+                    colors: [
+                      AppColors.contentColorCyan,
+                      AppColors.contentColorBlue
+                    ],
+                  ),
+                  barWidth: 4,
+                  isStrokeCapRound: true,
+                  belowBarData: BarAreaData(
+                    show: true,
+                    gradient: LinearGradient(
+                      colors: [
+                        AppColors.contentColorCyan.withOpacity(0.2),
+                        AppColors.contentColorBlue.withOpacity(0.2),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+              titlesData: FlTitlesData(
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 35,
+                    interval: 1,
+                    getTitlesWidget: (value, meta) {
+                      return Text(
+                        (value.toInt() + 1).toString(),
+                        style: const TextStyle(color: Colors.white),
+                      );
+                    },
+                  ),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    getTitlesWidget: (value, meta) {
+                      return Text(
+                        value.toInt().toString(),
+                        style: const TextStyle(color: Colors.white),
+                      );
+                    },
+                    reservedSize: 20,
+                  ),
+                ),
+                rightTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles:
+                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  double _parseCGPA(dynamic value) {
+    if (value == null || value == "-" || value == "0.00") {
+      return 0.0;
+    }
+    double parsedValue = double.tryParse(value.toString()) ?? 0.0;
+    return parsedValue.isFinite ? parsedValue : 0.0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: const Color(0xFF121316),
       appBar: AppBar(
-        title: const Text(
-          "CGPA/GPA",
-          style: TextStyle(color: Colors.white),
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
-        ),
-        backgroundColor: Colors.black,
+        title: const Text("CGPA/GPA", style: TextStyle(color: Colors.white)),
+        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: const Color(0xFF121316),
       ),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator(color: Colors.cyan))
-          : gradesData == null
-              ? const Center(
-                  child: Text(
-                    "No data available",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                )
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Total CGPA: ${gradesData?['CGPA']}",
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        "Total Credits: ${gradesData?['TotalCredits']}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Center(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            maxWidth: MediaQuery.of(context).size.width * 0.9,
-                          ),
-                          child: ToggleButtons(
-                            isSelected: [
-                              selectedIndex == 0,
-                              selectedIndex == 1
-                            ],
-                            onPressed: (int index) {
-                              setState(() {
-                                selectedIndex = index;
-                              });
-                            },
-                            children: const [
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Text(
-                                  'CGPA',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 16.0),
-                                child: Text(
-                                  'Credits',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      selectedIndex == 0
-                          ? _buildCGPATable()
-                          : _buildCreditsTable(),
-                    ],
-                  ),
-                ),
-    );
-  }
-
-  Widget _buildCGPATable() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const SizedBox(height: 16),
-        _buildScrollableTable(_buildGPATableRows()),
-      ],
-    );
-  }
-
-  Widget _buildCreditsTable() {
-    return _buildScrollableTable(_buildCreditsTableRows());
-  }
-
-  Widget _buildScrollableTable(List<TableRow> rows) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.9,
+      body: Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF232531),
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(40),
+            topRight: Radius.circular(40),
+          ),
         ),
-        child: Table(
-          border: TableBorder.all(
+        padding: const EdgeInsets.all(16),
+        child: isLoading
+            ? const Center(child: CircularProgressIndicator(color: Colors.cyan))
+            : gradesData == null
+                ? const Center(
+                    child: Text(
+                      "No data available",
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  )
+                : SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        _buildHeader(),
+                        const SizedBox(height: 16),
+                        _buildCGPAGraph(),
+                        const SizedBox(height: 16),
+                        _buildToggleButtons(),
+                        const SizedBox(height: 16),
+                        selectedIndex == 0
+                            ? _buildGPAList()
+                            : _buildCreditsList(),
+                      ],
+                    ),
+                  ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Container(
+          decoration: BoxDecoration(
             color: Colors.cyan,
-            width: 1.5,
+            borderRadius: BorderRadius.circular(20),
           ),
-          columnWidths: const {
-            0: FlexColumnWidth(2),
-            1: FlexColumnWidth(1),
-          },
-          children: rows,
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text("CGPA",
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black)),
+              Text("${gradesData?["CGPA"]}",
+                  style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black)),
+              Text("Total Credits: ${gradesData?["TotalCredits"]}",
+                  style: const TextStyle(fontSize: 16, color: Colors.black)),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  List<TableRow> _buildGPATableRows() {
-    final List<TableRow> rows = [
-      const TableRow(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              "Semester",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
+  Widget _buildToggleButtons() {
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.9,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: (MediaQuery.of(context).size.width * 0.9) / 2,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      selectedIndex == 0 ? Colors.cyan : Colors.transparent,
+                  foregroundColor:
+                      selectedIndex == 0 ? Colors.white : Colors.cyan,
+                ),
+                onPressed: () {
+                  setState(() {
+                    selectedIndex = 0;
+                  });
+                },
+                child: Text("GPA", style: TextStyle(fontSize: 18)),
               ),
-              textAlign: TextAlign.center,
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              "GPA",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
+            Container(
+              width: (MediaQuery.of(context).size.width * 0.9) / 2,
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  backgroundColor:
+                      selectedIndex == 1 ? Colors.cyan : Colors.transparent,
+                  foregroundColor:
+                      selectedIndex == 1 ? Colors.white : Colors.cyan,
+                ),
+                onPressed: () {
+                  setState(() {
+                    selectedIndex = 1;
+                  });
+                },
+                child: Text("Credits", style: TextStyle(fontSize: 18)),
               ),
-              textAlign: TextAlign.center,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ];
-
-    final semesters = {
-      "Semester I": gradesData?["GPASemesterI"],
-      "Semester II": gradesData?["GPASemesterII"],
-      "Semester III": gradesData?["GPASemesterIII"],
-      "Semester IV": gradesData?["GPASemesterIV"],
-      "Semester V": gradesData?["GPASemesterV"],
-      "Semester VI": gradesData?["GPASemesterVI"],
-      "Semester VII": gradesData?["GPASemesterVII"],
-      "Semester VIII": gradesData?["GPASemesterVIII"],
-    };
-
-    semesters.forEach((semester, gpa) {
-      if (gpa != null && gpa != "-" && gpa != 0.00) {
-        rows.add(
-          TableRow(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  semester,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  gpa.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-    });
-
-    return rows;
+    );
   }
 
-  List<TableRow> _buildCreditsTableRows() {
-    final List<TableRow> rows = [
-      const TableRow(
-        children: [
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              "Semester",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.all(12.0),
-            child: Text(
-              "Credits",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: Colors.white,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
-    ];
-
-    final credits = {
-      "Semester I": gradesData?["CreditsSemesterI"],
-      "Semester II": gradesData?["CreditsSemesterII"],
-      "Semester III": gradesData?["CreditsSemesterIII"],
-      "Semester IV": gradesData?["CreditsSemesterIV"],
-      "Semester V": gradesData?["CreditsSemesterV"],
-      "Semester VI": gradesData?["CreditsSemesterVI"],
-      "Semester VII": gradesData?["CreditsSemesterVII"],
-      "Semester VIII": gradesData?["CreditsSemesterVIII"],
+  Widget _buildCreditsList() {
+    final semesters = {
+      "Semester 1": gradesData?["CreditsSemesterI"],
+      "Semester 2": gradesData?["CreditsSemesterII"],
+      "Semester 3": gradesData?["CreditsSemesterIII"],
+      "Semester 4": gradesData?["CreditsSemesterIV"],
+      "Semester 5": gradesData?["CreditsSemesterV"],
+      "Semester 6": gradesData?["CreditsSemesterVI"],
+      "Semester 7": gradesData?["CreditsSemesterVII"],
+      "Semester 8": gradesData?["CreditsSemesterVIII"],
     };
 
-    credits.forEach((semester, credit) {
-      if (credit != null && credit != "-") {
-        rows.add(
-          TableRow(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  semester,
-                  textAlign: TextAlign.center,
+    return Column(
+      children: semesters.entries
+          .where((e) => e.value != null && e.value != "-" && e.value != "0.00")
+          .toList()
+          .reversed
+          .map((entry) {
+        return Card(
+          color: Color(0xFF232531),
+          elevation: 0,
+          margin: const EdgeInsets.symmetric(vertical: 5),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.cyan,
+              child: Text(entry.key.split(" ")[1],
                   style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: Text(
-                  credit.toString(),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
+                      color: Colors.black, fontWeight: FontWeight.bold)),
+            ),
+            title: Text(entry.key,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+            trailing: Text(entry.value.toString(),
+                style: const TextStyle(color: Colors.white, fontSize: 18)),
           ),
         );
-      }
-    });
+      }).toList(),
+    );
+  }
 
-    return rows;
+  Widget _buildGPAList() {
+    final semesters = {
+      "Semester 1": gradesData?["GPASemesterI"],
+      "Semester 2": gradesData?["GPASemesterII"],
+      "Semester 3": gradesData?["GPASemesterIII"],
+      "Semester 4": gradesData?["GPASemesterIV"],
+      "Semester 5": gradesData?["GPASemesterV"],
+      "Semester 6": gradesData?["GPASemesterVI"],
+      "Semester 7": gradesData?["GPASemesterVII"],
+      "Semester 8": gradesData?["GPASemesterVIII"],
+    };
+
+    return Column(
+      children: semesters.entries
+          .where((e) =>
+              e.value != null &&
+              e.value != "-" &&
+              e.value != "0.00" &&
+              e.value != 0)
+          .toList()
+          .reversed
+          .map((entry) {
+        return Card(
+          color: Color(0xFF232531),
+          elevation: 0,
+          margin: const EdgeInsets.symmetric(vertical: 5),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Colors.cyan,
+              child: Text(entry.key.split(" ")[1],
+                  style: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold)),
+            ),
+            title: Text(entry.key,
+                style: const TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
+            trailing: Text(entry.value.toString(),
+                style: const TextStyle(color: Colors.white, fontSize: 18)),
+          ),
+        );
+      }).toList(),
+    );
   }
 }

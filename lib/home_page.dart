@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
             ),
             NavigationDestination(
               icon: const Icon(
-                Icons.settings_outlined,
+                Icons.contact_support_outlined,
                 color: Colors.white,
                 size: 20,
               ),
@@ -135,9 +135,9 @@ class _HomePageState extends State<HomePage> {
                   color: _selectedIndex == 2 ? Colors.cyan : Colors.transparent,
                 ),
                 padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.settings, color: Colors.white),
+                child: const Icon(Icons.contact_support, color: Colors.white),
               ),
-              label: 'Settings',
+              label: 'About',
             ),
           ],
         ),

@@ -319,7 +319,7 @@ class _TimetableState extends State<Timetable> {
                 }).toList(),
               ),
             ),
-            if (isLoading) CircularProgressIndicator(),
+            if (isLoading) LinearProgressIndicator(),
             if (!isLoading && errorMessage.isNotEmpty)
               Padding(
                 padding: const EdgeInsets.all(8.0),
