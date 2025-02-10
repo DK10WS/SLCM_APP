@@ -97,7 +97,7 @@ class _CGPAState extends State<CGPA> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Container(
         decoration: BoxDecoration(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         padding: const EdgeInsets.all(16),
@@ -123,9 +123,9 @@ class _CGPAState extends State<CGPA> {
               ),
               borderData: FlBorderData(
                 show: true,
-                border: Border(
-                  left: const BorderSide(color: Color(0xff37434d)),
-                  bottom: const BorderSide(color: Color(0xff37434d)),
+                border: const Border(
+                  left: BorderSide(color: Color(0xff37434d)),
+                  bottom: BorderSide(color: Color(0xff37434d)),
                   right: BorderSide.none,
                   top: BorderSide.none,
                 ),
@@ -140,8 +140,8 @@ class _CGPAState extends State<CGPA> {
                   isCurved: true,
                   gradient: LinearGradient(
                     colors: [
-                      AppColors.contentColorCyan,
-                      AppColors.contentColorBlue
+                      Color(0xFFD5E7B5), // Light Green
+                      Color(0xFFA3C78F), // Muted Green
                     ],
                   ),
                   barWidth: 4,
@@ -150,8 +150,9 @@ class _CGPAState extends State<CGPA> {
                     show: true,
                     gradient: LinearGradient(
                       colors: [
-                        AppColors.contentColorCyan.withOpacity(0.2),
-                        AppColors.contentColorBlue.withOpacity(0.2),
+                        Color(0xFFD5E7B5)
+                            .withOpacity(0.2), // Light Green (transparent)
+                        Color(0xFFE7F5D5).withOpacity(0.4), // Pale Green
                       ],
                     ),
                   ),
@@ -214,7 +215,7 @@ class _CGPAState extends State<CGPA> {
       ),
       body: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -234,10 +235,11 @@ class _CGPAState extends State<CGPA> {
                     physics: const BouncingScrollPhysics(),
                     child: Column(
                       children: [
+                        const SizedBox(height: 10),
                         _buildHeader(),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 22),
                         _buildCGPAGraph(),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 0),
                         _buildToggleButtons(),
                         const SizedBox(height: 16),
                         selectedIndex == 0
@@ -256,7 +258,7 @@ class _CGPAState extends State<CGPA> {
         width: MediaQuery.of(context).size.width * 0.9,
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.cyan,
+            color: Color(0xFFD5E7B5),
             borderRadius: BorderRadius.circular(20),
           ),
           padding: const EdgeInsets.all(16),
@@ -284,43 +286,68 @@ class _CGPAState extends State<CGPA> {
 
   Widget _buildToggleButtons() {
     return Center(
-      child: SizedBox(
+      child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
+        decoration: BoxDecoration(
+          color: Color(0xFFD5E7B5).withOpacity(0.2),
+          borderRadius: BorderRadius.circular(20),
+        ),
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: (MediaQuery.of(context).size.width * 0.9) / 2,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor:
-                      selectedIndex == 0 ? Colors.cyan : Colors.transparent,
-                  foregroundColor:
-                      selectedIndex == 0 ? Colors.white : Colors.cyan,
-                ),
-                onPressed: () {
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
                   setState(() {
                     selectedIndex = 0;
                   });
                 },
-                child: Text("GPA", style: TextStyle(fontSize: 18)),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: selectedIndex == 0
+                        ? Color(0xFFD5E7B5)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "GPA",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color:
+                          selectedIndex == 0 ? Colors.black : Color(0xFFD5E7B5),
+                    ),
+                  ),
+                ),
               ),
             ),
-            Container(
-              width: (MediaQuery.of(context).size.width * 0.9) / 2,
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  backgroundColor:
-                      selectedIndex == 1 ? Colors.cyan : Colors.transparent,
-                  foregroundColor:
-                      selectedIndex == 1 ? Colors.white : Colors.cyan,
-                ),
-                onPressed: () {
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
                   setState(() {
                     selectedIndex = 1;
                   });
                 },
-                child: Text("Credits", style: TextStyle(fontSize: 18)),
+                child: Container(
+                  padding: EdgeInsets.symmetric(vertical: 12),
+                  decoration: BoxDecoration(
+                    color: selectedIndex == 1
+                        ? Color(0xFFD5E7B5)
+                        : Colors.transparent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  alignment: Alignment.center,
+                  child: Text(
+                    "Credits",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color:
+                          selectedIndex == 1 ? Colors.black : Color(0xFFD5E7B5),
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -348,21 +375,21 @@ class _CGPAState extends State<CGPA> {
           .reversed
           .map((entry) {
         return Card(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           elevation: 0,
           margin: const EdgeInsets.symmetric(vertical: 5),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Colors.cyan,
+              backgroundColor: Color(0xFFD5E7B5),
               child: Text(entry.key.split(" ")[1],
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold)),
             ),
             title: Text(entry.key,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                    color: Color(0xFFD5E7B5), fontWeight: FontWeight.bold)),
             trailing: Text(entry.value.toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 18)),
+                style: const TextStyle(color: Color(0xFFD5E7B5), fontSize: 18)),
           ),
         );
       }).toList(),
@@ -383,30 +410,29 @@ class _CGPAState extends State<CGPA> {
 
     return Column(
       children: semesters.entries
-          .where((e) =>
-              e.value != null &&
-              e.value != "-" &&
-              e.value != "0.00" &&
-              e.value != 0)
+          .where((e) => e.value != null && e.value != "-" && e.value != "0.00")
           .toList()
           .reversed
           .map((entry) {
         return Card(
-          color: Color(0xFF232531),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30.0),
+          ),
+          color: Colors.transparent,
           elevation: 0,
           margin: const EdgeInsets.symmetric(vertical: 5),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Colors.cyan,
+              backgroundColor: Color(0xFFD5E7B5),
               child: Text(entry.key.split(" ")[1],
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold)),
             ),
             title: Text(entry.key,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold)),
+                    color: Color(0xFFD5E7B5), fontWeight: FontWeight.bold)),
             trailing: Text(entry.value.toString(),
-                style: const TextStyle(color: Colors.white, fontSize: 18)),
+                style: const TextStyle(color: Color(0xFFD5E7B5), fontSize: 18)),
           ),
         );
       }).toList(),

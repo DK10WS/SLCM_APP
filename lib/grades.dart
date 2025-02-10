@@ -63,12 +63,14 @@ class _GradesState extends State<Grades> {
   Color getGradeColor(String grade) {
     switch (grade) {
       case 'A':
+        return Color(0xFF6EEB83);
       case 'S':
+        return Color(0xFFAB87FF);
       case 'A+':
-        return Colors.green;
+        return Color(0xFF1BE7FF);
       case 'B':
       case 'B+':
-        return Colors.blue;
+        return Colors.yellow;
       case 'C':
       case 'C+':
         return Colors.orange;
@@ -206,7 +208,7 @@ class _GradesState extends State<Grades> {
                                     child: Text(
                                       grade,
                                       style: const TextStyle(
-                                          color: Colors.white,
+                                          color: Colors.black,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 18),
                                     ),
