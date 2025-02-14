@@ -8,7 +8,7 @@ import 'package:mujslcm/timetable.dart';
 import 'package:mujslcm/cgpa.dart';
 import 'login.dart';
 import 'session_manager.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 
 String capitalizeFirstName(String fullName) {
   if (fullName.isEmpty) return fullName;
@@ -69,7 +69,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
+            icon: const Icon(Icons.logout, color: Color(0xFFD5E7B5)),
             onPressed: _logout,
           ),
         ],
@@ -77,7 +77,7 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         height: MediaQuery.of(context).size.height * 1,
         decoration: const BoxDecoration(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -95,47 +95,53 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
         child: NavigationBar(
-          backgroundColor: const Color(0xFF232531),
+          backgroundColor: const Color(0xFFE7F5D5).withOpacity(0.1),
           selectedIndex: _selectedIndex,
           onDestinationSelected: _onItemTapped,
           destinations: [
             NavigationDestination(
-              icon: Icon(Icons.person_outline, color: Colors.white),
+              icon: Icon(Icons.person_outline, color: Color(0xFFD5E7B5)),
               selectedIcon: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _selectedIndex == 0 ? Colors.cyan : Colors.transparent,
+                  color: _selectedIndex == 0
+                      ? Color(0xFFD5E7B5)
+                      : Colors.transparent,
                 ),
                 padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.person, color: Colors.white),
+                child: const Icon(Icons.person, color: Colors.black),
               ),
               label: 'Me',
             ),
             NavigationDestination(
-              icon: Icon(Icons.home_outlined, color: Colors.white),
+              icon: Icon(Icons.home_outlined, color: Color(0xFFD5E7B5)),
               selectedIcon: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _selectedIndex == 1 ? Colors.cyan : Colors.transparent,
+                  color: _selectedIndex == 1
+                      ? Color(0xFFD5E7B5)
+                      : Colors.transparent,
                 ),
                 padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.home, color: Colors.white),
+                child: const Icon(Icons.home, color: Colors.black),
               ),
               label: 'Home',
             ),
             NavigationDestination(
               icon: const Icon(
                 Icons.contact_support_outlined,
-                color: Colors.white,
+                color: Color(0xFFD5E7B5),
                 size: 20,
               ),
               selectedIcon: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _selectedIndex == 2 ? Colors.cyan : Colors.transparent,
+                  color: _selectedIndex == 2
+                      ? Color(0xFFD5E7B5)
+                      : Colors.transparent,
                 ),
                 padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.contact_support, color: Colors.white),
+                child: const Icon(Icons.contact_support, color: Colors.black),
               ),
               label: 'About',
             ),
@@ -184,9 +190,9 @@ class HomeScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 20),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFfede67),
+                    backgroundColor: const Color(0xFFffcb69),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(40),
+                      borderRadius: BorderRadius.circular(25),
                     ),
                   ),
                   onPressed: () {
@@ -195,20 +201,20 @@ class HomeScreen extends StatelessWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      Positioned(
-                        top: -100,
-                        right: 0,
-                        child: SvgPicture.asset(
-                          'assets/images/timetable-icon.svg',
-                          height: screenWidth * 0.60,
-                          width: screenWidth * 0.10,
-                          color: const Color(0xFF232531),
-                        ),
-                      ),
+                      // Positioned(
+                      //   top: -100,
+                      //   right: 0,
+                      //   child: SvgPicture.asset(
+                      //     'assets/images/timetable-icon.svg',
+                      //     height: screenWidth * 0.60,
+                      //     width: screenWidth * 0.10,
+                      //     color: const Color(0xFF232531),
+                      //   ),
+                      // ),
                       const Positioned(
                         bottom: 10,
                         child: Text(
-                          "TIME TABLE",
+                          "Time Table",
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.black,
@@ -248,22 +254,22 @@ class HomeScreen extends StatelessWidget {
         width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFfc894b),
-          borderRadius: BorderRadius.circular(40),
+          color: const Color(0xFFffac81),
+          borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Positioned(
-              top: -31,
-              left: -10,
-              child: SvgPicture.asset(
-                'assets/images/attendance.svg',
-                height: screenWidth * 0.35,
-                width: screenWidth * 0.6,
-                color: const Color(0xFF232531),
-              ),
-            ),
+            // Positioned(
+            //   top: -31,
+            //   left: -10,
+            //   child: SvgPicture.asset(
+            //     'assets/images/attendance.svg',
+            //     height: screenWidth * 0.35,
+            //     width: screenWidth * 0.6,
+            //     color: const Color(0xFF232531),
+            //   ),
+            // ),
             const Positioned(
               bottom: 10,
               child: Text(
@@ -289,21 +295,21 @@ class HomeScreen extends StatelessWidget {
         width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFb6f36a),
-          borderRadius: BorderRadius.circular(40),
+          color: const Color(0xFFcdeac0),
+          borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Positioned(
-              top: 0,
-              child: SvgPicture.asset(
-                'assets/images/marks.svg',
-                height: screenWidth * 0.29,
-                width: screenWidth * 0.6,
-                color: const Color(0xFF232531),
-              ),
-            ),
+            // Positioned(
+            //   top: 0,
+            //   child: SvgPicture.asset(
+            //     'assets/images/marks.svg',
+            //     height: screenWidth * 0.29,
+            //     width: screenWidth * 0.6,
+            //     color: const Color(0xFF232531),
+            //   ),
+            // ),
             const Positioned(
               bottom: 10,
               child: Text(
@@ -329,21 +335,21 @@ class HomeScreen extends StatelessWidget {
         width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFfd6297),
-          borderRadius: BorderRadius.circular(40),
+          color: const Color(0xFFff928b),
+          borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Positioned(
-              top: -4,
-              child: SvgPicture.asset(
-                'assets/images/CGPA.svg',
-                height: screenWidth * 0.3,
-                width: screenWidth * 0.2,
-                color: const Color(0xFF232531),
-              ),
-            ),
+            // Positioned(
+            //   top: -4,
+            //   child: SvgPicture.asset(
+            //     'assets/images/CGPA.svg',
+            //     height: screenWidth * 0.3,
+            //     width: screenWidth * 0.2,
+            //     color: const Color(0xFF232531),
+            //   ),
+            // ),
             const Positioned(
               bottom: 10,
               child: Text(
@@ -369,22 +375,22 @@ class HomeScreen extends StatelessWidget {
         width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFF9b77e5),
-          borderRadius: BorderRadius.circular(40),
+          color: const Color(0xFF9ab7d3),
+          borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Positioned(
-              top: -30,
-              right: -20,
-              child: SvgPicture.asset(
-                'assets/images/grades.svg',
-                height: screenWidth * 0.36,
-                width: screenWidth * 0.2,
-                color: const Color(0xFF232531),
-              ),
-            ),
+            // Positioned(
+            //   top: -30,
+            //   right: -20,
+            //   child: SvgPicture.asset(
+            //     'assets/images/grades.svg',
+            //     height: screenWidth * 0.36,
+            //     width: screenWidth * 0.2,
+            //     color: const Color(0xFF232531),
+            //   ),
+            // ),
             const Positioned(
               bottom: 10,
               child: Text(

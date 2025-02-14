@@ -113,10 +113,10 @@ class _AttendancePageState extends State<AttendancePage> {
             width: double.infinity,
             height: double.infinity,
             decoration: BoxDecoration(
-              color: Color(0xFF232531),
+              color: Color(0xFF212121),
               borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(20.0),
-                topRight: Radius.circular(20.0),
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
               ),
             ),
             child: FutureBuilder<List<Map<String, dynamic>>?>(
@@ -124,7 +124,7 @@ class _AttendancePageState extends State<AttendancePage> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(color: Colors.cyan),
+                    child: CircularProgressIndicator(color: Color(0xFFD5E7B5)),
                   );
                 } else if (snapshot.hasError) {
                   return Center(
@@ -165,8 +165,8 @@ class _AttendancePageState extends State<AttendancePage> {
                           margin: const EdgeInsets.symmetric(vertical: 8.0),
                           padding: const EdgeInsets.all(16.0),
                           decoration: BoxDecoration(
-                            color: Colors.grey[900],
-                            borderRadius: BorderRadius.circular(12.0),
+                            color: Color(0xFFA3C78F).withOpacity(0.125),
+                            borderRadius: BorderRadius.circular(25.0),
                           ),
                           child: InkWell(
                             onTap: () {
@@ -222,7 +222,8 @@ class _AttendancePageState extends State<AttendancePage> {
                                       onPressed: () => Navigator.pop(context),
                                       child: const Text(
                                         "Close",
-                                        style: TextStyle(color: Colors.cyan),
+                                        style:
+                                            TextStyle(color: Color(0xFFD5E7B5)),
                                       ),
                                     ),
                                   ],
@@ -250,7 +251,7 @@ class _AttendancePageState extends State<AttendancePage> {
                                       Text(
                                         "Attended: $attendedClasses | Missed Classes: $missedClasses ",
                                         style: const TextStyle(
-                                          color: Colors.cyan,
+                                          color: Color(0xFFD5E7B5),
                                           fontSize: 14,
                                         ),
                                       ),
