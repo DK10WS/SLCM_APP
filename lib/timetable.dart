@@ -237,7 +237,7 @@ class _TimetableState extends State<Timetable> {
       backgroundColor: Color(0xFF121316),
       body: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -271,7 +271,7 @@ class _TimetableState extends State<Timetable> {
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow,
+                      backgroundColor: Color(0xFFD5E7B5),
                     ),
                     onPressed: () => _selectDate(context),
                     child: Text(
@@ -302,7 +302,7 @@ class _TimetableState extends State<Timetable> {
                             ? Color(0xFF232531)
                             : Color.fromARGB(255, 32, 32, 32),
                         side: isSelected
-                            ? BorderSide(color: Colors.yellow, width: 2)
+                            ? BorderSide(color: Color(0xFFD5E7B5), width: 2)
                             : BorderSide.none,
                         elevation: isSelected ? 100 : 0,
                       ),

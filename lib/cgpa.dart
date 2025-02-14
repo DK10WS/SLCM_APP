@@ -218,7 +218,8 @@ class _CGPAState extends State<CGPA> {
         ),
         padding: const EdgeInsets.all(16),
         child: isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.cyan))
+            ? const Center(
+                child: CircularProgressIndicator(color: Color(0xFFD5E7B5)))
             : gradesData == null
                 ? const Center(
                     child: Text(

@@ -96,7 +96,7 @@ class _GradesState extends State<Grades> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -185,8 +185,8 @@ class _GradesState extends State<Grades> {
                               vertical: 10, horizontal: 15),
                           child: Container(
                             decoration: BoxDecoration(
-                              color: Colors.grey[900],
-                              borderRadius: BorderRadius.circular(15),
+                              color: Color(0xFFA3C78F).withOpacity(0.125),
+                              borderRadius: BorderRadius.circular(25),
                             ),
                             width: screenWidth * 0.95,
                             padding: const EdgeInsets.all(15),
@@ -226,7 +226,8 @@ class _GradesState extends State<Grades> {
                                       Text(
                                         'Credits: $credits',
                                         style: const TextStyle(
-                                            color: Colors.white, fontSize: 14),
+                                            color: Color(0xFFD5E7B5),
+                                            fontSize: 14),
                                       ),
                                     ],
                                   ),

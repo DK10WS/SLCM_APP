@@ -138,7 +138,7 @@ class _MyLoginState extends State<MyLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121316),
+      backgroundColor: const Color(0xFF212121),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -211,7 +211,7 @@ class _MyLoginState extends State<MyLogin> {
                   },
                   child: const Text(
                     'Forgot Password?',
-                    style: TextStyle(color: Colors.yellow),
+                    style: TextStyle(color: Color(0xFFD5E7B5)),
                   ),
                 ),
               ),
@@ -220,7 +220,7 @@ class _MyLoginState extends State<MyLogin> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.yellow,
+                    backgroundColor: Color(0xFFD5E7B5),
                     foregroundColor: Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),

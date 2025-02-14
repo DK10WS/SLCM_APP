@@ -21,7 +21,7 @@ class Settings extends StatelessWidget {
       body: Container(
         height: MediaQuery.of(context).size.height * 1,
         decoration: const BoxDecoration(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -59,7 +59,7 @@ class Settings extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: const Icon(Icons.person, color: Colors.yellow),
+                leading: const Icon(Icons.person, color: Color(0xFFD5E7B5)),
                 title: const Text('Dhruv Kunzru',
                     style: TextStyle(color: Colors.white)),
                 subtitle: const Text('Lead Developer',
@@ -67,7 +67,7 @@ class Settings extends StatelessWidget {
                 onTap: () => _launchURL('https://github.com/dk10ws'),
               ),
               ListTile(
-                leading: const Icon(Icons.person, color: Colors.yellow),
+                leading: const Icon(Icons.person, color: Color(0xFFD5E7B5)),
                 title: const Text('Amey Santosh Gupte',
                     style: TextStyle(color: Colors.white)),
                 subtitle: const Text('Graphics Designer',
@@ -86,13 +86,13 @@ class Settings extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: const Icon(Icons.email, color: Colors.yellow),
+                leading: const Icon(Icons.email, color: Color(0xFFD5E7B5)),
                 title: const Text('Contact Support',
                     style: TextStyle(color: Colors.white)),
                 onTap: () => _launchURL('https://t.me/dk10ws'),
               ),
               ListTile(
-                leading: const Icon(Icons.web, color: Colors.yellow),
+                leading: const Icon(Icons.web, color: Color(0xFFD5E7B5)),
                 title: const Text('Visit MUJ Website',
                     style: TextStyle(color: Colors.white)),
                 onTap: () => _launchURL('https://mujslcm.jaipur.manipal.edu'),
@@ -108,7 +108,7 @@ class Settings extends StatelessWidget {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.contacts, color: Colors.yellow),
+                leading: const Icon(Icons.contacts, color: Color(0xFFD5E7B5)),
                 title: const Text('Message me your interest in the project',
                     style: TextStyle(color: Colors.white)),
                 onTap: () => _launchURL('https://t.me/dk10ws'),

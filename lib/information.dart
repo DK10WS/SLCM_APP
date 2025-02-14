@@ -78,12 +78,12 @@ class _InformationState extends State<Information> {
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(
-                color: Colors.cyan,
+                color: Color(0xFFD5E7B5),
               ),
             )
           : Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF232531),
+                color: Color(0xFF212121),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
@@ -125,7 +125,7 @@ class _InformationState extends State<Information> {
                                 decoration: BoxDecoration(
                                   color: Colors.grey[900],
                                   border: Border.all(
-                                    color: Colors.cyan,
+                                    color: Color(0xFFD5E7B5),
                                     width: 2.0,
                                   ),
                                   borderRadius: BorderRadius.circular(8.0),
