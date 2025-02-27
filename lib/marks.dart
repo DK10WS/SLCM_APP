@@ -25,24 +25,13 @@ class _MarksState extends State<Marks> {
       isLoading = true;
     });
 
-    final url =
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetInternalMarkForFaculty";
+    final url = "http://127.0.0.1:3000/marks";
 
-    final Map<String, String> headers = {
-      "Cookie": widget.newCookies,
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-    };
-
-    final Map<String, String> body = {
-      "Enrollment": "",
-      "Semester": selectedSemester!
-    };
+    final Map<String, String> body = {"Semester": selectedSemester!};
 
     try {
       final session = http.Client();
-      var response =
-          await session.post(Uri.parse(url), headers: headers, body: body);
+      var response = await session.post(Uri.parse(url), body: body);
       session.close();
 
       if (response.statusCode == 200) {

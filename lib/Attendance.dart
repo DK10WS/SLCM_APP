@@ -30,12 +30,10 @@ class _AttendancePageState extends State<AttendancePage> {
 
     final Map<String, String> body = {"StudentCode": ""};
 
-    const attendanceUrl =
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetAttendanceSummaryList";
+    const attendanceUrl = "http://127.0.0.1:3000/attendance";
 
     final session = http.Client();
-    final response = await session.post(Uri.parse(attendanceUrl),
-        headers: headers, body: body);
+    final response = await session.get(Uri.parse(attendanceUrl));
 
     if (response.statusCode != 200) {
       print('Failed to load attendance data');

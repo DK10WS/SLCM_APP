@@ -166,15 +166,9 @@ class _TimetableState extends State<Timetable> {
   Future<Map<String, List<Map<String, dynamic>>>> weekTT(
       String newCookies) async {
     var response = await http.post(
-      Uri.parse(
-          "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetStudentCalenderEventList"),
-      headers: {"user-agent": "Mozilla/5.0", "Cookie": newCookies},
+      Uri.parse("http://127.0.0.1:3000/timetableweek"),
       body: {
-        "Year": "",
-        "Month": "",
-        "Type": "agendaWeek",
         "Dated": selectedDate,
-        "PreNext": "2"
       },
     );
     if (response.statusCode == 200) {
@@ -191,9 +185,7 @@ class _TimetableState extends State<Timetable> {
   Future<Map<String, String>> fetchEventDetails(
       String entryNo, String newCookies) async {
     var response = await http.post(
-      Uri.parse(
-          "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetEventDetailStudent"),
-      headers: {"user-agent": "Mozilla/5.0", "Cookie": newCookies},
+      Uri.parse("http://127.0.0.1:3000/timetable"),
       body: {"EventID": entryNo},
     );
     var eventDetails = jsonDecode(response.body);

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -72,103 +73,41 @@ class _MyLoginState extends State<MyLogin> {
     return parts.isNotEmpty ? parts[0].trim() : '';
   }
 
-  Future<Map<String, String>?> _login(String username, String password) async {
+  Future<Map<String, String?>?> _login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       _showError('Please fill in both fields.');
       return null;
     }
 
-    const url = "https://mujslcm.jaipur.manipal.edu";
-    const baseurl = "https://mujslcm.jaipur.manipal.edu";
+    const baseurl = "http://127.0.0.1:3000/login";
 
     final headers = {
       "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+      "Content-Type": "application/json",
     };
 
+    final payload = jsonEncode({
+      "username": username,
+      "password": password,
+    });
+
     var session = http.Client();
+
     try {
-      final response = await session.get(Uri.parse(url), headers: headers);
+      final response = await session.post(Uri.parse(baseurl),
+          headers: headers, body: payload);
 
-      if (response.statusCode != 200) {
-        _showError("Failed to fetch login page.");
+      if (response.statusCode == 200) {
+        _saveCredentials(username, password);
+        final redirectDocument = parse(response.body);
+        final name =
+            redirectDocument.querySelector('.kt-user-card__name')?.text.trim();
+        return {'name': name ?? ''};
+      } else {
+        _showError("Login failed: ${response.body}");
         return null;
       }
-
-      final document = parse(response.body);
-      final tokenElement =
-          document.querySelector('input[name="__RequestVerificationToken"]');
-      final token = tokenElement?.attributes['value'];
-      final cookies = response.headers['set-cookie'];
-
-      if (token == null || cookies == null) {
-        _showError("Token or session cookies missing.");
-        return null;
-      }
-
-      final cleanedCookies = cookies
-          .split(',')
-          .map((cookie) => extractSessionId(cookie))
-          .join(';');
-
-      final payload = {
-        "__RequestVerificationToken": token,
-        "EmailFor": "@muj.manipal.edu",
-        "LoginFor": "2",
-        "UserName": username,
-        "Password": password,
-      };
-
-      final headersForLogin = {
-        ...headers,
-        'Cookie': cleanedCookies,
-      };
-
-      final loginResponse = await session.post(
-        Uri.parse(url),
-        headers: headersForLogin,
-        body: payload,
-      );
-      var API = loginResponse.headers['set-cookie'];
-      final cleanedAPI = API != null
-          ? API.split(',').map((cookie) => extractSessionId(cookie)).join(';')
-          : '';
-
-      if (loginResponse.statusCode == 302) {
-        final locationHeader = loginResponse.headers['location'];
-        if (locationHeader != null) {
-          final redirectedUrl = Uri.parse(baseurl + locationHeader);
-
-          final newCookies =
-              cleanedCookies + (cleanedAPI.isNotEmpty ? '; $cleanedAPI' : '');
-
-          final redirectResponse = await session.get(
-            redirectedUrl,
-            headers: {
-              'Cookie': newCookies,
-              ...headers,
-            },
-          );
-
-          if (redirectResponse.statusCode == 200) {
-            final redirectDocument = parse(redirectResponse.body);
-            final name = redirectDocument
-                .querySelector('.kt-user-card__name')
-                ?.text
-                .trim();
-
-            _saveCredentials(username, password);
-
-            // Reset logout state and set session cookies
-            SessionManager.setSession(cleanedCookies + '; ' + cleanedAPI);
-
-            return {'name': name ?? '', 'newCookies': newCookies};
-          }
-        }
-      }
-
-      _showError("Login failed. Please check your credentials.");
-      return null;
     } catch (e) {
       _showError("An error occurred: $e");
       return null;

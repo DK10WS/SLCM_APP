@@ -26,8 +26,7 @@ class _CGPAState extends State<CGPA> {
   }
 
   Future<void> fetchGrades() async {
-    final url =
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetCGPAGPAForFaculty";
+    final url = "http://127.0.0.1:3000/cgpa";
     final Map<String, String> headers = {
       "Cookie": widget.newCookies,
       "User-Agent":
@@ -40,8 +39,7 @@ class _CGPAState extends State<CGPA> {
     };
 
     try {
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
+      final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
