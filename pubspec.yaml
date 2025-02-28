@@ -28,6 +28,8 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+
+  local_auth: ^2.3.0
   cupertino_icons: ^1.0.8
   firebase_core: ^3.10.0
   fl_chart: ^0.69.2
@@ -60,6 +62,12 @@ flutter:
     - assets/images/marks.svg
 
   fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-VariableFont_wdth,wght.ttf
+          
+          
+  
     - family: poppins
       fonts:
         - asset: assets/fonts/Poppins-Regular.ttf

@@ -64,8 +64,12 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF121316),
         title: const Text(
-          "MUJ SWITCH",
-          style: TextStyle(color: Colors.white, fontFamily: "Gotham"),
+          "SLCM SWITCH",
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: "Roboto",
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
@@ -180,7 +184,8 @@ class HomeScreen extends StatelessWidget {
               style: TextStyle(
                   fontSize: screenWidth * 0.1,
                   color: Colors.white,
-                  fontFamily: "poppins"),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Roboto"),
             ),
             const SizedBox(height: 20),
             Center(
@@ -218,7 +223,8 @@ class HomeScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.black,
-                            fontFamily: "Monserat",
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -277,7 +283,8 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
-                  fontFamily: "Monserat",
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -317,7 +324,8 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
-                  fontFamily: "Monserat",
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -357,7 +365,8 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
-                  fontFamily: "Monserat",
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -398,7 +407,8 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
-                  fontFamily: "Monserat",
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),

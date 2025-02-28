@@ -70,7 +70,7 @@ class Settings extends StatelessWidget {
                 leading: const Icon(Icons.person, color: Color(0xFFD5E7B5)),
                 title: const Text('Amey Santosh Gupte',
                     style: TextStyle(color: Colors.white)),
-                subtitle: const Text('Graphics Designer',
+                subtitle: const Text('UI/UX Designer',
                     style: TextStyle(color: Colors.grey)),
                 onTap: () => _launchURL('https://github.com/Vanillaicee17'),
               ),

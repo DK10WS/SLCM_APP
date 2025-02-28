@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
@@ -6,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'session_manager.dart';
+import 'package:local_auth/local_auth.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -15,9 +15,11 @@ class MyLogin extends StatefulWidget {
 }
 
 class _MyLoginState extends State<MyLogin> {
+  final LocalAuthentication auth = LocalAuthentication();
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
+  bool _isObscure = true;
 
   @override
   void initState() {
@@ -209,14 +211,14 @@ class _MyLoginState extends State<MyLogin> {
               const Text(
                 'Hello,',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Color(0xFFD5E7B5),
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 8),
               const Text(
-                'Welcome to MUJ Switch',
+                'Welcome to SLCM Switch',
                 style: TextStyle(
                   color: Colors.grey,
                   fontSize: 20,
@@ -229,21 +231,67 @@ class _MyLoginState extends State<MyLogin> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(0xFF24272B),
-                  hintText: 'Name.registration',
+                  hintText: 'Username',
                   hintStyle: const TextStyle(color: Colors.grey),
                   prefixIcon: const Icon(Icons.email, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: BorderSide.none,
                   ),
+                  suffix: Text(
+                    '@muj.manipal.edu',
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
                 style: const TextStyle(color: Colors.white),
               ),
               const SizedBox(height: 16),
               TextField(
+                obscureText: _isObscure,
                 controller: _passwordController,
-                obscureText: true,
                 decoration: InputDecoration(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      color: Color(0xFFD5E7B5),
+                      _isObscure ? Icons.visibility_off : Icons.visibility,
+                    ),
+                    onPressed: () async {
+                      if (_isObscure) {
+                        // Password is currently hidden, attempt authentication before showing
+                        bool canAuthenticate = await auth.canCheckBiometrics ||
+                            await auth.isDeviceSupported();
+
+                        if (canAuthenticate) {
+                          try {
+                            bool didAuthenticate = await auth.authenticate(
+                              localizedReason:
+                                  'Please authenticate to show password',
+                              options: const AuthenticationOptions(
+                                  biometricOnly: false),
+                            );
+
+                            if (didAuthenticate) {
+                              setState(() {
+                                _isObscure = false;
+                              });
+                            }
+                          } catch (e) {
+                            print(e);
+                          }
+                        } else {
+                          // If authentication is not available, show password without authentication
+                          setState(() {
+                            _isObscure = false;
+                          });
+                        }
+                      } else {
+                        // Password is currently visible, hide it without authentication
+                        setState(() {
+                          _isObscure = true;
+                        });
+                      }
+                    },
+                  ),
                   filled: true,
                   fillColor: const Color(0xFF24272B),
                   hintText: 'Enter your password',
