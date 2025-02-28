@@ -213,6 +213,35 @@ class _TimetableState extends State<Timetable> {
     fetchWeekEvents();
   }
 
+  String formatTime(String? timeString) {
+    if (timeString == null || timeString.isEmpty) return 'No Time Available';
+
+    try {
+      // Split the time string into start and end times
+      List<String> times = timeString.split('To');
+      if (times.length != 2)
+        return timeString; // Return original if format is unexpected
+
+      String startTime = times[0].trim();
+      String endTime = times[1].trim();
+
+      // Format start time
+      List<String> startParts = startTime.split(':');
+      String formattedStart =
+          '${int.parse(startParts[0])}:${startParts[1].padLeft(2, '0')}';
+
+      // Format end time
+      List<String> endParts = endTime.split(':');
+      String formattedEnd =
+          '${int.parse(endParts[0])}:${endParts[1].padLeft(2, '0')}';
+
+      // Return the formatted time slot
+      return '$formattedStart to $formattedEnd';
+    } catch (e) {
+      return timeString; // Return original if parsing fails
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -232,7 +261,7 @@ class _TimetableState extends State<Timetable> {
       backgroundColor: Color(0xFF121316),
       body: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -266,7 +295,7 @@ class _TimetableState extends State<Timetable> {
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.yellow,
+                      backgroundColor: Color(0xFFD5E7B5),
                     ),
                     onPressed: () => _selectDate(context),
                     child: Text(
@@ -297,7 +326,7 @@ class _TimetableState extends State<Timetable> {
                             ? Color(0xFF232531)
                             : Color.fromARGB(255, 32, 32, 32),
                         side: isSelected
-                            ? BorderSide(color: Colors.yellow, width: 2)
+                            ? BorderSide(color: Color(0xFFD5E7B5), width: 2)
                             : BorderSide.none,
                         elevation: isSelected ? 100 : 0,
                       ),
@@ -343,8 +372,7 @@ class _TimetableState extends State<Timetable> {
                           ? Colors.green
                           : Colors.grey;
 
-                  String eventTime =
-                      eventTimeCache[entryNo] ?? 'No Time Available';
+                  String eventTime = formatTime(eventTimeCache[entryNo]);
 
                   Duration eventDuration = parseTime(eventTime);
 
@@ -367,8 +395,8 @@ class _TimetableState extends State<Timetable> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    event['Description'].split(",")[0] ??
-                                        'No Description',
+                                    formatTime(
+                                        event['Description'].split(",")[0]),
                                     style: const TextStyle(
                                       fontSize: 18,
                                       color: Colors.black,

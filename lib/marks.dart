@@ -85,7 +85,7 @@ class _MarksState extends State<Marks> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
-          color: Color(0xFF232531),
+          color: Color(0xFF212121),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -140,7 +140,9 @@ class _MarksState extends State<Marks> {
             else ...[
               if (isLoading && selectedSemester != null)
                 const Expanded(
-                    child: Center(child: CircularProgressIndicator())),
+                    child: Center(
+                        child: CircularProgressIndicator(
+                            color: Color(0xFFD5E7B5)))),
               if (errorMessage.isNotEmpty)
                 Center(
                     child: Text(errorMessage,
@@ -168,8 +170,8 @@ class _MarksState extends State<Marks> {
                             vertical: 10, horizontal: 15),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.grey[900],
-                            borderRadius: BorderRadius.circular(15),
+                            color: Color(0xFFA3C78F).withOpacity(0.125),
+                            borderRadius: BorderRadius.circular(25),
                           ),
                           width: screenWidth * 0.95,
                           padding: const EdgeInsets.all(15),
@@ -236,27 +238,27 @@ class _MarksState extends State<Marks> {
                                     if (course['CWS'] != "-")
                                       Text('CWS: ${course['CWS']}',
                                           style: const TextStyle(
-                                              color: Colors.cyan)),
+                                              color: Color(0xFFD5E7B5))),
                                     if (course['MTE1'] != "-")
                                       Text('MTE1: ${course['MTE1']}',
                                           style: const TextStyle(
-                                              color: Colors.cyan)),
+                                              color: Color(0xFFD5E7B5))),
                                     if (course['MTE2'] != "-")
                                       Text('MTE2: ${course['MTE2']}',
                                           style: const TextStyle(
-                                              color: Colors.cyan)),
+                                              color: Color(0xFFD5E7B5))),
                                     if (course['RESESSION'] != "-")
                                       Text('Ressional: ${course['RESESSION']}',
                                           style: const TextStyle(
-                                              color: Colors.cyan)),
+                                              color: Color(0xFFD5E7B5))),
                                     if (course['PRS'] != "-")
                                       Text('PRS: ${course['PRS']}',
                                           style: const TextStyle(
-                                              color: Colors.cyan)),
+                                              color: Color(0xFFD5E7B5))),
                                     if (course['Total'] != "-")
                                       Text('Total: ${course['Total']}/60',
                                           style: const TextStyle(
-                                              color: Colors.cyan)),
+                                              color: Color(0xFFD5E7B5))),
                                   ],
                                 ),
                               ),
