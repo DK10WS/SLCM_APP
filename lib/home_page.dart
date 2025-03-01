@@ -77,6 +77,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: _logout,
           ),
         ],
+        scrolledUnderElevation: 0.0,
       ),
       body: Container(
         height: MediaQuery.of(context).size.height * 1,

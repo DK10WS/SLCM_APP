@@ -212,6 +212,7 @@ class _CGPAState extends State<CGPA> {
         title: const Text("CGPA/GPA", style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: const Color(0xFF121316),
+        scrolledUnderElevation: 0.0,
       ),
       body: Container(
         decoration: const BoxDecoration(

@@ -106,6 +106,7 @@ class _AttendancePageState extends State<AttendancePage> {
             'Attendance Summary',
             style: TextStyle(color: Colors.white),
           ),
+          scrolledUnderElevation: 0.0,
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 16.0),

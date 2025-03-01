@@ -97,6 +97,7 @@ class _GradesState extends State<Grades> {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
         shadowColor: Colors.transparent,
+        scrolledUnderElevation: 0.0,
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,

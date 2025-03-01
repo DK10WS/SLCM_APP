@@ -257,6 +257,7 @@ class _TimetableState extends State<Timetable> {
           'Timetable',
           style: TextStyle(color: Colors.white),
         ),
+        scrolledUnderElevation: 0.0,
       ),
       backgroundColor: Color(0xFF121316),
       body: Container(

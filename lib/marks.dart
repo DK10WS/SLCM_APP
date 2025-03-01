@@ -81,6 +81,7 @@ class _MarksState extends State<Marks> {
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
         shadowColor: Colors.transparent,
+        scrolledUnderElevation: 0.0,
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
