@@ -32,7 +32,7 @@ class _AttendancePageState extends State<AttendancePage> {
 
     final Map<String, String> body = {"login_cookies": newCookies};
 
-    const attendanceUrl = "http://34.131.23.80:8000/attendance";
+    const attendanceUrl = "http://34.131.23.80/attendance";
 
     final session = http.Client();
     final response = await session.post(

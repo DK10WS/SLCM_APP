@@ -87828,7 +87828,7 @@ p=A.ad(["login_cookies",a5],a3,a3)
 o=A.a1G()
 if(o==null)o=new A.n7(A.av(t.lZ))
 s=3
-return A.Q(o.mH("POST",A.dv("http://34.131.23.80:8000/attendance",0,null),a4,B.ac.lJ(p,null),null),$async$Am)
+return A.Q(o.mH("POST",A.dv("http://34.131.23.80/attendance",0,null),a4,B.ac.lJ(p,null),null),$async$Am)
 case 3:n=a7
 if(n.b!==200){A.pd("Failed to load attendance data")
 q=null
@@ -87898,7 +87898,7 @@ am(){this.aG()
 this.lL()},
 lL(){var s=0,r=A.N(t.H),q=1,p,o=this,n,m,l,k,j,i,h,g,f
 var $async$lL=A.O(function(a,b){if(a===1){p=b
-s=q}while(true)switch(s){case 0:j="http://34.131.23.80:8000/cgpa"
+s=q}while(true)switch(s){case 0:j="http://34.131.23.80/cgpa"
 i=t.N
 h=A.ad(["User-Agent",u.z,"Content-Type","application/json"],i,i)
 g=A.ad(["login_cookies",o.a.c],i,i)
@@ -88094,7 +88094,7 @@ s=p}while(true)switch(s){case 0:if(n.r==null){s=1
 break}n.a0(new A.aqR(n))
 g=t.N
 m=A.ad(["User-Agent",u.z,"Content-Type","application/json"],g,g)
-l="http://34.131.23.80:8000/grades?semester="+A.j(n.r)
+l="http://34.131.23.80/grades?semester="+A.j(n.r)
 k=A.ad(["login_cookies",n.a.c],g,g)
 p=4
 f=A.a1G()
@@ -88273,7 +88273,7 @@ Ao(){var s=0,r=A.N(t.H),q=1,p,o=this,n,m,l,k,j,i,h,g,f,e,d,c,b,a,a0,a1
 var $async$Ao=A.O(function(a2,a3){if(a2===1){p=a3
 s=q}while(true)switch(s){case 0:c=t.N
 b=A.ad(["User-Agent",u.z,"Content-Type","application/json"],c,c)
-a="http://34.131.23.80:8000/info"
+a="http://34.131.23.80/info"
 a0=A.ad(["login_cookies",o.a.c],c,c)
 q=3
 s=6
@@ -88388,7 +88388,7 @@ c=A.a1G()
 j=c==null?new A.n7(A.av(t.lZ)):c
 p=4
 s=7
-return A.Q(j.mH("POST",A.dv("http://34.131.23.80:8000/login",0,null),l,k,null),$async$u8)
+return A.Q(j.mH("POST",A.dv("http://34.131.23.80/login",0,null),l,k,null),$async$u8)
 case 7:i=a4
 if(i.b===200){m.qa(a1,a2)
 b=i
@@ -88493,7 +88493,7 @@ s=p}while(true)switch(s){case 0:if(n.r==null){s=1
 break}n.a0(new A.as8(n))
 g=t.N
 m=A.ad(["User-Agent",u.A,"Content-Type","application/json"],g,g)
-l="http://34.131.23.80:8000/internal_marks?semester="+A.j(n.r)
+l="http://34.131.23.80/internal_marks?semester="+A.j(n.r)
 k=A.ad(["login_cookies",n.a.c],g,g)
 p=4
 f=A.a1G()
@@ -88728,7 +88728,7 @@ k=A.ad(["User-Agent",u.z,"Content-Type","application/json"],l,l)
 j=p.d
 j===$&&A.a()
 s=3
-return A.Q(A.az0(A.dv("http://34.131.23.80:8000/timetable_week?dated="+j,0,null),B.ac.lJ(A.ad(["login_cookies",a],l,l),null),k),$async$Cj)
+return A.Q(A.az0(A.dv("http://34.131.23.80/timetable_week?dated="+j,0,null),B.ac.lJ(A.ad(["login_cookies",a],l,l),null),k),$async$Cj)
 case 3:o=c
 if(o.b===200){n=A.t(l,t.b5)
 for(l=J.aG(B.ac.cW(A.pa(A.p5(o.e).c.a.i(0,"charset")).cW(o.w)));l.A();){m=l.gL()
@@ -88745,7 +88745,7 @@ var $async$An=A.O(function(c,d){if(c===1)return A.K(d,r)
 while(true)switch(s){case 0:o=t.N
 n=A.ad(["User-Agent",u.z,"Content-Type","application/json"],o,o)
 s=3
-return A.Q(A.az0(A.dv("http://34.131.23.80:8000/timetable?eventid="+a,0,null),B.ac.lJ(A.ad(["login_cookies",p.a.c,"EventID",a],o,o),null),n),$async$An)
+return A.Q(A.az0(A.dv("http://34.131.23.80/timetable?eventid="+a,0,null),B.ac.lJ(A.ad(["login_cookies",p.a.c,"EventID",a],o,o),null),n),$async$An)
 case 3:m=d
 l=B.ac.mV(A.pa(A.p5(m.e).c.a.i(0,"charset")).cW(m.w),null)
 k=J.b4(l)

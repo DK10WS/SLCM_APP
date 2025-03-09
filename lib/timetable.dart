@@ -171,7 +171,7 @@ class _TimetableState extends State<Timetable> {
       "Content-Type": "application/json",
     };
     var response = await http.post(
-      Uri.parse("http://34.131.23.80:8000/timetable_week?dated=$selectedDate"),
+      Uri.parse("http://34.131.23.80/timetable_week?dated=$selectedDate"),
       headers: headers,
       body: jsonEncode({
         "login_cookies": newCookies,
@@ -196,7 +196,7 @@ class _TimetableState extends State<Timetable> {
       "Content-Type": "application/json",
     };
     var response = await http.post(
-      Uri.parse("http://34.131.23.80:8000/timetable?eventid=$entryNo"),
+      Uri.parse("http://34.131.23.80/timetable?eventid=$entryNo"),
       headers: headers,
       body:
           jsonEncode({"login_cookies": widget.newCookies, "EventID": entryNo}),

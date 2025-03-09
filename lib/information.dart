@@ -29,7 +29,7 @@ class _InformationState extends State<Information> {
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
       "Content-Type": "application/json",
     };
-    final url = "http://34.131.23.80:8000/info";
+    final url = "http://34.131.23.80/info";
 
     final Map<String, String> body = {"login_cookies": widget.newCookies};
     try {
