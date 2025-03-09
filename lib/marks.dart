@@ -24,14 +24,20 @@ class _MarksState extends State<Marks> {
     setState(() {
       isLoading = true;
     });
+    final Map<String, String> header = {
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+      "Content-Type": "application/json",
+    };
+    final url =
+        "http://34.131.23.80:8000/internal_marks?semester=$selectedSemester";
 
-    final url = "http://127.0.0.1:3000/marks";
-
-    final Map<String, String> body = {"Semester": selectedSemester!};
+    final Map<String, String> body = {"login_cookies": widget.newCookies};
 
     try {
       final session = http.Client();
-      var response = await session.post(Uri.parse(url), body: body);
+      var response = await session.post(Uri.parse(url),
+          body: jsonEncode(body), headers: header);
       session.close();
 
       if (response.statusCode == 200) {

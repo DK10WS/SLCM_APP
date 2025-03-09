@@ -79,7 +79,7 @@ class _MyLoginState extends State<MyLogin> {
       return null;
     }
 
-    const baseurl = "http://127.0.0.1:3000/login";
+    const baseurl = "http://34.131.23.80:8000/login";
 
     final headers = {
       "User-Agent":
@@ -96,14 +96,15 @@ class _MyLoginState extends State<MyLogin> {
 
     try {
       final response = await session.post(Uri.parse(baseurl),
-          headers: headers, body: payload);
+          body: payload, headers: headers);
 
       if (response.statusCode == 200) {
         _saveCredentials(username, password);
-        final redirectDocument = parse(response.body);
-        final name =
-            redirectDocument.querySelector('.kt-user-card__name')?.text.trim();
-        return {'name': name ?? ''};
+        final redirectDocument = jsonDecode(response.body);
+        final name = redirectDocument["name"];
+        final cookies = redirectDocument["login_cookies"];
+
+        return {'name': name ?? '', 'newCookies': cookies};
       } else {
         _showError("Login failed: ${response.body}");
         return null;

@@ -24,16 +24,22 @@ class _AttendancePageState extends State<AttendancePage> {
   Future<List<Map<String, dynamic>>?> fetchAttendance(String newCookies) async {
     final Map<String, String> headers = {
       "User-Agent":
-          "Mozilla/5.0 (X11; Linux x86_64; rv:132.0) Gecko/20100101 Firefox/132.0",
-      "Cookie": newCookies,
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+      "Content-Type": "application/json",
     };
 
-    final Map<String, String> body = {"StudentCode": ""};
+    print(newCookies);
 
-    const attendanceUrl = "http://127.0.0.1:3000/attendance";
+    final Map<String, String> body = {"login_cookies": newCookies};
+
+    const attendanceUrl = "http://34.131.23.80:8000/attendance";
 
     final session = http.Client();
-    final response = await session.get(Uri.parse(attendanceUrl));
+    final response = await session.post(
+      Uri.parse(attendanceUrl),
+      headers: headers,
+      body: jsonEncode(body),
+    );
 
     if (response.statusCode != 200) {
       print('Failed to load attendance data');

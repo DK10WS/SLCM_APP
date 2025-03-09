@@ -165,11 +165,17 @@ class _TimetableState extends State<Timetable> {
 
   Future<Map<String, List<Map<String, dynamic>>>> weekTT(
       String newCookies) async {
+    final Map<String, String> headers = {
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Content-Type": "application/json",
+    };
     var response = await http.post(
-      Uri.parse("http://127.0.0.1:3000/timetableweek"),
-      body: {
-        "Dated": selectedDate,
-      },
+      Uri.parse("http://34.131.23.80:8000/timetable_week?dated=$selectedDate"),
+      headers: headers,
+      body: jsonEncode({
+        "login_cookies": newCookies,
+      }),
     );
     if (response.statusCode == 200) {
       Map<String, List<Map<String, dynamic>>> groupedEvents = {};
@@ -184,9 +190,16 @@ class _TimetableState extends State<Timetable> {
 
   Future<Map<String, String>> fetchEventDetails(
       String entryNo, String newCookies) async {
+    final Map<String, String> headers = {
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Content-Type": "application/json",
+    };
     var response = await http.post(
-      Uri.parse("http://127.0.0.1:3000/timetable"),
-      body: {"EventID": entryNo},
+      Uri.parse("http://34.131.23.80:8000/timetable?eventid=$entryNo"),
+      headers: headers,
+      body:
+          jsonEncode({"login_cookies": widget.newCookies, "EventID": entryNo}),
     );
     var eventDetails = jsonDecode(response.body);
     return {

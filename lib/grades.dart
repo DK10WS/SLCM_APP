@@ -24,19 +24,19 @@ class _GradesState extends State<Grades> {
       isLoading = true;
     });
 
-    final url = "http://127.0.0.1:3000/grades";
-
     final Map<String, String> headers = {
-      "Cookie": widget.newCookies,
       "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Content-Type": "application/json",
     };
 
-    final Map<String, String> body = {"Semester": selectedSemester!};
+    final url = "http://34.131.23.80:8000/grades?semester=$selectedSemester";
+    final Map<String, String> body = {"login_cookies": widget.newCookies};
 
     try {
       final session = http.Client();
-      var response = await session.post(Uri.parse(url), body: body);
+      var response = await session.post(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
       session.close();
 
       if (response.statusCode == 200) {

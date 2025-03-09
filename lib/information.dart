@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
@@ -23,42 +25,26 @@ class _InformationState extends State<Information> {
 
   Future<void> fetchInformation() async {
     final Map<String, String> headers = {
-      "Cookie": widget.newCookies,
       "User-Agent":
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Content-Type": "application/json",
     };
-    final url = "http://127.0.0.1:3000/info";
+    final url = "http://34.131.23.80:8000/info";
 
+    final Map<String, String> body = {"login_cookies": widget.newCookies};
     try {
-      final response = await http.get(Uri.parse(url), headers: headers);
-      final document = parse(response.body);
-
-      final registrationNumber = document
-          .querySelector('input[name="RegistrationNo"]')
-          ?.attributes['value'];
-      final name =
-          document.querySelector('input[name="EmpName"]')?.attributes['value'];
-      final semester =
-          document.querySelector('input[name="Semester"]')?.attributes['value'];
-      final program = document
-          .querySelector('input[name="CourseName"]')
-          ?.attributes['value'];
-      final batch =
-          document.querySelector('input[name="Batch"]')?.attributes['value'];
-      final section =
-          document.querySelector('input[name="Section"]')?.attributes['value'];
-
-      var rows = document.querySelectorAll('table#kt_View tr');
-      String? classCoordinator;
-      String? classCoordinatoremail;
-      for (var row in rows) {
-        var cells = row.querySelectorAll('td');
-        if (cells.length > 1 && cells[1].text.trim() == "Class Coordinator") {
-          classCoordinator = cells[2].text.trim();
-          classCoordinatoremail = cells[3].text.trim();
-          break;
-        }
-      }
+      final response = await http.post(Uri.parse(url),
+          headers: headers, body: jsonEncode(body));
+      final document = jsonDecode(response.body);
+      print(document);
+      final registrationNumber = document["registration_no"];
+      final name = document["name"];
+      final semester = document["semester"];
+      final program = document["program"];
+      final batch = document["batch"];
+      final section = document["section"];
+      final classCoordinatoremail = document["class_coordinator_mail"];
+      final classCoordinator = document["class_coordinator"];
 
       if (mounted) {
         setState(() {
