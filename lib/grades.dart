@@ -30,7 +30,7 @@ class _GradesState extends State<Grades> {
       "Content-Type": "application/json",
     };
 
-    final url = "http://34.131.23.80/grades?semester=$selectedSemester";
+    final url = "http://34.131.23.80/api/grades?semester=$selectedSemester";
     final Map<String, String> body = {"login_cookies": widget.newCookies};
 
     try {

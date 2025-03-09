@@ -29,7 +29,8 @@ class _MarksState extends State<Marks> {
           "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
       "Content-Type": "application/json",
     };
-    final url = "http://34.131.23.80/internal_marks?semester=$selectedSemester";
+    final url =
+        "http://34.131.23.80/api/internal_marks?semester=$selectedSemester";
 
     final Map<String, String> body = {"login_cookies": widget.newCookies};
 
