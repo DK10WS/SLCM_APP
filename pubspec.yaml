@@ -58,6 +58,10 @@ flutter:
     - assets/images/attendance.svg
     - assets/images/CGPA.svg
     - assets/images/marks.svg
+    - assets/svg/timetable.svg
+    - assets/svg/people.svg
+    - assets/svg/cap.svg
+    - assets/svg/graph.svg
 
   fonts:
     - family: poppins

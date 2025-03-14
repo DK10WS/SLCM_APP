@@ -2,6 +2,7 @@ C/C++ Structured LogO
 M
 KC:\Dev\flutter\packages\flutter_tools\gradle\src\main\groovy\CMakeLists.txtC
 A
+<<<<<<< HEAD
 ?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ôïÌŠÐ2§ €„ÆÃÏ2m
 k
 iC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\additional_project_files.txt	õïÌŠÐ2 ÚÓ¢ÿÏ2j
@@ -26,3 +27,29 @@ a
 _C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\prefab_config.json	öïÌŠÐ2( äÓ¢ÿÏ2h
 f
 dC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\symbol_folder_index.txt	öïÌŠÐ2[ åÓ¢ÿÏ2
+=======
+?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ÛÞÑ°Ù2§ €„ÆÃÏ2m
+k
+iC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\additional_project_files.txt	ÜÞÑ°Ù2 ÚÓ¢ÿÏ2j
+h
+fC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\android_gradle_build.json	ÜÞÑ°Ù2µ ÜÓ¢ÿÏ2o
+m
+kC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\android_gradle_build_mini.json	ÜÞÑ°Ù2 áÓ¢ÿÏ2\
+Z
+XC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build.ninja	ÜÞÑ°Ù2 Ô ¹Ò¢ÿÏ2`
+^
+\C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build.ninja.txt	ÜÞÑ°Ù2e
+c
+aC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build_file_index.txt	ÜÞÑ°Ù2K æÓ¢ÿÏ2f
+d
+bC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\compile_commands.json	ÜÞÑ°Ù2	j
+h
+fC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\compile_commands.json.bin	ÜÞÑ°Ù2
+p
+n
+lC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\metadata_generation_command.txt	ÜÞÑ°Ù2½ ãÓ¢ÿÏ2c
+a
+_C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\prefab_config.json	ÜÞÑ°Ù2( äÓ¢ÿÏ2h
+f
+dC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\symbol_folder_index.txt	ÜÞÑ°Ù2[ åÓ¢ÿÏ2
+>>>>>>> 13ed5a3 (svgs added)

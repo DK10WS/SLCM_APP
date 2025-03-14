@@ -2,6 +2,7 @@ C/C++ Structured LogO
 M
 KC:\Dev\flutter\packages\flutter_tools\gradle\src\main\groovy\CMakeLists.txtC
 A
+<<<<<<< HEAD
 ?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ÔïÌŠÐ2§ €„ÆÃÏ2u
 s
 qC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\additional_project_files.txt	ÔïÌŠÐ2 ÜÀ¢ÿÏ2r
@@ -26,3 +27,29 @@ i
 gC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\prefab_config.json	ÔïÌŠÐ2( äÀ¢ÿÏ2p
 n
 lC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\symbol_folder_index.txt	ÔïÌŠÐ2c åÀ¢ÿÏ2
+=======
+?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	»ÞÑ°Ù2§ €„ÆÃÏ2u
+s
+qC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\additional_project_files.txt	¼ÞÑ°Ù2 ÜÀ¢ÿÏ2r
+p
+nC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\android_gradle_build.json	¼ÞÑ°Ù2Å ÝÀ¢ÿÏ2w
+u
+sC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\android_gradle_build_mini.json	¼ÞÑ°Ù2  áÀ¢ÿÏ2d
+b
+`C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build.ninja	¼ÞÑ°Ù2ÈÔ Õ¿¢ÿÏ2h
+f
+dC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build.ninja.txt	½ÞÑ°Ù2m
+k
+iC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build_file_index.txt	½ÞÑ°Ù2K æÀ¢ÿÏ2n
+l
+jC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\compile_commands.json	½ÞÑ°Ù2	r
+p
+nC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\compile_commands.json.bin	½ÞÑ°Ù2
+x
+v
+tC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\metadata_generation_command.txt	½ÞÑ°Ù2å ãÀ¢ÿÏ2k
+i
+gC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\prefab_config.json	½ÞÑ°Ù2( äÀ¢ÿÏ2p
+n
+lC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\symbol_folder_index.txt	½ÞÑ°Ù2c åÀ¢ÿÏ2
+>>>>>>> 13ed5a3 (svgs added)
