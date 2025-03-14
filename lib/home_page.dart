@@ -8,7 +8,7 @@ import 'package:mujslcm/timetable.dart';
 import 'package:mujslcm/cgpa.dart';
 import 'login.dart';
 import 'session_manager.dart';
-// import 'package:flutter_svg/flutter_svg.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 String capitalizeFirstName(String fullName) {
   if (fullName.isEmpty) return fullName;
@@ -207,16 +207,16 @@ class HomeScreen extends StatelessWidget {
                   child: Stack(
                     alignment: Alignment.center,
                     children: [
-                      // Positioned(
-                      //   top: -100,
-                      //   right: 0,
-                      //   child: SvgPicture.asset(
-                      //     'assets/images/timetable-icon.svg',
-                      //     height: screenWidth * 0.60,
-                      //     width: screenWidth * 0.10,
-                      //     color: const Color(0xFF232531),
-                      //   ),
-                      // ),
+                      Positioned(
+                        top: -70,
+                        left: 45,
+                        child: SvgPicture.asset(
+                          'assets/svg/timetable.svg',
+                          height: screenWidth * 1.15,
+                          width: screenWidth * 1.1,
+                          color: const Color(0xFFE0A84F).withOpacity(0.8),
+                        ),
+                      ),
                       const Positioned(
                         bottom: 10,
                         child: Text(
@@ -267,16 +267,13 @@ class HomeScreen extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Positioned(
-            //   top: -31,
-            //   left: -10,
-            //   child: SvgPicture.asset(
-            //     'assets/images/attendance.svg',
-            //     height: screenWidth * 0.35,
-            //     width: screenWidth * 0.6,
-            //     color: const Color(0xFF232531),
-            //   ),
-            // ),
+            Positioned(
+              top: 10,
+              child: SvgPicture.asset('assets/svg/people.svg',
+                  height: screenWidth * 0.27,
+                  width: screenWidth * 0.5,
+                  color: const Color(0xFFE08E63).withOpacity(0.8)),
+            ),
             const Positioned(
               bottom: 10,
               child: Text(
@@ -298,39 +295,44 @@ class HomeScreen extends StatelessWidget {
   Widget _marksCard(BuildContext context, double screenWidth) {
     return InkWell(
       onTap: () => _navigateTo(context, Marks(newCookies: newCookies)),
-      child: Container(
-        height: screenWidth * 0.6,
-        width: screenWidth * 0.9,
-        margin: const EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-          color: const Color(0xFFcdeac0),
-          borderRadius: BorderRadius.circular(25),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            // Positioned(
-            //   top: 0,
-            //   child: SvgPicture.asset(
-            //     'assets/images/marks.svg',
-            //     height: screenWidth * 0.29,
-            //     width: screenWidth * 0.6,
-            //     color: const Color(0xFF232531),
-            //   ),
-            // ),
-            const Positioned(
-              bottom: 10,
-              child: Text(
-                "Marks",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontFamily: "Roboto",
-                  fontWeight: FontWeight.bold,
+      child: ClipRRect(
+        // Ensures border radius applies to children too
+        borderRadius: BorderRadius.circular(25),
+        child: Container(
+          height: screenWidth * 0.6,
+          width: screenWidth * 0.9,
+          margin: const EdgeInsets.only(bottom: 20),
+          decoration: BoxDecoration(
+            color: const Color(0xFFcdeac0),
+            borderRadius: BorderRadius.circular(25),
+          ),
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: -33,
+                right: 43,
+                child: SvgPicture.asset(
+                  'assets/svg/cap.svg',
+                  height: screenWidth * 0.45,
+                  width: screenWidth * 0.6,
+                  color: const Color(0xFFA8C79D).withOpacity(0.8),
                 ),
               ),
-            ),
-          ],
+              const Positioned(
+                bottom: 10,
+                child: Text(
+                  "Marks",
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                    fontFamily: "Roboto",
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -350,15 +352,16 @@ class HomeScreen extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Positioned(
-            //   top: -4,
-            //   child: SvgPicture.asset(
-            //     'assets/images/CGPA.svg',
-            //     height: screenWidth * 0.3,
-            //     width: screenWidth * 0.2,
-            //     color: const Color(0xFF232531),
-            //   ),
-            // ),
+            Positioned(
+              top: -20,
+              right: 32,
+              child: SvgPicture.asset(
+                'assets/svg/graph.svg',
+                height: screenWidth * 0.4,
+                width: screenWidth * 0.2,
+                color: const Color(0xFFCC756F).withOpacity(0.8),
+              ),
+            ),
             const Positioned(
               bottom: 10,
               child: Text(
@@ -391,16 +394,16 @@ class HomeScreen extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            // Positioned(
-            //   top: -30,
-            //   right: -20,
-            //   child: SvgPicture.asset(
-            //     'assets/images/grades.svg',
-            //     height: screenWidth * 0.36,
-            //     width: screenWidth * 0.2,
-            //     color: const Color(0xFF232531),
-            //   ),
-            // ),
+            Positioned(
+              top: -30,
+              right: -20,
+              child: SvgPicture.asset(
+                'assets/images/grades.svg',
+                height: screenWidth * 0.36,
+                width: screenWidth * 0.2,
+                color: const Color(0xFF7695B3).withOpacity(0.8),
+              ),
+            ),
             const Positioned(
               bottom: 10,
               child: Text(
