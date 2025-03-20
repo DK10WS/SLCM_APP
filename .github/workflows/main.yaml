@@ -3,10 +3,10 @@ name: "Build and Releases"
 on:
   pull_request:
     branches:
-      - flutter_app
+      - website
   push:
     branches:
-      - flutter_app
+      - website
   workflow_dispatch:
 
 jobs: 
@@ -38,14 +38,17 @@ jobs:
       - name: Install Dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk
+      - name: Build Web Files
+        run: flutter build web
 
-      - name: Upload APK
+      - name: Zip artifacts
+        run: zip -r9 build/web.zip build/web
+
+      - name: Upload WebApk
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: build/web.zip
 
   release:
     name: Create Release
