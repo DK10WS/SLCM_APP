@@ -41,14 +41,11 @@ jobs:
       - name: Build Web Files
         run: flutter build web
 
-      - name: Zip artifacts
-        run: zip -r9 build/web.zip build/web
-
-      - name: Upload WebApk
+      - name: Upload WebApp
         uses: actions/upload-artifact@v4
         with:
-          name: release-apk
-          path: build/web.zip
+          name: release-webapp
+          path: build/web
 
   release:
     name: Create Release
@@ -69,7 +66,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/app-release.apk
+          files: artifacts/web.zip
           tag_name: v1.0.${{ github.run_number }}
           name: "Release v1.0.${{ github.run_number }}"
           body: "Automated release for commit ${{ github.sha }}"
