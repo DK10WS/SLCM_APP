@@ -74,6 +74,14 @@ class Settings extends StatelessWidget {
                     style: TextStyle(color: Colors.grey)),
                 onTap: () => _launchURL('https://github.com/Vanillaicee17'),
               ),
+              ListTile(
+                leading: const Icon(Icons.person, color: Color(0xFFD5E7B5)),
+                title: const Text('Karan Parashar',
+                    style: TextStyle(color: Colors.white)),
+                subtitle: const Text('iOS Last Hope (Backend Developer)',
+                    style: TextStyle(color: Colors.grey)),
+                onTap: () => _launchURL('https://github.com/whyredfire'),
+              ),
               const SizedBox(height: 24),
               const Divider(color: Colors.grey),
               const Text(
