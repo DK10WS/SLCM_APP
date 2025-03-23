@@ -173,11 +173,6 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Hello,",
-              style: TextStyle(
-                  fontSize: 24, color: Colors.white, fontFamily: "poppins"),
-            ),
             Text(
               "${capitalizeFirstName(name)}",
               style: TextStyle(
