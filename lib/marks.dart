@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
+import 'package:mujslcm/redirects.dart';
 
 class Marks extends StatefulWidget {
   final String newCookies;
@@ -24,13 +25,8 @@ class _MarksState extends State<Marks> {
     setState(() {
       isLoading = true;
     });
-    final Map<String, String> header = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-      "Content-Type": "application/json",
-    };
-    final url =
-        "http://34.131.23.80/api/internal_marks?semester=$selectedSemester";
+
+    final url = MarksURL + selectedSemester!;
 
     final Map<String, String> body = {"login_cookies": widget.newCookies};
 

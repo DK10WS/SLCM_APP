@@ -1,8 +1,8 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
+import 'package:mujslcm/redirects.dart';
 
 class Information extends StatefulWidget {
   final String newCookies;
@@ -24,19 +24,15 @@ class _InformationState extends State<Information> {
   }
 
   Future<void> fetchInformation() async {
-    final Map<String, String> headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Content-Type": "application/json",
-    };
-    final url = "http://34.131.23.80/api/info";
+    final url = infomationURL;
 
     final Map<String, String> body = {"login_cookies": widget.newCookies};
     try {
       final response = await http.post(Uri.parse(url),
-          headers: headers, body: jsonEncode(body));
+          headers: header, body: jsonEncode(body));
+
       final document = jsonDecode(response.body);
-      print(document);
+
       final registrationNumber = document["registration_no"];
       final name = document["name"];
       final semester = document["semester"];

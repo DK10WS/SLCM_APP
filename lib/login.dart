@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'session_manager.dart';
+import 'redirects.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -79,13 +80,7 @@ class _MyLoginState extends State<MyLogin> {
       return null;
     }
 
-    const baseurl = "http://34.131.23.80/api/login";
-
-    final headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-      "Content-Type": "application/json",
-    };
+    final baseurl = loginURL;
 
     final payload = jsonEncode({
       "username": username,
@@ -96,7 +91,7 @@ class _MyLoginState extends State<MyLogin> {
 
     try {
       final response = await session.post(Uri.parse(baseurl),
-          body: payload, headers: headers);
+          body: payload, headers: header);
 
       if (response.statusCode == 200) {
         _saveCredentials(username, password);
@@ -169,12 +164,16 @@ class _MyLoginState extends State<MyLogin> {
                 decoration: InputDecoration(
                   filled: true,
                   fillColor: const Color(0xFF24272B),
-                  hintText: 'Name.registration',
+                  hintText: 'Username',
                   hintStyle: const TextStyle(color: Colors.grey),
                   prefixIcon: const Icon(Icons.email, color: Colors.grey),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8.0),
                     borderSide: BorderSide.none,
+                  ),
+                  suffix: Text(
+                    '@muj.manipal.edu',
+                    style: TextStyle(color: Colors.grey),
                   ),
                 ),
                 style: const TextStyle(color: Colors.white),

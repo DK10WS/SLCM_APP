@@ -94,58 +94,61 @@ class _HomePageState extends State<HomePage> {
             const TextStyle(color: Colors.white),
           ),
         ),
-        child: NavigationBar(
-          backgroundColor: const Color(0xFFE7F5D5).withOpacity(0.1),
-          selectedIndex: _selectedIndex,
-          onDestinationSelected: _onItemTapped,
-          destinations: [
-            NavigationDestination(
-              icon: Icon(Icons.person_outline, color: Color(0xFFD5E7B5)),
-              selectedIcon: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _selectedIndex == 0
-                      ? Color(0xFFD5E7B5)
-                      : Colors.transparent,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: NavigationBar(
+            backgroundColor: const Color(0xFFE7F5D5).withOpacity(0.1),
+            selectedIndex: _selectedIndex,
+            onDestinationSelected: _onItemTapped,
+            destinations: [
+              NavigationDestination(
+                icon: Icon(Icons.person_outline, color: Color(0xFFD5E7B5)),
+                selectedIcon: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _selectedIndex == 0
+                        ? Color(0xFFD5E7B5)
+                        : Colors.transparent,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(Icons.person, color: Colors.black),
                 ),
-                padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.person, color: Colors.black),
+                label: 'Me',
               ),
-              label: 'Me',
-            ),
-            NavigationDestination(
-              icon: Icon(Icons.home_outlined, color: Color(0xFFD5E7B5)),
-              selectedIcon: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _selectedIndex == 1
-                      ? Color(0xFFD5E7B5)
-                      : Colors.transparent,
+              NavigationDestination(
+                icon: Icon(Icons.home_outlined, color: Color(0xFFD5E7B5)),
+                selectedIcon: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _selectedIndex == 1
+                        ? Color(0xFFD5E7B5)
+                        : Colors.transparent,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(Icons.home, color: Colors.black),
                 ),
-                padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.home, color: Colors.black),
+                label: 'Home',
               ),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              icon: const Icon(
-                Icons.contact_support_outlined,
-                color: Color(0xFFD5E7B5),
-                size: 20,
-              ),
-              selectedIcon: Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: _selectedIndex == 2
-                      ? Color(0xFFD5E7B5)
-                      : Colors.transparent,
+              NavigationDestination(
+                icon: const Icon(
+                  Icons.contact_support_outlined,
+                  color: Color(0xFFD5E7B5),
+                  size: 20,
                 ),
-                padding: const EdgeInsets.all(8),
-                child: const Icon(Icons.contact_support, color: Colors.black),
+                selectedIcon: Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _selectedIndex == 2
+                        ? Color(0xFFD5E7B5)
+                        : Colors.transparent,
+                  ),
+                  padding: const EdgeInsets.all(8),
+                  child: const Icon(Icons.contact_support, color: Colors.black),
+                ),
+                label: 'About',
               ),
-              label: 'About',
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -373,43 +376,45 @@ class HomeScreen extends StatelessWidget {
 
   Widget _gradesCard(BuildContext context, double screenWidth) {
     return InkWell(
-      onTap: () => _navigateTo(context, Grades(newCookies: newCookies)),
-      child: Container(
-        height: screenWidth * 0.6,
-        width: screenWidth * 0.9,
-        margin: const EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-          color: const Color(0xFF9ab7d3),
+        onTap: () => _navigateTo(context, Grades(newCookies: newCookies)),
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              top: -30,
-              right: -20,
-              child: SvgPicture.asset(
-                'assets/images/grades.svg',
-                height: screenWidth * 0.36,
-                width: screenWidth * 0.2,
-                color: const Color(0xFF7695B3).withOpacity(0.8),
-              ),
+          child: Container(
+            height: screenWidth * 0.6,
+            width: screenWidth * 0.9,
+            margin: const EdgeInsets.only(bottom: 20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF9ab7d3),
+              borderRadius: BorderRadius.circular(25),
             ),
-            const Positioned(
-              bottom: 10,
-              child: Text(
-                "Grades",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontFamily: "Monserat",
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Positioned(
+                  top: -30,
+                  right: -20,
+                  child: SvgPicture.asset(
+                    'assets/images/grades.svg',
+                    height: screenWidth * 0.36,
+                    width: screenWidth * 0.2,
+                    color: const Color(0xFF7695B3).withOpacity(0.8),
+                  ),
                 ),
-              ),
+                const Positioned(
+                  bottom: 10,
+                  child: Text(
+                    "Grades",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontFamily: "Monserat",
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   void _navigateTo(BuildContext context, Widget page) {

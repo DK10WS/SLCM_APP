@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'redirects.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert';
@@ -165,14 +166,9 @@ class _TimetableState extends State<Timetable> {
 
   Future<Map<String, List<Map<String, dynamic>>>> weekTT(
       String newCookies) async {
-    final Map<String, String> headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Content-Type": "application/json",
-    };
     var response = await http.post(
-      Uri.parse("http://34.131.23.80/api/timetable_week?dated=$selectedDate"),
-      headers: headers,
+      Uri.parse(TimetableWeek + selectedDate),
+      headers: header,
       body: jsonEncode({
         "login_cookies": newCookies,
       }),
@@ -190,14 +186,9 @@ class _TimetableState extends State<Timetable> {
 
   Future<Map<String, String>> fetchEventDetails(
       String entryNo, String newCookies) async {
-    final Map<String, String> headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Content-Type": "application/json",
-    };
     var response = await http.post(
-      Uri.parse("http://34.131.23.80/api/timetable?eventid=$entryNo"),
-      headers: headers,
+      Uri.parse(TimetableEvent + entryNo),
+      headers: header,
       body:
           jsonEncode({"login_cookies": widget.newCookies, "EventID": entryNo}),
     );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
+import 'package:mujslcm/redirects.dart';
 
 class AttendancePage extends StatefulWidget {
   final String newCookies;
@@ -22,22 +23,16 @@ class _AttendancePageState extends State<AttendancePage> {
   }
 
   Future<List<Map<String, dynamic>>?> fetchAttendance(String newCookies) async {
-    final Map<String, String> headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-      "Content-Type": "application/json",
-    };
-
     print(newCookies);
 
     final Map<String, String> body = {"login_cookies": newCookies};
 
-    const attendanceUrl = "http://34.131.23.80/api/attendance";
+    final attendanceUrl = AttendanceURL;
 
     final session = http.Client();
     final response = await session.post(
       Uri.parse(attendanceUrl),
-      headers: headers,
+      headers: header,
       body: jsonEncode(body),
     );
 

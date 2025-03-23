@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:mujslcm/redirects.dart';
 
 class Grades extends StatefulWidget {
   final String newCookies;
@@ -24,19 +25,13 @@ class _GradesState extends State<Grades> {
       isLoading = true;
     });
 
-    final Map<String, String> headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
-      "Content-Type": "application/json",
-    };
-
-    final url = "http://34.131.23.80/api/grades?semester=$selectedSemester";
+    final url = GradesURL + selectedSemester!;
     final Map<String, String> body = {"login_cookies": widget.newCookies};
 
     try {
       final session = http.Client();
       var response = await session.post(Uri.parse(url),
-          headers: headers, body: jsonEncode(body));
+          headers: header, body: jsonEncode(body));
       session.close();
 
       if (response.statusCode == 200) {
