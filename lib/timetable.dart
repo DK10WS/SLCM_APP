@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'redirects.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert';
@@ -166,8 +167,7 @@ class _TimetableState extends State<Timetable> {
   Future<Map<String, List<Map<String, dynamic>>>> weekTT(
       String newCookies) async {
     var response = await http.post(
-      Uri.parse(
-          "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetStudentCalenderEventList"),
+      Uri.parse(TimeTableWeek),
       headers: {"user-agent": "Mozilla/5.0", "Cookie": newCookies},
       body: {
         "Year": "",
@@ -191,8 +191,7 @@ class _TimetableState extends State<Timetable> {
   Future<Map<String, String>> fetchEventDetails(
       String entryNo, String newCookies) async {
     var response = await http.post(
-      Uri.parse(
-          "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetEventDetailStudent"),
+      Uri.parse(TimeTableEvent),
       headers: {"user-agent": "Mozilla/5.0", "Cookie": newCookies},
       body: {"EventID": entryNo},
     );
@@ -217,10 +216,8 @@ class _TimetableState extends State<Timetable> {
     if (timeString == null || timeString.isEmpty) return 'No Time Available';
 
     try {
-      // Split the time string into start and end times
       List<String> times = timeString.split('To');
-      if (times.length != 2)
-        return timeString; // Return original if format is unexpected
+      if (times.length != 2) return timeString;
 
       String startTime = times[0].trim();
       String endTime = times[1].trim();

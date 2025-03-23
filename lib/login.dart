@@ -6,6 +6,7 @@ import 'home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'session_manager.dart';
 import 'package:local_auth/local_auth.dart';
+import 'redirects.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -80,8 +81,8 @@ class _MyLoginState extends State<MyLogin> {
       return null;
     }
 
-    const url = "https://mujslcm.jaipur.manipal.edu";
-    const baseurl = "https://mujslcm.jaipur.manipal.edu";
+    var url = loginURL;
+    var baseurl = loginURL;
 
     final headers = {
       "User-Agent":
@@ -161,7 +162,6 @@ class _MyLoginState extends State<MyLogin> {
 
             _saveCredentials(username, password);
 
-            // Reset logout state and set session cookies
             SessionManager.setSession(cleanedCookies + '; ' + cleanedAPI);
 
             return {'name': name ?? '', 'newCookies': newCookies};

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'redirects.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
@@ -30,8 +31,7 @@ class _AttendancePageState extends State<AttendancePage> {
 
     final Map<String, String> body = {"StudentCode": ""};
 
-    const attendanceUrl =
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetAttendanceSummaryList";
+    final attendanceUrl = Attendance;
 
     final session = http.Client();
     final response = await session.post(Uri.parse(attendanceUrl),

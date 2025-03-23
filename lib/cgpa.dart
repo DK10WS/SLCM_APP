@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'redirects.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
@@ -26,8 +27,7 @@ class _CGPAState extends State<CGPA> {
   }
 
   Future<void> fetchGrades() async {
-    final url =
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetCGPAGPAForFaculty";
+    final url = CGPAURL;
     final Map<String, String> headers = {
       "Cookie": widget.newCookies,
       "User-Agent":
