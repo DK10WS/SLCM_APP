@@ -382,44 +382,45 @@ class HomeScreen extends StatelessWidget {
 
   Widget _gradesCard(BuildContext context, double screenWidth) {
     return InkWell(
-      onTap: () => _navigateTo(context, Grades(newCookies: newCookies)),
-      child: Container(
-        height: screenWidth * 0.6,
-        width: screenWidth * 0.9,
-        margin: const EdgeInsets.only(bottom: 20),
-        decoration: BoxDecoration(
-          color: const Color(0xFF9ab7d3),
+        onTap: () => _navigateTo(context, Grades(newCookies: newCookies)),
+        child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
-        ),
-        child: Stack(
-          alignment: Alignment.center,
-          children: [
-            Positioned(
-              top: -30,
-              right: -20,
-              child: SvgPicture.asset(
-                'assets/images/grades.svg',
-                height: screenWidth * 0.36,
-                width: screenWidth * 0.2,
-                color: const Color(0xFF7695B3).withOpacity(0.8),
-              ),
+          child: Container(
+            height: screenWidth * 0.6,
+            width: screenWidth * 0.9,
+            margin: const EdgeInsets.only(bottom: 20),
+            decoration: BoxDecoration(
+              color: const Color(0xFF9ab7d3),
+              borderRadius: BorderRadius.circular(25),
             ),
-            const Positioned(
-              bottom: 10,
-              child: Text(
-                "Grades",
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.black,
-                  fontFamily: "Roboto",
-                  fontWeight: FontWeight.bold,
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Positioned(
+                  top: -30,
+                  right: -20,
+                  child: SvgPicture.asset(
+                    'assets/images/grades.svg',
+                    height: screenWidth * 0.36,
+                    width: screenWidth * 0.2,
+                    color: const Color(0xFF7695B3).withOpacity(0.8),
+                  ),
                 ),
-              ),
+                const Positioned(
+                  bottom: 10,
+                  child: Text(
+                    "Grades",
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                      fontFamily: "Monserat",
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
   }
 
   void _navigateTo(BuildContext context, Widget page) {
