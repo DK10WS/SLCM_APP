@@ -550,7 +550,7 @@ class _MyLoginState extends State<MyLogin> {
         headers: headers, body: ExpirePayload);
 
     if (onExpire.statusCode != 200) {
-      print("Expire request failed: ${onExpire.statusCode}");
+      _showError("Expire request failed: ${onExpire.statusCode}");
       return;
     }
 
@@ -566,7 +566,7 @@ class _MyLoginState extends State<MyLogin> {
       });
       _startTimer();
     } else {
-      print("Failed to send OTP: ${response.statusCode}");
+      _showError("Failed to send OTP: ${response.statusCode}");
     }
   }
 
