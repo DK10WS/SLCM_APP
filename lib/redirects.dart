@@ -7,3 +7,9 @@ String TimeTableWeek =
 String TimeTableEvent = loginURL + "/Student/Academic/GetEventDetailStudent";
 String InformationURL = loginURL + "/Employee/EmployeeDirectory/IndexStudent";
 String CGPAURL = loginURL + "/Student/Academic/GetCGPAGPAForFaculty";
+
+// Parents Login
+
+String otpValidateURL = loginURL + "/Home/OnValidate";
+String otpIndexURL = loginURL + "/Home/IndexOTP";
+String HomeURL = loginURL + "/Home/Dashboard";
