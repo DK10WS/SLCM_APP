@@ -7,6 +7,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'session_manager.dart';
 import 'package:local_auth/local_auth.dart';
 import 'redirects.dart';
+import 'dart:async';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -428,10 +429,71 @@ class _MyLoginState extends State<MyLogin> {
 
   final TextEditingController _otpController = TextEditingController();
 
+  int _remainingTime = 120;
+  Timer? _timer;
+
+  void _startTimer() {
+    if (_timer != null) {
+      _timer!.cancel();
+    }
+
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_remainingTime > 0) {
+        setState(() {
+          _remainingTime--;
+        });
+      } else {
+        timer.cancel();
+      }
+    });
+  }
+
+  String _formatTime(int seconds) {
+    int minutes = seconds ~/ 60;
+    int secs = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
+  }
+
+  @override
+  void dispose() {
+    _otpController.dispose();
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  Future<void> _verifyOTP() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final result = await otpLogin(_otpController.text);
+
+    if (result?["name"] != "") {
+      if (mounted) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomePage(
+              name: result?['name'] ?? "",
+              newCookies: result?['newCookies'] ?? "",
+            ),
+          ),
+        );
+      }
+    }
+  }
+
   Widget _VerifyOTP() {
+    _startTimer();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        Text(
+          "Time Remaining: ${_formatTime(_remainingTime)}",
+          style: const TextStyle(
+              color: Colors.red, fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 10),
         TextField(
           controller: _otpController,
           decoration: InputDecoration(
@@ -459,34 +521,53 @@ class _MyLoginState extends State<MyLogin> {
               ),
               padding: const EdgeInsets.symmetric(vertical: 16.0),
             ),
-            onPressed: () async {
-              _toggleLoading(true);
-              final result = await otpLogin(_otpController.text);
-              _toggleLoading(false);
-
-              if (result?["name"] != "") {
-                if (mounted) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomePage(
-                        name: result?['name'] ?? "",
-                        newCookies: result?['newCookies'] ?? "",
-                      ),
-                    ),
-                  );
-                }
-              }
-            },
-            child: _isLoading
-                ? const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Colors.black),
-                  )
-                : const Text('Login'),
+            onPressed: _remainingTime > 0 ? _verifyOTP : _resendOTP,
+            child: _remainingTime > 0
+                ? (_isLoading
+                    ? const CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(Colors.black),
+                      )
+                    : const Text('Login'))
+                : const Text('Resend OTP'),
           ),
         ),
       ],
     );
+  }
+
+  void _resendOTP() async {
+    var session = http.Client();
+
+    final headers = {
+      "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+      'Cookie': Gcookie,
+    };
+
+    final ExpirePayload = {"Flag": "--"};
+
+    final onExpire = await session.post(Uri.parse(OnExpireURL),
+        headers: headers, body: ExpirePayload);
+
+    if (onExpire.statusCode != 200) {
+      print("Expire request failed: ${onExpire.statusCode}");
+      return;
+    }
+
+    final payload = {"QnsStr": "--"};
+
+    final response = await session.post(Uri.parse(ResendOTPUrl),
+        headers: headers, body: payload);
+
+    if (response.statusCode == 200) {
+      print("OTP Sent Successfully!");
+      setState(() {
+        _remainingTime = 120;
+      });
+      _startTimer();
+    } else {
+      print("Failed to send OTP: ${response.statusCode}");
+    }
   }
 
   Widget _buildSendOTP() {

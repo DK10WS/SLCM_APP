@@ -13,3 +13,5 @@ String CGPAURL = loginURL + "/Student/Academic/GetCGPAGPAForFaculty";
 String otpValidateURL = loginURL + "/Home/OnValidate";
 String otpIndexURL = loginURL + "/Home/IndexOTP";
 String HomeURL = loginURL + "/Home/Dashboard";
+String OnExpireURL = loginURL + "/Home/OnExpire";
+String ResendOTPUrl = loginURL + "/Home/ResendOTP";
