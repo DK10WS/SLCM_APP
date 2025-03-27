@@ -67,6 +67,7 @@ class _HomePageState extends State<HomePage> {
           "MUJ SWITCH",
           style: TextStyle(color: Colors.white, fontFamily: "Gotham"),
         ),
+        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Color(0xFFD5E7B5)),
@@ -188,7 +189,7 @@ class HomeScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 20),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFffcb69),
+                    backgroundColor: const Color(0xFFfdde69),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
@@ -206,7 +207,7 @@ class HomeScreen extends StatelessWidget {
                           'assets/svg/timetable.svg',
                           height: screenWidth * 1.15,
                           width: screenWidth * 1.1,
-                          color: const Color(0xFFE0A84F).withOpacity(0.8),
+                          color: const Color(0xFF121316).withOpacity(0.8),
                         ),
                       ),
                       const Positioned(
@@ -252,7 +253,7 @@ class HomeScreen extends StatelessWidget {
         width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFffac81),
+          color: const Color(0xFFfb894b),
           borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
@@ -263,7 +264,7 @@ class HomeScreen extends StatelessWidget {
               child: SvgPicture.asset('assets/svg/people.svg',
                   height: screenWidth * 0.27,
                   width: screenWidth * 0.5,
-                  color: const Color(0xFFE08E63).withOpacity(0.8)),
+                  color: const Color(0xFF121316).withOpacity(0.8)),
             ),
             const Positioned(
               bottom: 10,
@@ -293,7 +294,7 @@ class HomeScreen extends StatelessWidget {
           width: screenWidth * 0.9,
           margin: const EdgeInsets.only(bottom: 20),
           decoration: BoxDecoration(
-            color: const Color(0xFFcdeac0),
+            color: const Color(0xFFb6f36a),
             borderRadius: BorderRadius.circular(25),
           ),
           child: Stack(
@@ -306,7 +307,7 @@ class HomeScreen extends StatelessWidget {
                   'assets/svg/cap.svg',
                   height: screenWidth * 0.45,
                   width: screenWidth * 0.6,
-                  color: const Color(0xFFA8C79D).withOpacity(0.8),
+                  color: const Color(0xFF121316).withOpacity(0.8),
                 ),
               ),
               const Positioned(
@@ -336,7 +337,7 @@ class HomeScreen extends StatelessWidget {
         width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFff928b),
+          color: const Color(0xFFfd6297),
           borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
@@ -349,7 +350,7 @@ class HomeScreen extends StatelessWidget {
                 'assets/svg/graph.svg',
                 height: screenWidth * 0.4,
                 width: screenWidth * 0.2,
-                color: const Color(0xFFCC756F).withOpacity(0.8),
+                color: const Color(0xFF121316).withOpacity(0.8),
               ),
             ),
             const Positioned(
@@ -379,7 +380,7 @@ class HomeScreen extends StatelessWidget {
             width: screenWidth * 0.9,
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-              color: const Color(0xFF9ab7d3),
+              color: const Color(0xFF9b77e5),
               borderRadius: BorderRadius.circular(25),
             ),
             child: Stack(
@@ -392,7 +393,7 @@ class HomeScreen extends StatelessWidget {
                     'assets/images/grades.svg',
                     height: screenWidth * 0.36,
                     width: screenWidth * 0.2,
-                    color: const Color(0xFF7695B3).withOpacity(0.8),
+                    color: const Color(0xFF121316).withOpacity(0.8),
                   ),
                 ),
                 const Positioned(

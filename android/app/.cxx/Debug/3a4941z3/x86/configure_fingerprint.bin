@@ -3,6 +3,7 @@ M
 KC:\Dev\flutter\packages\flutter_tools\gradle\src\main\groovy\CMakeLists.txtC
 A
 <<<<<<< HEAD
+<<<<<<< HEAD
 ?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ôïÌŠĞ2§ €„ÆÃÏ2m
 k
 iC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\additional_project_files.txt	õïÌŠĞ2 ÚÓ¢ÿÏ2j
@@ -29,27 +30,34 @@ f
 dC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\symbol_folder_index.txt	öïÌŠĞ2[ åÓ¢ÿÏ2
 =======
 ?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ÛŞÑ°Ù2§ €„ÆÃÏ2m
+=======
+?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ååÄİ2§ €„ÆÃÏ2m
+>>>>>>> 28d910c (widget colour changes and cneter alingment of title)
 k
-iC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\additional_project_files.txt	ÜŞÑ°Ù2 ÚÓ¢ÿÏ2j
+iC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\additional_project_files.txt	ååÄİ2 ÚÓ¢ÿÏ2j
 h
-fC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\android_gradle_build.json	ÜŞÑ°Ù2µ ÜÓ¢ÿÏ2o
+fC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\android_gradle_build.json	ååÄİ2µ ÜÓ¢ÿÏ2o
 m
-kC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\android_gradle_build_mini.json	ÜŞÑ°Ù2 áÓ¢ÿÏ2\
+kC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\android_gradle_build_mini.json	ååÄİ2 áÓ¢ÿÏ2\
 Z
-XC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build.ninja	ÜŞÑ°Ù2 Ô ¹Ò¢ÿÏ2`
+XC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build.ninja	ååÄİ2 Ô ¹Ò¢ÿÏ2`
 ^
-\C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build.ninja.txt	ÜŞÑ°Ù2e
+\C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build.ninja.txt	ååÄİ2e
 c
-aC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build_file_index.txt	ÜŞÑ°Ù2K æÓ¢ÿÏ2f
+aC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\build_file_index.txt	ååÄİ2K æÓ¢ÿÏ2f
 d
-bC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\compile_commands.json	ÜŞÑ°Ù2	j
+bC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\compile_commands.json	ååÄİ2	j
 h
-fC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\compile_commands.json.bin	ÜŞÑ°Ù2
+fC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\compile_commands.json.bin	çåÄİ2
 p
 n
-lC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\metadata_generation_command.txt	ÜŞÑ°Ù2½ ãÓ¢ÿÏ2c
+lC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\metadata_generation_command.txt	çåÄİ2½ ãÓ¢ÿÏ2c
 a
-_C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\prefab_config.json	ÜŞÑ°Ù2( äÓ¢ÿÏ2h
+_C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\prefab_config.json	çåÄİ2( äÓ¢ÿÏ2h
 f
+<<<<<<< HEAD
 dC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\symbol_folder_index.txt	ÜŞÑ°Ù2[ åÓ¢ÿÏ2
 >>>>>>> 13ed5a3 (svgs added)
+=======
+dC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\x86\symbol_folder_index.txt	çåÄİ2[ åÓ¢ÿÏ2
+>>>>>>> 28d910c (widget colour changes and cneter alingment of title)

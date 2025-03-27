@@ -3,6 +3,7 @@ M
 KC:\Dev\flutter\packages\flutter_tools\gradle\src\main\groovy\CMakeLists.txtC
 A
 <<<<<<< HEAD
+<<<<<<< HEAD
 ?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ÔïÌŠĞ2§ €„ÆÃÏ2u
 s
 qC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\additional_project_files.txt	ÔïÌŠĞ2 ÜÀ¢ÿÏ2r
@@ -29,27 +30,34 @@ n
 lC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\symbol_folder_index.txt	ÔïÌŠĞ2c åÀ¢ÿÏ2
 =======
 ?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	»ŞÑ°Ù2§ €„ÆÃÏ2u
+=======
+?com.android.build.gradle.internal.cxx.io.EncodedFileFingerPrint	ÇäÄİ2§ €„ÆÃÏ2u
+>>>>>>> 28d910c (widget colour changes and cneter alingment of title)
 s
-qC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\additional_project_files.txt	¼ŞÑ°Ù2 ÜÀ¢ÿÏ2r
+qC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\additional_project_files.txt	ÇäÄİ2 ÜÀ¢ÿÏ2r
 p
-nC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\android_gradle_build.json	¼ŞÑ°Ù2Å İÀ¢ÿÏ2w
+nC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\android_gradle_build.json	ÇäÄİ2Å İÀ¢ÿÏ2w
 u
-sC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\android_gradle_build_mini.json	¼ŞÑ°Ù2  áÀ¢ÿÏ2d
+sC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\android_gradle_build_mini.json	ÇäÄİ2  áÀ¢ÿÏ2d
 b
-`C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build.ninja	¼ŞÑ°Ù2ÈÔ Õ¿¢ÿÏ2h
+`C:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build.ninja	ÌäÄİ2ÈÔ Õ¿¢ÿÏ2h
 f
-dC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build.ninja.txt	½ŞÑ°Ù2m
+dC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build.ninja.txt	ÌäÄİ2m
 k
-iC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build_file_index.txt	½ŞÑ°Ù2K æÀ¢ÿÏ2n
+iC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\build_file_index.txt	ÌäÄİ2K æÀ¢ÿÏ2n
 l
-jC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\compile_commands.json	½ŞÑ°Ù2	r
+jC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\compile_commands.json	ÌäÄİ2	r
 p
-nC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\compile_commands.json.bin	½ŞÑ°Ù2
+nC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\compile_commands.json.bin	ÌäÄİ2
 x
 v
-tC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\metadata_generation_command.txt	½ŞÑ°Ù2å ãÀ¢ÿÏ2k
+tC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\metadata_generation_command.txt	ÌäÄİ2å ãÀ¢ÿÏ2k
 i
-gC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\prefab_config.json	½ŞÑ°Ù2( äÀ¢ÿÏ2p
+gC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\prefab_config.json	ÌäÄİ2( äÀ¢ÿÏ2p
 n
+<<<<<<< HEAD
 lC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\symbol_folder_index.txt	½ŞÑ°Ù2c åÀ¢ÿÏ2
 >>>>>>> 13ed5a3 (svgs added)
+=======
+lC:\Users\ameys\StudioProjects\MUJ_SLCM--\android\app\.cxx\Debug\3a4941z3\armeabi-v7a\symbol_folder_index.txt	ÑäÄİ2c åÀ¢ÿÏ2
+>>>>>>> 28d910c (widget colour changes and cneter alingment of title)
