@@ -9,7 +9,7 @@ on:
       - flutter_app
   workflow_dispatch:
 
-jobs: 
+jobs:
   build:
     name: Build & Release
     runs-on: ubuntu-latest
@@ -17,29 +17,42 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      
+
       - name: Set Gradle Java Home
         run: sed -i '$d' android/gradle.properties
 
       - name: Set Up Java
         uses: actions/setup-java@v3
         with:
-          distribution: 'oracle'
-          java-version: '17'
+          distribution: "oracle"
+          java-version: "17"
           cache: gradle
 
       - name: Set Up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.2'
-          channel: 'stable'
-          cache: true 
+          flutter-version: "3.27.2"
+          channel: "stable"
+          cache: true
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
+          ls -l android/
+
+      - name: Create key.properties
+        run: |
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=upload-keystore.jks" >> android/key.properties
+          cat android/key.properties
 
       - name: Install Dependencies
         run: flutter pub get
 
       - name: Build APK
-        run: flutter build apk
+        run: flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
