@@ -8,6 +8,7 @@ import 'session_manager.dart';
 import 'package:local_auth/local_auth.dart';
 import 'redirects.dart';
 import 'dart:async';
+import 'change_password.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -154,6 +155,18 @@ class _MyLoginState extends State<MyLogin> {
       if (loginResponse.statusCode == 302) {
         final locationHeader = loginResponse.headers['location'];
         if (locationHeader != null) {
+          if (locationHeader.contains('/Home/ChangePassword')) {
+            final newCookies =
+                cleanedCookies + (cleanedAPI.isNotEmpty ? '; $cleanedAPI' : '');
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    ChangePasswordPage(sessionCookie: newCookies),
+              ),
+            );
+            return null;
+          }
           final redirectedUrl = Uri.parse(baseurl + locationHeader);
 
           final newCookies =
