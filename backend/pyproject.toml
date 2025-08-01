@@ -1,0 +1,14 @@
+[project]
+name = "betterslcm-backend"
+version = "0.1.0"
+description = "FastAPI application for SLCM Switch"
+readme = "README.md"
+authors = [
+    { name = "Karan Parashar", email = "whyredfire@gmail.com" },
+]
+requires-python = ">=3.13"
+dependencies = [
+    "bs4>=0.0.2",
+    "fastapi[standard]>=0.116.1",
+    "requests>=2.32.4",
+]
