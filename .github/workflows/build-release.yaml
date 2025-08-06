@@ -1,4 +1,4 @@
-name: "Build and Release"
+run-name: "Build and Release ${{ github.ref_name }}"
 
 on:
   push:
@@ -71,21 +71,24 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - run: echo "today=$(date -I)" >> $GITHUB_ENV
 
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
           name: release-apk
           path: artifacts/
+      - run: mv artifacts/app-release.apk artifacts/slcm-switch-${{ github.ref_name }}-${{ env.today }}.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/app-release.apk
+          files: artifacts/slcm-switch-${{ github.ref_name }}-${{ env.today }}.apk
           tag_name: ${{ github.ref_name }}
-          name: "Release ${{ github.ref_name }}"
-          body: "Automated release for ${{ github.ref_name }}"
+          name: "Release version ${{ github.ref_name }}"
+          body: "Automated release for version ${{ github.ref_name }}"
           draft: false
           prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
