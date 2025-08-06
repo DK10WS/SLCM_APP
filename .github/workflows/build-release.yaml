@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set Gradle Java Home
-        run: sed -i '$d' android/gradle.properties
+        run: sed -i '$d' frontend/android/gradle.properties
 
       - name: Set Up Java
         uses: actions/setup-java@v3
@@ -34,12 +34,13 @@ jobs:
 
       - name: Decode Keystore
         run: |
+          cd frontend
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > upload-keystore.jks
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
-          ls -l
 
       - name: Create key.properties
         run: |
+          cd frontend
           echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
           echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
           echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
@@ -47,16 +48,20 @@ jobs:
           cat android/key.properties
 
       - name: Install Dependencies
-        run: flutter pub get
+        run: |
+          cd frontend
+          flutter pub get
 
       - name: Build APK
-        run: flutter build apk --release
+        run: |
+          cd frontend
+          flutter build apk --release
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
+          path: frontend/build/app/outputs/flutter-apk/app-release.apk
 
   release:
     name: Create Release
