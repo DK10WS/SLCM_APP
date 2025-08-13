@@ -1,10 +1,15 @@
 from pydantic import BaseModel
 
 
-class UserCredentials(BaseModel):
+class Credentials(BaseModel):
     username: str
     password: str | str = ""
 
 
-class ParentsLogin(BaseModel):
+class loginCookies(BaseModel):
+    login_cookies: str
+
+
+class parentLogin(BaseModel):
+    cookies: str
     otp: str

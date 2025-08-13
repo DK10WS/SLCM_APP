@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from fastapi import APIRouter, Response, Request, HTTPException
 import requests
 
-from schemas import UserCredentials, ParentsLogin
+from schemas import Credentials, loginCookies, parentLogin
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0",
@@ -25,30 +25,22 @@ API_REF = {
 }
 
 
-def cookies_template(token_cookie, session_cookie):
-    return {
-        "__RequestVerificationToken": token_cookie,
-        "ASP.NET_SessionId": session_cookie,
-    }
-
-
-def _make_request(endpoint, request, data=None, redirect=True):
+def make_request(login_cookies, endpoint, request, data=None):
     try:
+        login_cookies_array = login_cookies.split(";")
+
         res = requests.post(
             url=API_REF["login"] + API_REF[endpoint],
             data=data,
             headers=HEADERS,
-            cookies=cookies_template(
-                request.cookies.get("__RequestVerificationToken"),
-                request.cookies.get("ASP.NET_SessionId"),
-            ),
-            allow_redirects=redirect,
+            cookies={
+                "__RequestVerificationToken": login_cookies_array[0],
+                "ASP.NET_SessionId": login_cookies_array[1],
+            },
         )
 
-        # these endpoints donot return json response
-        if endpoint in ["otp_index", "otp_validate", "otp_expire", "otp_resend"]:
-            return res.status_code, res.content  # usually a yes or no
-
+        if endpoint == "otp_index" or endpoint == "otp_validate":
+            return res
         return res.json()
     except requests.exceptions.JSONDecodeError:
         raise HTTPException(status_code=401, detail={"message": "unauthorized"})
@@ -62,25 +54,43 @@ def _get_token():
 
     token = soup.find("input", {"name": "__RequestVerificationToken"})["value"]
     cookies = res.headers.get("Set-Cookie").split(";")[0]
-    token_cookie = cookies.split("=")[1]
+    cookie = cookies.split("=")[1]
 
-    return token, token_cookie
+    return token, cookie
+
+
+def _get_otp_token(cook):
+    login_cookies_array = cook.split(";")
+    cookies = {
+        "__RequestVerificationToken": login_cookies_array[0],
+        "ASP.NET_SessionId": login_cookies_array[1],
+    }
+
+    res = requests.get(
+        API_REF["login"] + API_REF["otp_index"], headers=HEADERS, cookies=cookies
+    )
+
+    soup = BeautifulSoup(res.content, "html.parser")
+    token = soup.find("input", {"name": "__RequestVerificationToken"})["value"]
+
+    return token
 
 
 app = APIRouter()
 
 
 @app.post("/login")
-async def login(credentials: UserCredentials, response: Response):
+async def login(creds: Credentials, response: Response):
 
-    token, token_cookie = _get_token()
-    cookies = {"__RequestVerificationToken": token_cookie}
+    token, cookie = _get_token()
+
+    cookies = {"__RequestVerificationToken": cookie}
     payload = {
         "__RequestVerificationToken": token,
         "EmailFor": "@muj.manipal.edu",
         "LoginFor": "2",
-        "UserName": credentials.username,
-        "Password": credentials.password,
+        "UserName": creds.username,
+        "Password": creds.password,
     }
 
     res = requests.post(
@@ -94,38 +104,42 @@ async def login(credentials: UserCredentials, response: Response):
     if not res.headers.get("Set-Cookie"):
         raise HTTPException(status_code=401, detail={"message": "invalid credentials"})
 
-    session_cookie = res.headers.get("Set-Cookie").split(";")[0].split("=")[1]
+    session_id = res.headers.get("Set-Cookie").split(";")[0].split("=")[1]
 
     response.set_cookie(
-        key="__RequestVerificationToken", value=token_cookie, expires="Session"
+        key="__RequestVerificationToken", value=cookie, expires="Session"
     )
-    response.set_cookie(key="ASP.NET_SessionId", value=session_cookie)
+    response.set_cookie(key="ASP.NET_SessionId", value=session_id)
 
     details_page = requests.get(
         url=API_REF["login"] + API_REF["details"],
         headers=HEADERS,
-        cookies=cookies_template(token_cookie, session_cookie),
+        cookies={
+            "__RequestVerificationToken": cookie,
+            "ASP.NET_SessionId": session_id,
+        },
     ).content
 
     details_soup = BeautifulSoup(details_page, "html.parser")
-    student_name = details_soup.find(class_="kt-user-card__name").text
+    user_card_name_element = details_soup.find(class_="kt-user-card__name").text
 
     return {
         "message": "user logged in",
-        "name": student_name.title(),
+        "name": user_card_name_element,
+        "login_cookies": f"{cookie};{session_id}",
     }
 
 
 @app.post("/login/parents")
-async def login(credentials: UserCredentials, response: Response):
-    token, token_cookie = _get_token()
+async def login(creds: Credentials, response: Response):
+    token, cookie = _get_token()
 
-    cookies = {"__RequestVerificationToken": token_cookie}
+    cookies = {"__RequestVerificationToken": cookie}
     payload = {
         "__RequestVerificationToken": token,
         "EmailFor": "",
         "LoginFor": "3",
-        "UserName": f"{credentials.username}@muj.manipal.edu",
+        "UserName": creds.username,
         "Password": "",
     }
 
@@ -137,96 +151,84 @@ async def login(credentials: UserCredentials, response: Response):
         allow_redirects=False,
     )
 
-    student_name = credentials.username.split(".")[0]
+    student_name = creds.username.split(".")[0]
     session_id = res.headers.get("Set-Cookie").split(";")[0].split("=")[1]
 
     response.set_cookie(
-        key="__RequestVerificationToken", value=token_cookie, expires="Session"
+        key="__RequestVerificationToken", value=cookie, expires="Session"
     )
     response.set_cookie(key="ASP.NET_SessionId", value=session_id)
 
     return {
         "message": "OTP sent successfully",
-        "name": student_name.title(),
+        "name": student_name,
+        "login_cookies": f"{cookie};{session_id}",
     }
 
 
 @app.post("/login/parents/otp")
-async def login_otp(login: ParentsLogin, request: Request):
+async def login_otp(login: parentLogin, request: Request):
+    token = _get_otp_token(login.cookies)
+    payload = {"OTP": login.otp}
 
-    def _get_otp_token(request):
-        res = requests.get(
-            API_REF["login"] + API_REF["otp_index"],
-            headers=HEADERS,
-            cookies=cookies_template(
-                request.cookies.get("__RequestVerificationToken"),
-                request.cookies.get("ASP.NET_SessionId"),
-            ),
-        )
+    _res = make_request(login.cookies, "otp_validate", request=request, data=payload)
 
-        soup = BeautifulSoup(res.content, "html.parser")
-        token = soup.find("input", {"name": "__RequestVerificationToken"})["value"]
-
-        return token
-
-    # validate otp
-    _res_status, _res_content = _make_request(
-        endpoint="otp_validate", request=request, data={"OTP": login.otp}
-    )
-
-    if _res_status != 200 or _res_content == "No":
-        raise HTTPException(
-            status_code=401, detail={"message": "OTP validation failed"}
-        )
-
-    # send otp
-    token = _get_otp_token(request)
     payload = {"__RequestVerificationToken": token, "OTPPassword": login.otp}
 
-    res_status, res_content = _make_request(
-        endpoint="otp_index", request=request, data=payload, redirect=False
+    login_cookies_array = login.cookies.split(";")
+
+    res = requests.post(
+        url=API_REF["login"] + API_REF["otp_index"],
+        data=payload,
+        headers=HEADERS,
+        cookies={
+            "__RequestVerificationToken": login_cookies_array[0],
+            "ASP.NET_SessionId": login_cookies_array[1],
+        },
+        allow_redirects=False,
     )
 
-    if not res_status == 302:
-        raise HTTPException(status_code=401, detail={"message": "unauthorized"})
+    if res.status_code == 302:
+        return {"message": "logged in sucessfully"}
 
-    return {"message": "logged in sucessfully"}
+    raise HTTPException(status_code=401, detail={"message": "unauthorized"})
 
 
-@app.get("/login/parents/otp/resend")
-async def resend_otp(request: Request):
-    # expire otp
-    _res_status, _res_content = _make_request(
-        endpoint="otp_expire", request=request, data={"Flag": "--"}
+@app.post("/login/parents/expireotp")
+async def expire_otp(cookies: loginCookies, request: Request):
+    res = make_request(
+        cookies.cookies, "otp_expire", request=request, data={"Flag": "--"}
     )
-    if _res_status != 200 or _res_content == "No":
-        raise HTTPException(
-            status_code=500,
-            detail={"message": "Something went wrong", "key": "OTP_EXPIRE"},
-        )
 
-    # resend otp
-    res_status, res_content = _make_request(
-        endpoint="otp_resend", request=request, data={"QnsStr": "--"}
+    if res.status_code == 200:
+        return {"message": "expired otp successfully"}
+
+    raise HTTPException(status_code=401, detail={"message": "something went wrong"})
+
+
+@app.post("/login/parents/resendotp")
+async def resend_otp(cookies: loginCookies, request: Request):
+    res = make_request(
+        cookies.cookies, "otp_resend", request=request, data={"QnsStr": "--"}
     )
-    if res_status != 200:
-        raise HTTPException(
-            status_code=500,
-            detail={"message": "Something went wrong", "key": "OTP_RESEND"},
-        )
 
-    return {"message": "resent otp"}
+    if res.status_code == 200:
+        return {"message": "resent otp"}
+
+    raise HTTPException(status_code=401, detail={"message": "something went wrong"})
 
 
-@app.get("/info")
-async def info(request: Request):
+@app.post("/info")
+async def info(cook: loginCookies, request: Request):
+    login_cookies = cook.login_cookies.split(";")
+
     info_page = requests.get(
         url=API_REF["login"] + API_REF["info"],
         headers=HEADERS,
-        cookies=cookies_template(
-            request.cookies.get("__RequestVerificationToken"),
-            request.cookies.get("ASP.NET_SessionId"),
-        ),
+        cookies={
+            "__RequestVerificationToken": login_cookies[0],
+            "ASP.NET_SessionId": login_cookies[1],
+        },
     ).content
 
     info_soup = BeautifulSoup(info_page, "html.parser")
@@ -262,11 +264,11 @@ async def info(request: Request):
 
     return {
         "registration_no": registration_no,
-        "name": name.title(),
-        "program": program.title(),
+        "name": name,
+        "program": program,
         "semester": semester,
         "section": section,
-        "batch": batch.title(),
+        "batch": batch,
         "gender": gender,
         "mobile_no": mobile_no,
         "class_coordinator": class_coordinator,
@@ -275,10 +277,11 @@ async def info(request: Request):
     }
 
 
-@app.get("/timetable_week")
-async def timetable_week(request: Request, dated: str):
-    return _make_request(
-        endpoint="timetable_week",
+@app.post("/timetable_week")
+async def timetable_week(cook: loginCookies, request: Request, dated: str):
+    return make_request(
+        cook.login_cookies,
+        "timetable_week",
         request=request,
         data={
             "Year": "",
@@ -290,44 +293,48 @@ async def timetable_week(request: Request, dated: str):
     )
 
 
-@app.get("/timetable")
-async def timetable(request: Request, eventid: str):
-    return _make_request(
-        endpoint="timetable", request=request, data={"EventID": eventid}
+@app.post("/timetable")
+async def timetable(cook: loginCookies, request: Request, eventid: str):
+    return make_request(
+        cook.login_cookies, "timetable", request=request, data={"EventID": eventid}
     )
 
 
-@app.get("/attendance")
-async def attendance(request: Request):
-    return _make_request(
-        endpoint="attendance",
+@app.post("/attendance")
+async def attendance(cook: loginCookies, request: Request):
+    return make_request(
+        cook.login_cookies,
+        "attendance",
         request=request,
         data={"StudentCode": ""},
     )
 
 
-@app.get("/cgpa")
-async def cgpa(request: Request):
-    return _make_request(
-        endpoint="cgpa",
+@app.post("/cgpa")
+async def cgpa(cook: loginCookies, request: Request):
+    return make_request(
+        cook.login_cookies,
+        "cgpa",
         request=request,
         data={"Enrollment": "", "AcademicYear": "", "ProgramCode": ""},
     )
 
 
-@app.get("/grades")
-async def grades(request: Request, semester: str):
-    return _make_request(
-        endpoint="grades",
+@app.post("/grades")
+async def grades(cook: loginCookies, request: Request, semester: str):
+    return make_request(
+        cook.login_cookies,
+        "grades",
         request=request,
         data={"Enrollment": "", "Semester": semester},
     )
 
 
-@app.get("/internal_marks")
-async def internal_marks(request: Request, semester: str):
-    return _make_request(
-        endpoint="internal_marks",
+@app.post("/internal_marks")
+async def internal_marks(cook: loginCookies, request: Request, semester: str):
+    return make_request(
+        cook.login_cookies,
+        "internal_marks",
         request=request,
         data={"Enrollment": "", "Semester": semester},
     )
