@@ -1,0 +1,14 @@
+services:
+  frontend:
+    container_name: slcm-frontend
+    image: ghcr.io/dk10ws/slcm-frontend:main
+    ports:
+      - 80:80
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  backend:
+    container_name: slcm-backend
+    image: ghcr.io/dk10ws/slcm-frontend:main
+    restart: unless-stopped

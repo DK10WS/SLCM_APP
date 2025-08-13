@@ -1,0 +1,13 @@
+services:
+  frontend:
+    container_name: slcm-frontend
+    build: frontend
+    ports:
+      - 80:80
+    restart: unless-stopped
+    depends-on: backend
+
+  backend:
+    container_name: slcm-backend
+    build: backend
+    restart: unless-stopped
