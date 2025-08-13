@@ -1,17 +1,14 @@
-name: "Build and Releases"
+run-name: "Build and Release App ${{ github.ref_name }}"
 
 on:
-  pull_request:
-    branches:
-      - flutter_app
   push:
-    branches:
-      - flutter_app
+    tags:
+      - v[0-9]+.[0-9]+.[0-9]+
   workflow_dispatch:
 
 jobs:
   build:
-    name: Build & Release
+    name: Build & Release App
     runs-on: ubuntu-latest
 
     steps:
@@ -39,7 +36,6 @@ jobs:
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > upload-keystore.jks
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/upload-keystore.jks
-          ls -l
 
       - name: Create key.properties
         run: |
@@ -65,25 +61,26 @@ jobs:
     name: Create Release
     needs: build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+      - run: echo "today=$(date -I)" >> $GITHUB_ENV
 
       - name: Download APK
         uses: actions/download-artifact@v4
         with:
           name: release-apk
           path: artifacts/
+      - run: mv artifacts/app-release.apk artifacts/slcm-switch-${{ github.ref_name }}-${{ env.today }}.apk
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: artifacts/app-release.apk
-          tag_name: v1.0.${{ github.run_number }}
-          name: "Release v1.0.${{ github.run_number }}"
-          body: "Automated release for commit ${{ github.sha }}"
+          files: artifacts/slcm-switch-${{ github.ref_name }}-${{ env.today }}.apk
+          tag_name: ${{ github.ref_name }}
+          name: "Release version ${{ github.ref_name }}"
+          body: "Automated release for version ${{ github.ref_name }}"
           draft: false
           prerelease: false
         env:
