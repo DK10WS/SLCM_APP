@@ -5,9 +5,12 @@ services:
     ports:
       - 80:80
     restart: unless-stopped
-    depends-on: backend
+    depends-on:
+      - backend
 
   backend:
     container_name: slcm-backend
     build: backend
+    ports:
+      - 8000:8000
     restart: unless-stopped

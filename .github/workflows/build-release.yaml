@@ -17,32 +17,6 @@ jobs:
         with:
           ref: "web"
 
-      - name: Set Gradle Java Home
-        run: sed -i '$d' frontend/android/gradle.properties
-
-      - name: Set Up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: "oracle"
-          java-version: "17"
-          cache: gradle
-
-      - name: Set Up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.27.2"
-          channel: "stable"
-          cache: true
-
-      - name: Install Dependencies
-        run: |
-          cd frontend
-          flutter pub get
-
-      - name: Build Web Files
-        run: |
-          cd frontend && flutter build web
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
