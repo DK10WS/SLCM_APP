@@ -1,3 +1,5 @@
+import 'package:mujslcm/session_manager.dart';
+
 import 'redirects.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
@@ -5,8 +7,7 @@ import 'app_colors.dart';
 import 'package:mujslcm/utils/util.dart';
 
 class CGPA extends StatefulWidget {
-  final String newCookies;
-  const CGPA({super.key, required this.newCookies});
+  const CGPA({super.key});
 
   @override
   _CGPAState createState() => _CGPAState();
@@ -30,7 +31,7 @@ class _CGPAState extends State<CGPA> {
 
     final Map<String, String> header = {
       ...headers,
-      "Cookie": widget.newCookies,
+      "Cookie": SessionManager.sessionCookie ?? "",
     };
 
     final Map<String, String> body = {

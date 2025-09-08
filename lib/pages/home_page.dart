@@ -36,9 +36,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages = [
-      Information(newCookies: widget.newCookies),
+      Information(),
       HomeScreen(name: widget.name, newCookies: widget.newCookies),
-      Settings(newCookies: widget.newCookies),
+      Settings(),
     ];
   }
 
@@ -202,7 +202,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    _navigateTo(context, Timetable(newCookies: newCookies));
+                    _navigateTo(context, Timetable());
                   },
                   child: Stack(
                     alignment: Alignment.center,
@@ -255,7 +255,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _attendanceCard(BuildContext context, double screenWidth) {
     return InkWell(
-      onTap: () => _navigateTo(context, AttendancePage(newCookies: newCookies)),
+      onTap: () => _navigateTo(context, AttendancePage()),
       child: Container(
         height: screenWidth * 0.6,
         width: screenWidth * 0.9,
@@ -294,7 +294,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _marksCard(BuildContext context, double screenWidth) {
     return InkWell(
-      onTap: () => _navigateTo(context, Marks(newCookies: newCookies)),
+      onTap: () => _navigateTo(context, Marks()),
       child: ClipRRect(
         // Ensures border radius applies to children too
         borderRadius: BorderRadius.circular(25),
@@ -340,7 +340,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _cgpaCard(BuildContext context, double screenWidth) {
     return InkWell(
-      onTap: () => _navigateTo(context, CGPA(newCookies: newCookies)),
+      onTap: () => _navigateTo(context, CGPA()),
       child: Container(
         height: screenWidth * 0.6,
         width: screenWidth * 0.9,
@@ -382,7 +382,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _gradesCard(BuildContext context, double screenWidth) {
     return InkWell(
-        onTap: () => _navigateTo(context, Grades(newCookies: newCookies)),
+        onTap: () => _navigateTo(context, Grades()),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
           child: Container(

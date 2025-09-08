@@ -6,9 +6,7 @@ import 'package:mujslcm/utils/util.dart';
 import 'package:mujslcm/session_manager.dart';
 
 class Information extends StatefulWidget {
-  final String newCookies;
-
-  const Information({Key? key, required this.newCookies}) : super(key: key);
+  const Information({super.key});
 
   @override
   State<Information> createState() => _InformationState();

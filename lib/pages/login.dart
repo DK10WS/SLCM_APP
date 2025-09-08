@@ -662,7 +662,13 @@ class _MyLoginState extends State<MyLogin> {
         document.querySelector('input[name="__RequestVerificationToken"]');
     final token = tokenElement?.attributes['value'];
 
-    final response = await post(otpValidateURL, headers, payload);
+    final response = await dio.post(otpValidateURL,
+        data: payload,
+        options: Options(
+          headers: headers,
+          contentType: Headers.formUrlEncodedContentType,
+          validateStatus: (status) => status! < 500,
+        ));
 
     final newpayload = {
       "__RequestVerificationToken": token ?? "",
@@ -726,11 +732,13 @@ class _MyLoginState extends State<MyLogin> {
         'Cookie': cleanedCookies,
       };
 
-      final loginResponse = await post(
-        url,
-        headersForLogin,
-        payload,
-      );
+      final loginResponse = await dio.post(url,
+          data: payload,
+          options: Options(
+            headers: headersForLogin,
+            contentType: Headers.formUrlEncodedContentType,
+            validateStatus: (status) => status! < 500,
+          ));
 
       if (loginResponse.statusCode == 302) {
         final API = loginResponse.headers['set-cookie'];

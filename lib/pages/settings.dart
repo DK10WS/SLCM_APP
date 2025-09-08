@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Settings extends StatelessWidget {
-  final String newCookies;
-
-  const Settings({super.key, required this.newCookies});
+  const Settings({super.key});
 
   void _launchURL(String url) async {
     if (await canLaunchUrl(Uri.parse(url))) {

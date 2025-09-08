@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'redirects.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:mujslcm/session_manager.dart';
+import 'package:mujslcm/utils/util.dart';
 
 class Timetable extends StatefulWidget {
-  final String newCookies;
-
-  const Timetable({Key? key, required this.newCookies}) : super(key: key);
+  const Timetable({super.key});
 
   @override
   _TimetableState createState() => _TimetableState();
@@ -117,7 +116,7 @@ class _TimetableState extends State<Timetable> {
     }
 
     try {
-      var data = await weekTT(widget.newCookies);
+      var data = await weekTT(SessionManager.sessionCookie ?? "");
       if (data != null) {
         setState(() {
           eventsByDate = data;
@@ -149,7 +148,8 @@ class _TimetableState extends State<Timetable> {
 
   Future<void> _fetchAndCacheEventDetails(String entryNo) async {
     try {
-      var eventDetails = await fetchEventDetails(entryNo, widget.newCookies);
+      var eventDetails =
+          await fetchEventDetails(entryNo, SessionManager.sessionCookie ?? "");
       setState(() {
         attendanceCache[entryNo] =
             eventDetails['AttendanceType'] ?? 'Not Marked';
@@ -166,10 +166,10 @@ class _TimetableState extends State<Timetable> {
 
   Future<Map<String, List<Map<String, dynamic>>>> weekTT(
       String newCookies) async {
-    var response = await http.post(
-      Uri.parse(TimeTableWeek),
-      headers: {"user-agent": "Mozilla/5.0", "Cookie": newCookies},
-      body: {
+    var response = await post(
+      TimeTableWeek,
+      {"Cookie": SessionManager.sessionCookie ?? "", ...headers},
+      {
         "Year": "",
         "Month": "",
         "Type": "agendaWeek",
@@ -179,7 +179,7 @@ class _TimetableState extends State<Timetable> {
     );
     if (response.statusCode == 200) {
       Map<String, List<Map<String, dynamic>>> groupedEvents = {};
-      for (var event in json.decode(response.body)) {
+      for (var event in response.data) {
         String date = event['StartDate'].split('T')[0];
         groupedEvents.putIfAbsent(date, () => []).add(event);
       }
@@ -190,12 +190,12 @@ class _TimetableState extends State<Timetable> {
 
   Future<Map<String, String>> fetchEventDetails(
       String entryNo, String newCookies) async {
-    var response = await http.post(
-      Uri.parse(TimeTableEvent),
-      headers: {"user-agent": "Mozilla/5.0", "Cookie": newCookies},
-      body: {"EventID": entryNo},
+    var response = await post(
+      TimeTableEvent,
+      {...headers, "Cookie": SessionManager.sessionCookie ?? ""},
+      {"EventID": entryNo},
     );
-    var eventDetails = jsonDecode(response.body);
+    var eventDetails = response.data;
     return {
       'AttendanceType': eventDetails['AttendanceType'] ?? "Not Marked",
       'Time': eventDetails['SlotScheme'] ?? '',

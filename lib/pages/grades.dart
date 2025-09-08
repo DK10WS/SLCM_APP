@@ -1,12 +1,10 @@
-import 'dart:convert';
 import 'redirects.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:mujslcm/session_manager.dart';
+import 'package:mujslcm/utils/util.dart';
 
 class Grades extends StatefulWidget {
-  final String newCookies;
-
-  const Grades({super.key, required this.newCookies});
+  const Grades({super.key});
 
   @override
   _GradesState createState() => _GradesState();
@@ -27,10 +25,9 @@ class _GradesState extends State<Grades> {
 
     final url = GradesURL;
 
-    final Map<String, String> headers = {
-      "Cookie": widget.newCookies,
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    final Map<String, String> header = {
+      "Cookie": SessionManager.sessionCookie ?? "",
+      ...headers,
     };
 
     final Map<String, String> body = {
@@ -39,14 +36,11 @@ class _GradesState extends State<Grades> {
     };
 
     try {
-      final session = http.Client();
-      var response =
-          await session.post(Uri.parse(url), headers: headers, body: body);
-      session.close();
+      var response = await post(url, header, body);
 
       if (response.statusCode == 200) {
         setState(() {
-          gradesData = jsonDecode(response.body);
+          gradesData = response.data;
           isLoading = false;
         });
       } else {
@@ -89,7 +83,7 @@ class _GradesState extends State<Grades> {
     return Scaffold(
       backgroundColor: const Color(0xFF121316),
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Grades",
           style: TextStyle(color: Colors.white),
         ),

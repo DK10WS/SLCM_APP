@@ -1,13 +1,12 @@
-import 'dart:convert';
+import 'package:mujslcm/session_manager.dart';
+import 'package:mujslcm/utils/util.dart';
+
 import 'redirects.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
 
 class Marks extends StatefulWidget {
-  final String newCookies;
-
-  const Marks({super.key, required this.newCookies});
+  const Marks({super.key});
 
   @override
   _MarksState createState() => _MarksState();
@@ -26,13 +25,9 @@ class _MarksState extends State<Marks> {
       isLoading = true;
     });
 
-    final url =
-        "https://mujslcm.jaipur.manipal.edu/Student/Academic/GetInternalMarkForFaculty";
-
-    final Map<String, String> headers = {
-      "Cookie": widget.newCookies,
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+    final Map<String, String> header = {
+      "Cookie": SessionManager.sessionCookie ?? "",
+      ...headers,
     };
 
     final Map<String, String> body = {
@@ -41,15 +36,12 @@ class _MarksState extends State<Marks> {
     };
 
     try {
-      final session = http.Client();
-      var response =
-          await session.post(Uri.parse(url), headers: headers, body: body);
-      session.close();
+      var response = await post(MarksURL, header, body);
 
       if (response.statusCode == 200) {
         setState(() {
           marksData = List<Map<String, dynamic>>.from(
-              jsonDecode(response.body)["InternalMarksList"]);
+              response.data["InternalMarksList"]);
           isLoading = false;
         });
       } else {
@@ -74,7 +66,7 @@ class _MarksState extends State<Marks> {
     return Scaffold(
       backgroundColor: const Color(0xFF121316),
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           "Marks Details",
           style: TextStyle(color: Colors.white),
         ),
