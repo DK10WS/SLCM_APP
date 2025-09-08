@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mujslcm/Attendance.dart';
-import 'package:mujslcm/grades.dart';
-import 'package:mujslcm/information.dart';
-import 'package:mujslcm/marks.dart';
-import 'package:mujslcm/settings.dart';
-import 'package:mujslcm/timetable.dart';
-import 'package:mujslcm/cgpa.dart';
+import 'package:mujslcm/pages/Attendance.dart';
+import 'package:mujslcm/pages/grades.dart';
+import 'package:mujslcm/pages/information.dart';
+import 'package:mujslcm/pages/marks.dart';
+import 'package:mujslcm/pages/settings.dart';
+import 'package:mujslcm/pages/timetable.dart';
+import 'package:mujslcm/pages/cgpa.dart';
 import 'login.dart';
-import 'session_manager.dart';
+import 'package:mujslcm/session_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 String capitalizeFirstName(String fullName) {

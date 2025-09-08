@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'session_manager.dart';
+import 'package:mujslcm/session_manager.dart';
 import 'package:local_auth/local_auth.dart';
 import 'redirects.dart';
 import 'dart:async';
 import 'change_password.dart';
+import 'package:mujslcm/utils/util.dart';
+import 'package:dio/dio.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -96,24 +97,20 @@ class _MyLoginState extends State<MyLogin> {
       return null;
     }
 
-    var url = loginURL;
     var baseurl = loginURL;
 
-    final headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-    };
-
-    var session = http.Client();
     try {
-      final response = await session.get(Uri.parse(url), headers: headers);
+      final response = await get(
+        baseurl,
+        headers,
+      );
 
       if (response.statusCode != 200) {
         _showError("Failed to fetch login page.");
         return null;
       }
 
-      final document = parse(response.body);
+      final document = parse(response.data);
       final tokenElement =
           document.querySelector('input[name="__RequestVerificationToken"]');
       final token = tokenElement?.attributes['value'];
@@ -124,10 +121,8 @@ class _MyLoginState extends State<MyLogin> {
         return null;
       }
 
-      final cleanedCookies = cookies
-          .split(',')
-          .map((cookie) => extractSessionId(cookie))
-          .join(';');
+      final cleanedCookies =
+          cookies.map((cookie) => extractSessionId(cookie)).join(';');
 
       final payload = {
         "__RequestVerificationToken": token,
@@ -142,18 +137,20 @@ class _MyLoginState extends State<MyLogin> {
         'Cookie': cleanedCookies,
       };
 
-      final loginResponse = await session.post(
-        Uri.parse(url),
-        headers: headersForLogin,
-        body: payload,
+      final loginResponse = await post(
+        baseurl,
+        headersForLogin,
+        payload,
       );
-      var API = loginResponse.headers['set-cookie'];
-      final cleanedAPI = API != null
-          ? API.split(',').map((cookie) => extractSessionId(cookie)).join(';')
+
+      var apiCookies = loginResponse.headers.map['set-cookie'];
+      final cleanedAPI = apiCookies != null
+          ? apiCookies.map((cookie) => extractSessionId(cookie)).join(';')
           : '';
 
       if (loginResponse.statusCode == 302) {
-        final locationHeader = loginResponse.headers['location'];
+        final locationHeader = loginResponse.headers.value('location');
+
         if (locationHeader != null) {
           if (locationHeader.contains('/Home/ChangePassword')) {
             final newCookies =
@@ -167,21 +164,22 @@ class _MyLoginState extends State<MyLogin> {
             );
             return null;
           }
-          final redirectedUrl = Uri.parse(baseurl + locationHeader);
+
+          final redirectedUrl = baseurl + locationHeader;
 
           final newCookies =
               cleanedCookies + (cleanedAPI.isNotEmpty ? '; $cleanedAPI' : '');
 
-          final redirectResponse = await session.get(
+          final redirectResponse = await get(
             redirectedUrl,
-            headers: {
+            {
               'Cookie': newCookies,
               ...headers,
             },
           );
 
           if (redirectResponse.statusCode == 200) {
-            final redirectDocument = parse(redirectResponse.body);
+            final redirectDocument = parse(redirectResponse.data);
             final name = redirectDocument
                 .querySelector('.kt-user-card__name')
                 ?.text
@@ -201,8 +199,6 @@ class _MyLoginState extends State<MyLogin> {
     } catch (e) {
       _showError("An error occurred: $e");
       return null;
-    } finally {
-      session.close();
     }
   }
 
@@ -549,18 +545,14 @@ class _MyLoginState extends State<MyLogin> {
   }
 
   void _resendOTP() async {
-    var session = http.Client();
-
-    final headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+    final OTPheaders = {
+      ...headers,
       'Cookie': Gcookie,
     };
 
     final ExpirePayload = {"Flag": "--"};
 
-    final onExpire = await session.post(Uri.parse(OnExpireURL),
-        headers: headers, body: ExpirePayload);
+    final onExpire = await post(OnExpireURL, OTPheaders, ExpirePayload);
 
     if (onExpire.statusCode != 200) {
       _showError("Expire request failed: ${onExpire.statusCode}");
@@ -569,8 +561,7 @@ class _MyLoginState extends State<MyLogin> {
 
     final payload = {"QnsStr": "--"};
 
-    final response = await session.post(Uri.parse(ResendOTPUrl),
-        headers: headers, body: payload);
+    final response = await post(ResendOTPUrl, headers, payload);
 
     if (response.statusCode == 200) {
       print("OTP Sent Successfully!");
@@ -648,43 +639,39 @@ class _MyLoginState extends State<MyLogin> {
       _showError('Please fill in OTP.');
       return null;
     }
-    var session = http.Client();
 
     final payload = {
       "OTP": otp,
     };
 
-    final headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
+    final OTPheaders = {
+      ...headers,
       'Cookie': Gcookie,
     };
 
     final url = otpIndexURL;
     var name = "";
 
-    final otpPage = await session.get(Uri.parse(url), headers: headers);
+    final otpPage = await get(url, OTPheaders);
 
-    final document = parse(otpPage.body);
+    final document = parse(otpPage.data);
 
     final tokenElement =
         document.querySelector('input[name="__RequestVerificationToken"]');
     final token = tokenElement?.attributes['value'];
 
-    final response = await session.post(Uri.parse(otpValidateURL),
-        headers: headers, body: payload);
+    final response = await post(otpValidateURL, headers, payload);
 
     final newpayload = {
-      "__RequestVerificationToken": token,
-      "OTPPassword": otp
+      "__RequestVerificationToken": token ?? "",
+      "OTPPassword": otp ?? ""
     };
-    if (response.body == "Yes") {
-      final finalresponse = await session.post(Uri.parse(url),
-          headers: headers, body: newpayload);
+    if (response.data == "Yes") {
+      final finalresponse = await post(url, headers, newpayload);
 
       if (finalresponse.statusCode == 302) {
-        final request = await session.get(Uri.parse(HomeURL), headers: headers);
-        final redirectDocument = parse(request.body);
+        final request = await get(HomeURL, headers);
+        final redirectDocument = parse(request.data);
         name =
             redirectDocument.querySelector('.kt-user-card__name')!.text.trim();
       }
@@ -702,21 +689,15 @@ class _MyLoginState extends State<MyLogin> {
 
     var url = loginURL;
 
-    final headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-    };
-
-    var session = http.Client();
     try {
-      final response = await session.get(Uri.parse(url), headers: headers);
+      final response = await get(url, headers);
 
       if (response.statusCode != 200) {
         _showError("Failed to fetch login page.");
         return false;
       }
 
-      final document = parse(response.body);
+      final document = parse(response.data);
       final tokenElement =
           document.querySelector('input[name="__RequestVerificationToken"]');
       final token = tokenElement?.attributes['value'];
@@ -727,10 +708,8 @@ class _MyLoginState extends State<MyLogin> {
         return false;
       }
 
-      final cleanedCookies = cookies
-          .split(',')
-          .map((cookie) => extractSessionId(cookie))
-          .join(';');
+      final cleanedCookies =
+          cookies.map((cookie) => extractSessionId(cookie)).join(';');
 
       final payload = {
         "__RequestVerificationToken": token,
@@ -745,16 +724,16 @@ class _MyLoginState extends State<MyLogin> {
         'Cookie': cleanedCookies,
       };
 
-      final loginResponse = await session.post(
-        Uri.parse(url),
-        headers: headersForLogin,
-        body: payload,
+      final loginResponse = await post(
+        url,
+        headersForLogin,
+        payload,
       );
 
       if (loginResponse.statusCode == 302) {
         final API = loginResponse.headers['set-cookie'];
         final cleanedAPI = API != null
-            ? API.split(',').map((cookie) => extractSessionId(cookie)).join(';')
+            ? API.map((cookie) => extractSessionId(cookie)).join(';')
             : '';
 
         final newCookies =
@@ -768,8 +747,6 @@ class _MyLoginState extends State<MyLogin> {
     } catch (e) {
       _showError("An error occurred: $e");
       return false;
-    } finally {
-      session.close();
     }
   }
 

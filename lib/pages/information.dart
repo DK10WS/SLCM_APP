@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'redirects.dart';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
+import 'package:mujslcm/utils/util.dart';
 
 class Information extends StatefulWidget {
   final String newCookies;
@@ -23,16 +24,15 @@ class _InformationState extends State<Information> {
   }
 
   Future<void> fetchInformation() async {
-    final Map<String, String> headers = {
+    final Map<String, String> header = {
+      ...headers,
       "Cookie": widget.newCookies,
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     };
     final url = InformationURL;
 
     try {
-      final response = await http.get(Uri.parse(url), headers: headers);
-      final document = parse(response.body);
+      final response = await get(url, header);
+      final document = parse(response.data);
 
       final registrationNumber = document
           .querySelector('input[name="RegistrationNo"]')
