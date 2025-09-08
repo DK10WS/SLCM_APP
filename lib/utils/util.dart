@@ -1,4 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:mujslcm/session_manager.dart';
+import 'login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final headers = {
   "User-Agent":
@@ -9,18 +12,36 @@ final headers = {
 final dio = Dio();
 Future<Response> get(String url, Map<String, String> headers) async {
   final response = await dio.get(url,
-      options: Options(headers: headers, followRedirects: false));
+      options: Options(
+        headers: headers,
+        validateStatus: (status) => status! < 400,
+      ));
+
+  if (response.statusCode == 302) {
+    final prefs = await SharedPreferences.getInstance();
+    final username = prefs.getString('username') ?? '';
+    final password = prefs.getString('password') ?? '';
+    final cookie = await login(username, password);
+    SessionManager.setSession(cookie);
+  }
   return response;
 }
 
 Future<Response> post(String url, Map<String, String> postheaders,
     Map<String, String> payload) async {
-  final response = dio.post(url,
+  final response = await dio.post(url,
       data: payload,
       options: Options(
         headers: postheaders,
         contentType: Headers.formUrlEncodedContentType,
         validateStatus: (status) => status! < 400,
       ));
+  if (response.statusCode == 302) {
+    final prefs = await SharedPreferences.getInstance();
+    final username = prefs.getString('username') ?? '';
+    final password = prefs.getString('password') ?? '';
+    final cookie = await login(username, password);
+    SessionManager.setSession(cookie);
+  }
   return response;
 }

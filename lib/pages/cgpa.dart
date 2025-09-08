@@ -89,13 +89,13 @@ class _CGPAState extends State<CGPA> {
     }
 
     if (spots.isEmpty) {
-      return Center(child: Text("No CGPA data available"));
+      return const Center(child: Text("No CGPA data available"));
     }
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Color(0xFF212121),
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),

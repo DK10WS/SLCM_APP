@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:mujslcm/utils/login.dart';
 import 'redirects.dart';
 import 'package:html/parser.dart';
 import 'package:mujslcm/utils/util.dart';
+import 'package:mujslcm/session_manager.dart';
 
 class Information extends StatefulWidget {
   final String newCookies;
@@ -25,7 +27,7 @@ class _InformationState extends State<Information> {
   Future<void> fetchInformation() async {
     final Map<String, String> header = {
       ...headers,
-      "Cookie": widget.newCookies,
+      "Cookie": SessionManager.sessionCookie ?? "",
     };
     final url = InformationURL;
 

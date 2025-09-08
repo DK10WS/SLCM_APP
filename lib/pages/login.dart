@@ -137,11 +137,13 @@ class _MyLoginState extends State<MyLogin> {
         'Cookie': cleanedCookies,
       };
 
-      final loginResponse = await post(
-        baseurl,
-        headersForLogin,
-        payload,
-      );
+      final loginResponse = await dio.post(baseurl,
+          data: payload,
+          options: Options(
+            headers: headersForLogin,
+            contentType: Headers.formUrlEncodedContentType,
+            validateStatus: (status) => status! < 500,
+          ));
 
       var apiCookies = loginResponse.headers.map['set-cookie'];
       final cleanedAPI = apiCookies != null
