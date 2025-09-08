@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'redirects.dart';
-import 'package:http/http.dart' as http;
 import 'package:html/parser.dart';
 import 'package:mujslcm/utils/util.dart';
 

@@ -1,9 +1,8 @@
-import 'dart:convert';
 import 'redirects.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
 import 'app_colors.dart';
+import 'package:mujslcm/utils/util.dart';
 
 class CGPA extends StatefulWidget {
   final String newCookies;
@@ -28,11 +27,12 @@ class _CGPAState extends State<CGPA> {
 
   Future<void> fetchGrades() async {
     final url = CGPAURL;
-    final Map<String, String> headers = {
+
+    final Map<String, String> header = {
+      ...headers,
       "Cookie": widget.newCookies,
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
     };
+
     final Map<String, String> body = {
       "Enrollment": "",
       "AcademicYear": "",
@@ -40,10 +40,9 @@ class _CGPAState extends State<CGPA> {
     };
 
     try {
-      final response =
-          await http.post(Uri.parse(url), headers: headers, body: body);
+      final response = await post(url, header, body);
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
+        final data = response.data;
         setState(() {
           gradesData = data["InternalMarksList"][0];
           isLoading = false;
