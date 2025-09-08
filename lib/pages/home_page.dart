@@ -214,7 +214,7 @@ class HomeScreen extends StatelessWidget {
                           'assets/svg/timetable.svg',
                           height: screenWidth * 1.15,
                           width: screenWidth * 1.1,
-                          color: const Color(0xFFE0A84F).withOpacity(0.8),
+                          color: const Color(0xFF121316).withOpacity(0.8),
                         ),
                       ),
                       const Positioned(
@@ -269,10 +269,12 @@ class HomeScreen extends StatelessWidget {
           children: [
             Positioned(
               top: 10,
-              child: SvgPicture.asset('assets/svg/people.svg',
-                  height: screenWidth * 0.27,
-                  width: screenWidth * 0.5,
-                  color: const Color(0xFFE08E63).withOpacity(0.8)),
+              child: SvgPicture.asset(
+                'assets/svg/people.svg',
+                height: screenWidth * 0.27,
+                width: screenWidth * 0.5,
+                color: const Color(0xFF121316).withOpacity(0.8),
+              ),
             ),
             const Positioned(
               bottom: 10,
@@ -296,7 +298,6 @@ class HomeScreen extends StatelessWidget {
     return InkWell(
       onTap: () => _navigateTo(context, Marks()),
       child: ClipRRect(
-        // Ensures border radius applies to children too
         borderRadius: BorderRadius.circular(25),
         child: Container(
           height: screenWidth * 0.6,
@@ -316,7 +317,7 @@ class HomeScreen extends StatelessWidget {
                   'assets/svg/cap.svg',
                   height: screenWidth * 0.45,
                   width: screenWidth * 0.6,
-                  color: const Color(0xFFA8C79D).withOpacity(0.8),
+                  color: const Color(0xFF121316).withOpacity(0.8),
                 ),
               ),
               const Positioned(
@@ -359,7 +360,7 @@ class HomeScreen extends StatelessWidget {
                 'assets/svg/graph.svg',
                 height: screenWidth * 0.4,
                 width: screenWidth * 0.2,
-                color: const Color(0xFFCC756F).withOpacity(0.8),
+                color: const Color(0xFF121316).withOpacity(0.8),
               ),
             ),
             const Positioned(
@@ -403,7 +404,7 @@ class HomeScreen extends StatelessWidget {
                     'assets/images/grades.svg',
                     height: screenWidth * 0.36,
                     width: screenWidth * 0.2,
-                    color: const Color(0xFF7695B3).withOpacity(0.8),
+                    color: const Color(0xFF121316).withOpacity(0.8),
                   ),
                 ),
                 const Positioned(
