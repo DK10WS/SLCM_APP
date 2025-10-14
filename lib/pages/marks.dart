@@ -157,7 +157,7 @@ class _MarksState extends State<Marks> {
                       double total = course['Total'] != "-"
                           ? double.parse(course['Total'].toString())
                           : 0.0;
-                      double maxMarks = 60;
+                      double maxMarks = 100;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(
@@ -247,6 +247,10 @@ class _MarksState extends State<Marks> {
                                               color: Color(0xFFD5E7B5))),
                                     if (course['PRS'] != "-")
                                       Text('PRS: ${course['PRS']}',
+                                          style: const TextStyle(
+                                              color: Color(0xFFD5E7B5))),
+                                    if (course['ETE'] != "-")
+                                      Text('ETE: ${course['ETE']}',
                                           style: const TextStyle(
                                               color: Color(0xFFD5E7B5))),
                                     if (course['Total'] != "-")
