@@ -1,6 +1,5 @@
 import 'package:mujslcm/utils/util.dart';
 import "package:mujslcm/pages/redirects.dart";
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:html/parser.dart' show parse;
 
 String extractSessionId(String cookie) {

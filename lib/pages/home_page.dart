@@ -6,6 +6,7 @@ import 'package:mujslcm/pages/marks.dart';
 import 'package:mujslcm/pages/settings.dart';
 import 'package:mujslcm/pages/timetable.dart';
 import 'package:mujslcm/pages/cgpa.dart';
+import 'package:mujslcm/utils/checkupdates.dart';
 import 'login.dart';
 import 'package:mujslcm/session_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -35,6 +36,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    check_update(context);
     _pages = [
       Information(),
       HomeScreen(name: widget.name, newCookies: widget.newCookies),
@@ -64,7 +66,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF121316),
         title: const Text(
-          "SLCM SWITCH",
+          "MUJ SWITCH",
           style: TextStyle(
             color: Colors.white,
             fontFamily: "Roboto",
