@@ -254,7 +254,7 @@ class _MarksState extends State<Marks> {
                                           style: const TextStyle(
                                               color: Color(0xFFD5E7B5))),
                                     if (course['Total'] != "-")
-                                      Text('Total: ${course['Total']}/60',
+                                      Text('Total: ${course['Total']}/100',
                                           style: const TextStyle(
                                               color: Color(0xFFD5E7B5))),
                                   ],
