@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mujslcm/Attendance.dart';
-import 'package:mujslcm/grades.dart';
-import 'package:mujslcm/information.dart';
-import 'package:mujslcm/marks.dart';
-import 'package:mujslcm/settings.dart';
-import 'package:mujslcm/timetable.dart';
-import 'package:mujslcm/cgpa.dart';
+import 'package:mujslcm/pages/Attendance.dart';
+import 'package:mujslcm/pages/grades.dart';
+import 'package:mujslcm/pages/information.dart';
+import 'package:mujslcm/pages/marks.dart';
+import 'package:mujslcm/pages/settings.dart';
+import 'package:mujslcm/pages/timetable.dart';
+import 'package:mujslcm/pages/cgpa.dart';
 import 'login.dart';
-import 'session_manager.dart';
+import 'package:mujslcm/session_manager.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 String capitalizeFirstName(String fullName) {
@@ -36,9 +36,9 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _pages = [
-      Information(newCookies: widget.newCookies),
+      Information(),
       HomeScreen(name: widget.name, newCookies: widget.newCookies),
-      Settings(newCookies: widget.newCookies),
+      Settings(),
     ];
   }
 
@@ -65,15 +65,19 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: const Color(0xFF121316),
         title: const Text(
           "MUJ SWITCH",
-          style: TextStyle(color: Colors.white, fontFamily: "Gotham"),
+          style: TextStyle(
+            color: Colors.white,
+            fontFamily: "Roboto",
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        centerTitle: true,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout, color: Color(0xFFD5E7B5)),
             onPressed: _logout,
           ),
         ],
+        scrolledUnderElevation: 0.0,
       ),
       body: Container(
         height: MediaQuery.of(context).size.height * 1,
@@ -95,61 +99,58 @@ class _HomePageState extends State<HomePage> {
             const TextStyle(color: Colors.white),
           ),
         ),
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: NavigationBar(
-            backgroundColor: const Color(0xFFE7F5D5).withOpacity(0.1),
-            selectedIndex: _selectedIndex,
-            onDestinationSelected: _onItemTapped,
-            destinations: [
-              NavigationDestination(
-                icon: Icon(Icons.person_outline, color: Color(0xFFD5E7B5)),
-                selectedIcon: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _selectedIndex == 0
-                        ? Color(0xFFD5E7B5)
-                        : Colors.transparent,
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  child: const Icon(Icons.person, color: Colors.black),
+        child: NavigationBar(
+          backgroundColor: const Color(0xFFE7F5D5).withOpacity(0.1),
+          selectedIndex: _selectedIndex,
+          onDestinationSelected: _onItemTapped,
+          destinations: [
+            NavigationDestination(
+              icon: Icon(Icons.person_outline, color: Color(0xFFD5E7B5)),
+              selectedIcon: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _selectedIndex == 0
+                      ? Color(0xFFD5E7B5)
+                      : Colors.transparent,
                 ),
-                label: 'Me',
+                padding: const EdgeInsets.all(8),
+                child: const Icon(Icons.person, color: Colors.black),
               ),
-              NavigationDestination(
-                icon: Icon(Icons.home_outlined, color: Color(0xFFD5E7B5)),
-                selectedIcon: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _selectedIndex == 1
-                        ? Color(0xFFD5E7B5)
-                        : Colors.transparent,
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  child: const Icon(Icons.home, color: Colors.black),
+              label: 'Me',
+            ),
+            NavigationDestination(
+              icon: Icon(Icons.home_outlined, color: Color(0xFFD5E7B5)),
+              selectedIcon: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _selectedIndex == 1
+                      ? Color(0xFFD5E7B5)
+                      : Colors.transparent,
                 ),
-                label: 'Home',
+                padding: const EdgeInsets.all(8),
+                child: const Icon(Icons.home, color: Colors.black),
               ),
-              NavigationDestination(
-                icon: const Icon(
-                  Icons.contact_support_outlined,
-                  color: Color(0xFFD5E7B5),
-                  size: 20,
-                ),
-                selectedIcon: Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: _selectedIndex == 2
-                        ? Color(0xFFD5E7B5)
-                        : Colors.transparent,
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  child: const Icon(Icons.contact_support, color: Colors.black),
-                ),
-                label: 'About',
+              label: 'Home',
+            ),
+            NavigationDestination(
+              icon: const Icon(
+                Icons.contact_support_outlined,
+                color: Color(0xFFD5E7B5),
+                size: 20,
               ),
-            ],
-          ),
+              selectedIcon: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: _selectedIndex == 2
+                      ? Color(0xFFD5E7B5)
+                      : Colors.transparent,
+                ),
+                padding: const EdgeInsets.all(8),
+                child: const Icon(Icons.contact_support, color: Colors.black),
+              ),
+              label: 'About',
+            ),
+          ],
         ),
       ),
     );
@@ -174,12 +175,18 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const Text(
+              "Hello,",
+              style: TextStyle(
+                  fontSize: 24, color: Colors.white, fontFamily: "poppins"),
+            ),
             Text(
               "${capitalizeFirstName(name)}",
               style: TextStyle(
                   fontSize: screenWidth * 0.1,
                   color: Colors.white,
-                  fontFamily: "poppins"),
+                  fontWeight: FontWeight.bold,
+                  fontFamily: "Roboto"),
             ),
             const SizedBox(height: 20),
             Center(
@@ -189,13 +196,13 @@ class HomeScreen extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 20),
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFfdde69),
+                    backgroundColor: const Color(0xFFffcb69),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
                   onPressed: () {
-                    _navigateTo(context, Timetable(newCookies: newCookies));
+                    _navigateTo(context, Timetable());
                   },
                   child: Stack(
                     alignment: Alignment.center,
@@ -217,7 +224,8 @@ class HomeScreen extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 18,
                             color: Colors.black,
-                            fontFamily: "Monserat",
+                            fontFamily: "Roboto",
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -247,13 +255,13 @@ class HomeScreen extends StatelessWidget {
 
   Widget _attendanceCard(BuildContext context, double screenWidth) {
     return InkWell(
-      onTap: () => _navigateTo(context, AttendancePage(newCookies: newCookies)),
+      onTap: () => _navigateTo(context, AttendancePage()),
       child: Container(
         height: screenWidth * 0.6,
         width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFfb894b),
+          color: const Color(0xFFffac81),
           borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
@@ -261,10 +269,12 @@ class HomeScreen extends StatelessWidget {
           children: [
             Positioned(
               top: 10,
-              child: SvgPicture.asset('assets/svg/people.svg',
-                  height: screenWidth * 0.27,
-                  width: screenWidth * 0.5,
-                  color: const Color(0xFF121316).withOpacity(0.8)),
+              child: SvgPicture.asset(
+                'assets/svg/people.svg',
+                height: screenWidth * 0.27,
+                width: screenWidth * 0.5,
+                color: const Color(0xFF121316).withOpacity(0.8),
+              ),
             ),
             const Positioned(
               bottom: 10,
@@ -273,7 +283,8 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
-                  fontFamily: "Monserat",
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -285,16 +296,15 @@ class HomeScreen extends StatelessWidget {
 
   Widget _marksCard(BuildContext context, double screenWidth) {
     return InkWell(
-      onTap: () => _navigateTo(context, Marks(newCookies: newCookies)),
+      onTap: () => _navigateTo(context, Marks()),
       child: ClipRRect(
-        // Ensures border radius applies to children too
         borderRadius: BorderRadius.circular(25),
         child: Container(
           height: screenWidth * 0.6,
           width: screenWidth * 0.9,
           margin: const EdgeInsets.only(bottom: 20),
           decoration: BoxDecoration(
-            color: const Color(0xFFb6f36a),
+            color: const Color(0xFFcdeac0),
             borderRadius: BorderRadius.circular(25),
           ),
           child: Stack(
@@ -331,13 +341,13 @@ class HomeScreen extends StatelessWidget {
 
   Widget _cgpaCard(BuildContext context, double screenWidth) {
     return InkWell(
-      onTap: () => _navigateTo(context, CGPA(newCookies: newCookies)),
+      onTap: () => _navigateTo(context, CGPA()),
       child: Container(
         height: screenWidth * 0.6,
         width: screenWidth * 0.9,
         margin: const EdgeInsets.only(bottom: 20),
         decoration: BoxDecoration(
-          color: const Color(0xFFfd6297),
+          color: const Color(0xFFff928b),
           borderRadius: BorderRadius.circular(25),
         ),
         child: Stack(
@@ -360,7 +370,8 @@ class HomeScreen extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 18,
                   color: Colors.black,
-                  fontFamily: "Monserat",
+                  fontFamily: "Roboto",
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
@@ -372,7 +383,7 @@ class HomeScreen extends StatelessWidget {
 
   Widget _gradesCard(BuildContext context, double screenWidth) {
     return InkWell(
-        onTap: () => _navigateTo(context, Grades(newCookies: newCookies)),
+        onTap: () => _navigateTo(context, Grades()),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(25),
           child: Container(
@@ -380,7 +391,7 @@ class HomeScreen extends StatelessWidget {
             width: screenWidth * 0.9,
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-              color: const Color(0xFF9b77e5),
+              color: const Color(0xFF9ab7d3),
               borderRadius: BorderRadius.circular(25),
             ),
             child: Stack(

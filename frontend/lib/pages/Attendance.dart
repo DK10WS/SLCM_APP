@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:mujslcm/session_manager.dart';
+import 'redirects.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:mujslcm/redirects.dart';
+import 'package:mujslcm/utils/util.dart';
 
 class AttendancePage extends StatefulWidget {
-  final String newCookies;
-
-  const AttendancePage({Key? key, required this.newCookies}) : super(key: key);
+  const AttendancePage({super.key});
 
   @override
   _AttendancePageState createState() => _AttendancePageState();
@@ -19,29 +17,22 @@ class _AttendancePageState extends State<AttendancePage> {
   @override
   void initState() {
     super.initState();
-    _attendanceData = fetchAttendance(widget.newCookies);
+    _attendanceData = fetchAttendance(SessionManager.sessionCookie ?? "");
   }
 
   Future<List<Map<String, dynamic>>?> fetchAttendance(String newCookies) async {
-    print(newCookies);
-
     final Map<String, String> body = {"login_cookies": newCookies};
 
     final attendanceUrl = AttendanceURL;
 
-    final session = http.Client();
-    final response = await session.post(
-      Uri.parse(attendanceUrl),
-      headers: header,
-      body: jsonEncode(body),
-    );
+    final response = await post(attendanceUrl, headers, body);
 
     if (response.statusCode != 200) {
       print('Failed to load attendance data');
       return null;
     }
 
-    final decoded = jsonDecode(response.body);
+    final decoded = response.data;
     final List<dynamic> attendanceList = decoded["AttendanceSummaryList"];
 
     List<Map<String, dynamic>> attendanceData = [];
@@ -67,7 +58,7 @@ class _AttendancePageState extends State<AttendancePage> {
       int? classesNeeded;
       if (newpercentage < 75) {
         classesNeeded =
-            ((0.75 * totalClasses - attendedClasses) / (1 - 0.75)).ceil();
+            ((0.75 * totalClasses - attendedClasses) / (1 - 0.75)).floor();
         statusMessage = "$classesNeeded more classes needed to reach 75%.";
       } else {
         statusMessage = "Good! Your attendance is above or equal to 75%.";
@@ -86,7 +77,6 @@ class _AttendancePageState extends State<AttendancePage> {
       });
     }
 
-    session.close();
     return attendanceData;
   }
 
@@ -105,13 +95,14 @@ class _AttendancePageState extends State<AttendancePage> {
             'Attendance Summary',
             style: TextStyle(color: Colors.white),
           ),
+          scrolledUnderElevation: 0.0,
         ),
         body: Padding(
           padding: const EdgeInsets.only(top: 16.0),
           child: Container(
             width: double.infinity,
             height: double.infinity,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color(0xFF212121),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(40),

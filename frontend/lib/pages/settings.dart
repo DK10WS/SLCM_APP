@@ -1,14 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class Settings extends StatelessWidget {
-  final String newCookies;
+class Settings extends StatefulWidget {
+  const Settings({super.key});
 
-  const Settings({super.key, required this.newCookies});
+  @override
+  State<Settings> createState() => _SettingsState();
+}
 
-  void _launchURL(String url) async {
-    if (await canLaunchUrl(Uri.parse(url))) {
-      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+class _SettingsState extends State<Settings> {
+  String _version = 'Unknown';
+  String _buildNumber = 'Unknown';
+
+  @override
+  void initState() {
+    super.initState();
+    _initPackageInfo();
+  }
+
+  Future<void> _initPackageInfo() async {
+    final PackageInfo info = await PackageInfo.fromPlatform();
+    setState(() {
+      _version = info.version;
+      _buildNumber = info.buildNumber;
+    });
+  }
+
+  Future<void> _launchURL(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
     } else {
       throw 'Could not launch $url';
     }
@@ -19,7 +41,7 @@ class Settings extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF121316),
       body: Container(
-        height: MediaQuery.of(context).size.height * 1,
+        height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
           color: Color(0xFF212121),
           borderRadius: BorderRadius.only(
@@ -42,10 +64,7 @@ class Settings extends StatelessWidget {
               const SizedBox(height: 8),
               const Text(
                 'MUJ Switch is an app made for the convenience of accessing MUJ SLCM features on your phone.',
-                style: TextStyle(
-                  color: Colors.grey,
-                  fontSize: 16,
-                ),
+                style: TextStyle(color: Colors.grey, fontSize: 16),
               ),
               const SizedBox(height: 24),
               const Divider(color: Colors.grey),
@@ -70,7 +89,7 @@ class Settings extends StatelessWidget {
                 leading: const Icon(Icons.person, color: Color(0xFFD5E7B5)),
                 title: const Text('Amey Santosh Gupte',
                     style: TextStyle(color: Colors.white)),
-                subtitle: const Text('Graphics Designer',
+                subtitle: const Text('UI/UX Designer',
                     style: TextStyle(color: Colors.grey)),
                 onTap: () => _launchURL('https://github.com/Vanillaicee17'),
               ),
@@ -92,7 +111,6 @@ class Settings extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 8),
               ListTile(
                 leading: const Icon(Icons.email, color: Color(0xFFD5E7B5)),
                 title: const Text('Contact Support',

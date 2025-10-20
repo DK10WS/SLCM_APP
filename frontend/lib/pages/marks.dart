@@ -1,13 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:fl_chart/fl_chart.dart';
-import 'package:mujslcm/redirects.dart';
+import 'package:mujslcm/pages/redirects.dart';
+import 'package:mujslcm/session_manager.dart';
+import 'package:mujslcm/utils/util.dart';
 
 class Marks extends StatefulWidget {
-  final String newCookies;
-
-  const Marks({super.key, required this.newCookies});
+  const Marks({super.key});
 
   @override
   _MarksState createState() => _MarksState();
@@ -28,18 +26,17 @@ class _MarksState extends State<Marks> {
 
     final url = MarksURL + selectedSemester!;
 
-    final Map<String, String> body = {"login_cookies": widget.newCookies};
+    final Map<String, String> body = {
+      "login_cookies": SessionManager.sessionCookie ?? ""
+    };
 
     try {
-      final session = http.Client();
-      var response = await session.post(Uri.parse(url),
-          body: jsonEncode(body), headers: header);
-      session.close();
+      var response = await post(url, headers, body);
 
       if (response.statusCode == 200) {
         setState(() {
           marksData = List<Map<String, dynamic>>.from(
-              jsonDecode(response.body)["InternalMarksList"]);
+              response.data["InternalMarksList"]);
           isLoading = false;
         });
       } else {
@@ -154,7 +151,7 @@ class _MarksState extends State<Marks> {
                       double total = course['Total'] != "-"
                           ? double.parse(course['Total'].toString())
                           : 0.0;
-                      double maxMarks = 60;
+                      double maxMarks = 100;
 
                       return Padding(
                         padding: const EdgeInsets.symmetric(
@@ -247,7 +244,7 @@ class _MarksState extends State<Marks> {
                                           style: const TextStyle(
                                               color: Color(0xFFD5E7B5))),
                                     if (course['Total'] != "-")
-                                      Text('Total: ${course['Total']}/60',
+                                      Text('Total: ${course['Total']}/100',
                                           style: const TextStyle(
                                               color: Color(0xFFD5E7B5))),
                                   ],

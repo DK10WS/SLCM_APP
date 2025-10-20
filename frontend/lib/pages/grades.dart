@@ -1,14 +1,13 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:mujslcm/redirects.dart';
+import 'package:mujslcm/pages/redirects.dart';
+import 'package:mujslcm/session_manager.dart';
+import 'package:mujslcm/utils/util.dart';
 
 class Grades extends StatefulWidget {
-  final String newCookies;
-
-  const Grades({super.key, required this.newCookies});
+  const Grades({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _GradesState createState() => _GradesState();
 }
 
@@ -26,17 +25,16 @@ class _GradesState extends State<Grades> {
     });
 
     final url = GradesURL + selectedSemester!;
-    final Map<String, String> body = {"login_cookies": widget.newCookies};
+    final Map<String, String> body = {
+      "login_cookies": SessionManager.sessionCookie ?? ""
+    };
 
     try {
-      final session = http.Client();
-      var response = await session.post(Uri.parse(url),
-          headers: header, body: jsonEncode(body));
-      session.close();
+      var response = await post(url, headers, body);
 
       if (response.statusCode == 200) {
         setState(() {
-          gradesData = jsonDecode(response.body);
+          gradesData = response.data;
           isLoading = false;
         });
       } else {

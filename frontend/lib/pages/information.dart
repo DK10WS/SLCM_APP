@@ -1,13 +1,11 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart';
-import 'package:mujslcm/redirects.dart';
+import 'package:mujslcm/pages/redirects.dart';
+import 'package:mujslcm/session_manager.dart';
+
+import '../utils/util.dart';
 
 class Information extends StatefulWidget {
-  final String newCookies;
-
-  const Information({Key? key, required this.newCookies}) : super(key: key);
+  const Information({super.key});
 
   @override
   State<Information> createState() => _InformationState();
@@ -24,14 +22,15 @@ class _InformationState extends State<Information> {
   }
 
   Future<void> fetchInformation() async {
-    final url = infomationURL;
+    final url = informationURL;
 
-    final Map<String, String> body = {"login_cookies": widget.newCookies};
+    final Map<String, String> body = {
+      "login_cookies": SessionManager.sessionCookie ?? ""
+    };
     try {
-      final response = await http.post(Uri.parse(url),
-          headers: header, body: jsonEncode(body));
+      final response = await post(url, headers, body);
 
-      final document = jsonDecode(response.body);
+      final document = response.data;
 
       final registrationNumber = document["registration_no"];
       final name = document["name"];

@@ -1,14 +1,13 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' show parse;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'session_manager.dart';
+import 'package:mujslcm/session_manager.dart';
 import 'redirects.dart';
 import 'dart:async';
+import 'package:mujslcm/utils/util.dart';
 
 class MyLogin extends StatefulWidget {
   const MyLogin({super.key});
@@ -97,33 +96,32 @@ class _MyLoginState extends State<MyLogin> {
 
     final baseurl = loginURL;
 
-    final payload = jsonEncode({
+    final payload = {
       "username": username,
       "password": password,
-    });
-
-    var session = http.Client();
+    };
 
     try {
-      final response = await session.post(Uri.parse(baseurl),
-          body: payload, headers: header);
+      final response = await post(baseurl, headers, payload);
 
       if (response.statusCode == 200) {
         _saveCredentials(username, password);
-        final redirectDocument = jsonDecode(response.body);
+        final redirectDocument = response.data;
         final name = redirectDocument["name"];
         final cookies = redirectDocument["login_cookies"];
 
+        SessionManager.setSession(cookies);
+
         return {'name': name ?? '', 'newCookies': cookies};
       } else {
-        _showError("Login failed: ${response.body}");
+        _showError("Login failed: ${response.data["message"]}");
         return null;
       }
     } catch (e) {
       _showError("An error occurred: $e");
       return null;
     } finally {
-      session.close();
+      print("Logged in");
     }
   }
 
