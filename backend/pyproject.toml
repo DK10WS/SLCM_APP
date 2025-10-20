@@ -12,3 +12,10 @@ dependencies = [
     "fastapi[standard]>=0.116.1",
     "requests>=2.32.4",
 ]
+
+[dependency-groups]
+dev = [
+    "nox>=2025.10.16",
+    "pyrefly>=0.38.0",
+    "ruff>=0.14.1",
+]

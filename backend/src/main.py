@@ -1,10 +1,10 @@
-from fastapi import FastAPI, HTTPException, Request
+import uvicorn
+from fastapi import FastAPI, HTTPException
 from fastapi.encoders import jsonable_encoder
-from fastapi.responses import JSONResponse
-from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse, RedirectResponse
 
-from routers import betterslcm
+from .betterslcm import router
 
 app = FastAPI()
 
@@ -19,7 +19,7 @@ app.add_middleware(
 
 
 @app.exception_handler(HTTPException)
-async def validation_exception_handler(request: Request, exc: HTTPException):
+async def validation_exception_handler(exc: HTTPException):
     return JSONResponse(
         status_code=exc.status_code, content=jsonable_encoder(exc.detail)
     )
@@ -30,9 +30,12 @@ async def redirect():
     return RedirectResponse("https://github.com/whyredfire/betterslcm")
 
 
-@app.get("/status")
+@app.get("/health")
 async def status():
     return {"message": "OK"}
 
 
-app.include_router(betterslcm.app, prefix="/api")
+app.include_router(router, prefix="/api")
+
+if __name__ == "__main__":
+    uvicorn.run("src.main:app", host="0.0.0.0", port=8000)
