@@ -5,7 +5,7 @@ services:
     ports:
       - 80:80
     restart: unless-stopped
-    depends-on:
+    depends_on:
       - backend
 
   backend:

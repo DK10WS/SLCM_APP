@@ -1,8 +1,8 @@
-from bs4 import BeautifulSoup
-from fastapi import APIRouter, Response, Request, HTTPException
 import requests
+from bs4 import BeautifulSoup
+from fastapi import APIRouter, HTTPException, Request, Response
 
-from schemas import Credentials, loginCookies, parentLogin
+from .schemas import Credentials, loginCookies, parentLogin
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/112.0",
@@ -76,12 +76,11 @@ def _get_otp_token(cook):
     return token
 
 
-app = APIRouter()
+router = APIRouter()
 
 
-@app.post("/login")
+@router.post("/login")
 async def login(creds: Credentials, response: Response):
-
     token, cookie = _get_token()
 
     cookies = {"__RequestVerificationToken": cookie}
@@ -130,7 +129,7 @@ async def login(creds: Credentials, response: Response):
     }
 
 
-@app.post("/login/parents")
+@router.post("/login/parents")
 async def login(creds: Credentials, response: Response):
     token, cookie = _get_token()
 
@@ -166,12 +165,12 @@ async def login(creds: Credentials, response: Response):
     }
 
 
-@app.post("/login/parents/otp")
+@router.post("/login/parents/otp")
 async def login_otp(login: parentLogin, request: Request):
     token = _get_otp_token(login.cookies)
     payload = {"OTP": login.otp}
 
-    _res = make_request(login.cookies, "otp_validate", request=request, data=payload)
+    make_request(login.cookies, "otp_validate", request=request, data=payload)
 
     payload = {"__RequestVerificationToken": token, "OTPPassword": login.otp}
 
@@ -194,10 +193,10 @@ async def login_otp(login: parentLogin, request: Request):
     raise HTTPException(status_code=401, detail={"message": "unauthorized"})
 
 
-@app.post("/login/parents/expireotp")
+@router.post("/login/parents/expireotp")
 async def expire_otp(cookies: loginCookies, request: Request):
     res = make_request(
-        cookies.cookies, "otp_expire", request=request, data={"Flag": "--"}
+        cookies.login_cookies, "otp_expire", request=request, data={"Flag": "--"}
     )
 
     if res.status_code == 200:
@@ -206,10 +205,10 @@ async def expire_otp(cookies: loginCookies, request: Request):
     raise HTTPException(status_code=401, detail={"message": "something went wrong"})
 
 
-@app.post("/login/parents/resendotp")
+@router.post("/login/parents/resendotp")
 async def resend_otp(cookies: loginCookies, request: Request):
     res = make_request(
-        cookies.cookies, "otp_resend", request=request, data={"QnsStr": "--"}
+        cookies.login_cookies, "otp_resend", request=request, data={"QnsStr": "--"}
     )
 
     if res.status_code == 200:
@@ -218,7 +217,7 @@ async def resend_otp(cookies: loginCookies, request: Request):
     raise HTTPException(status_code=401, detail={"message": "something went wrong"})
 
 
-@app.post("/info")
+@router.post("/info")
 async def info(cook: loginCookies, request: Request):
     login_cookies = cook.login_cookies.split(";")
 
@@ -277,7 +276,7 @@ async def info(cook: loginCookies, request: Request):
     }
 
 
-@app.post("/timetable_week")
+@router.post("/timetable_week")
 async def timetable_week(cook: loginCookies, request: Request, dated: str):
     return make_request(
         cook.login_cookies,
@@ -293,14 +292,14 @@ async def timetable_week(cook: loginCookies, request: Request, dated: str):
     )
 
 
-@app.post("/timetable")
+@router.post("/timetable")
 async def timetable(cook: loginCookies, request: Request, eventid: str):
     return make_request(
         cook.login_cookies, "timetable", request=request, data={"EventID": eventid}
     )
 
 
-@app.post("/attendance")
+@router.post("/attendance")
 async def attendance(cook: loginCookies, request: Request):
     return make_request(
         cook.login_cookies,
@@ -310,7 +309,7 @@ async def attendance(cook: loginCookies, request: Request):
     )
 
 
-@app.post("/cgpa")
+@router.post("/cgpa")
 async def cgpa(cook: loginCookies, request: Request):
     return make_request(
         cook.login_cookies,
@@ -320,7 +319,7 @@ async def cgpa(cook: loginCookies, request: Request):
     )
 
 
-@app.post("/grades")
+@router.post("/grades")
 async def grades(cook: loginCookies, request: Request, semester: str):
     return make_request(
         cook.login_cookies,
@@ -330,7 +329,7 @@ async def grades(cook: loginCookies, request: Request, semester: str):
     )
 
 
-@app.post("/internal_marks")
+@router.post("/internal_marks")
 async def internal_marks(cook: loginCookies, request: Request, semester: str):
     return make_request(
         cook.login_cookies,
