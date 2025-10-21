@@ -2,8 +2,8 @@ run-name: "Build and Release Web version ${{ github.ref_name }}"
 
 on:
   push:
-    tags:
-      - v[0-9]+.[0-9]+.[0-9]+
+    branches:
+      - web
   workflow_dispatch:
 
 jobs:
