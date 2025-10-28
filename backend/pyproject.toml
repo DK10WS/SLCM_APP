@@ -19,3 +19,10 @@ dev = [
     "pyrefly>=0.38.0",
     "ruff>=0.14.1",
 ]
+
+[tool.pyright]
+# Pyright is only used for editors
+
+# Pyright ReportCallIssue is incorrectly flagged on
+# pydantic models and settings on defaults
+reportCallIssue = false
