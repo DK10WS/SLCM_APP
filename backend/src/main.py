@@ -1,8 +1,7 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException
-from fastapi.encoders import jsonable_encoder
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 
 from .routes import router
 
@@ -16,13 +15,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.exception_handler(HTTPException)
-async def validation_exception_handler(exc: HTTPException):
-    return JSONResponse(
-        status_code=exc.status_code, content=jsonable_encoder(exc.detail)
-    )
 
 
 @app.get("/")

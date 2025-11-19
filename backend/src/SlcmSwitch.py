@@ -4,7 +4,7 @@ from typing import Any, AsyncGenerator
 from bs4 import BeautifulSoup
 from httpx import AsyncClient
 
-from .models import SlcmCookies, SlcmCookiesWithName
+from .models import IncorrectPassword, SlcmCookies, SlcmCookiesWithName
 
 
 class SlcmSwitch:
@@ -76,6 +76,9 @@ class SlcmSwitch:
                 cookies=cookies.model_dump(by_alias=True),
                 follow_redirects=False,
             )
+
+            if res.status_code != 302:
+                raise IncorrectPassword()
 
             return SlcmCookiesWithName(
                 verification_token=cookies.verification_token,

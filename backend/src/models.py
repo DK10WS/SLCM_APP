@@ -31,3 +31,7 @@ class StudentLogin(ParentLogin):
 
 class ParentLoginOTP(SlcmCookies):
     otp: str = Field(..., description="The OTP for the login")
+
+
+class IncorrectPassword(Exception):
+    pass
