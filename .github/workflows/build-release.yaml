@@ -6,14 +6,25 @@ on:
       - web
   workflow_dispatch:
 
+env:
+  FRONTEND_IMAGE: ghcr.io/dk10ws/slcm-frontend
+  BACKEND_IMAGE: ghcr.io/dk10ws/slcm-backend
+
 jobs:
   build:
     name: Build & Release Web version
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-latest
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           ref: "web"
 
@@ -27,36 +38,57 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Get metadata for frontend docker image
-        id: meta-frontend
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/dk10ws/slcm-frontend
-
       - name: Build and Push frontend Docker Image
         uses: docker/build-push-action@v6
         with:
           context: frontend
           push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta-frontend.outputs.tags }}
-          labels: ${{ steps.meta-frontend.outputs.tags }}
-          cache-from: type=registry,ref=ghcr.io/dk10ws/slcm-frontend:buildcache
-          cache-to: type=registry,ref=ghcr.io/dk10ws/slcm-frontend:buildcache,mode=max
-
-      - name: Get metadata for backend Docker image
-        id: meta-backend
-        uses: docker/metadata-action@v5
-        with:
-          images: ghcr.io/dk10ws/slcm-backend
+          platforms: linux/${{ matrix.arch }}
+          tags: |
+            ${{ env.FRONTEND_IMAGE }}:latest-${{ matrix.arch }}
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-${{ matrix.arch }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
       - name: Build and Push backend Docker Image
         uses: docker/build-push-action@v6
         with:
           context: backend
           push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ${{ steps.meta-backend.outputs.tags }}
-          labels: ${{ steps.meta-backend.outputs.tags }}
-          cache-from: type=registry,ref=ghcr.io/dk10ws/slcm-backend:buildcache
-          cache-to: type=registry,ref=ghcr.io/dk10ws/slcm-backend:buildcache,mode=max
+          platforms: linux/${{ matrix.arch }}
+          tags: |
+            ${{ env.BACKEND_IMAGE }}:latest-${{ matrix.arch }}
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-${{ matrix.arch }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  merge-manifest:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Create multi-arch manifest for frontend
+        run: |
+          docker buildx imagetools create \
+            -t ${{ env.FRONTEND_IMAGE }}:${{ github.sha }} \
+            -t ${{ env.FRONTEND_IMAGE }}:latest \
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-amd64 \
+            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-arm64
+
+      - name: Create multi-arch manifest for backend
+        run: |
+          docker buildx imagetools create \
+            -t ${{ env.BACKEND_IMAGE }}:${{ github.sha }} \
+            -t ${{ env.BACKEND_IMAGE }}:latest \
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-amd64 \
+            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-arm64

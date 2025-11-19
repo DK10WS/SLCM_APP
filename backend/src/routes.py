@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from .models import ParentLogin, SlcmCookies, StudentLogin
-from .slcmswitch import SlcmSwitch
+from .SlcmSwitch import SlcmSwitch
 
 router = APIRouter()
 slcm = SlcmSwitch()
@@ -16,7 +16,7 @@ async def student_login(login: StudentLogin) -> dict[str, str]:
 @router.post("/login/parent")
 async def parent_login(login: ParentLogin) -> dict[str, str]:
     cookies = await slcm.parent_login(login.username)
-    return cookies.to_dict()
+    return cookies.model_dump(by_alias=True)
 
 
 @router.post("/login/parent/otp")
