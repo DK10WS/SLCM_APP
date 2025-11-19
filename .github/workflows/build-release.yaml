@@ -1,5 +1,4 @@
 run-name: "Build and Release Web version ${{ github.ref_name }}"
-
 on:
   push:
     branches:
@@ -7,21 +6,22 @@ on:
   workflow_dispatch:
 
 env:
-  FRONTEND_IMAGE: ghcr.io/dk10ws/slcm-frontend
-  BACKEND_IMAGE: ghcr.io/dk10ws/slcm-backend
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ghcr.io/dk10ws/slcm
 
 jobs:
   build:
-    name: Build & Release Web version
+    name: Build ${{ matrix.service }} (${{ matrix.arch }})
     strategy:
       matrix:
+        arch: [amd64, arm64]
+        service: [frontend, backend]
         include:
           - arch: amd64
             runner: ubuntu-latest
           - arch: arm64
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
-
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -38,34 +38,24 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Push frontend Docker Image
+      - name: Build and Push ${{ matrix.service }} Docker Image
         uses: docker/build-push-action@v6
         with:
-          context: frontend
+          context: ${{ matrix.service }}
           push: true
           platforms: linux/${{ matrix.arch }}
           tags: |
-            ${{ env.FRONTEND_IMAGE }}:latest-${{ matrix.arch }}
-            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-${{ matrix.arch }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and Push backend Docker Image
-        uses: docker/build-push-action@v6
-        with:
-          context: backend
-          push: true
-          platforms: linux/${{ matrix.arch }}
-          tags: |
-            ${{ env.BACKEND_IMAGE }}:latest-${{ matrix.arch }}
-            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-${{ matrix.arch }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest-${{ matrix.arch }}
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}-${{ matrix.arch }}
+          cache-from: type=gha,scope=${{ matrix.service }}-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.service }}-${{ matrix.arch }}
 
   merge-manifest:
     needs: build
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        service: [frontend, backend]
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -77,18 +67,10 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Create multi-arch manifest for frontend
+      - name: Create multi-arch manifest for ${{ matrix.service }}
         run: |
           docker buildx imagetools create \
-            -t ${{ env.FRONTEND_IMAGE }}:${{ github.sha }} \
-            -t ${{ env.FRONTEND_IMAGE }}:latest \
-            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-amd64 \
-            ${{ env.FRONTEND_IMAGE }}:${{ github.sha }}-arm64
-
-      - name: Create multi-arch manifest for backend
-        run: |
-          docker buildx imagetools create \
-            -t ${{ env.BACKEND_IMAGE }}:${{ github.sha }} \
-            -t ${{ env.BACKEND_IMAGE }}:latest \
-            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-amd64 \
-            ${{ env.BACKEND_IMAGE }}:${{ github.sha }}-arm64
+            -t ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }} \
+            -t ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:latest \
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}-amd64 \
+            ${{ env.IMAGE_PREFIX }}-${{ matrix.service }}:${{ github.sha }}-arm64
