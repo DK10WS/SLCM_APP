@@ -11,8 +11,6 @@ final headers = {
   'Content-Type': 'application/json',
 };
 
-final Map<String, String> body = {...SessionManager.sessionCookie};
-
 final dio = Dio();
 Future<Response> get(String url, Map<String, String> headers) async {
   final response = await dio.get(url,

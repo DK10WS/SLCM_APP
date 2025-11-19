@@ -164,7 +164,14 @@ class _TimetableState extends State<Timetable> {
   }
 
   Future<Map<String, List<Map<String, dynamic>>>> weekTT() async {
-    var response = await post(TimetableWeek + selectedDate, headers, body);
+    var response = await post(
+      TimetableWeek + selectedDate,
+      headers,
+      {
+        "__RequestVerificationToken": SessionManager.rf ?? "",
+        "ASP.NET_SessionId": SessionManager.asp ?? "",
+      },
+    );
     if (response.statusCode == 200) {
       Map<String, List<Map<String, dynamic>>> groupedEvents = {};
       for (var event in response.data) {
@@ -177,7 +184,14 @@ class _TimetableState extends State<Timetable> {
   }
 
   Future<Map<String, String>> fetchEventDetails(String entryNo) async {
-    var response = await post(TimetableEvent + entryNo, headers, body);
+    var response = await post(
+      TimetableEvent + entryNo,
+      headers,
+      {
+        "__RequestVerificationToken": SessionManager.rf ?? "",
+        "ASP.NET_SessionId": SessionManager.asp ?? "",
+      },
+    );
     var eventDetails = response.data;
     return {
       'AttendanceType': eventDetails['AttendanceType'] ?? "Not Marked",

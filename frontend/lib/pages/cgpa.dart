@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:mujslcm/pages/redirects.dart';
+import 'package:mujslcm/session_manager.dart';
 import '../utils/util.dart';
 import 'app_colors.dart';
 
@@ -26,6 +27,11 @@ class _CGPAState extends State<CGPA> {
 
   Future<void> fetchGrades() async {
     final url = cgpaURL;
+
+    final Map<String, String> body = {
+      "__RequestVerificationToken": SessionManager.rf ?? "",
+      "ASP.NET_SessionId": SessionManager.asp ?? "",
+    };
 
     try {
       final response = await post(url, headers, body);

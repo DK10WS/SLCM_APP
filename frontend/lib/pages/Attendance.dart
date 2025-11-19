@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mujslcm/session_manager.dart';
 import 'redirects.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:mujslcm/utils/util.dart';
@@ -20,6 +21,11 @@ class _AttendancePageState extends State<AttendancePage> {
   }
 
   Future<List<Map<String, dynamic>>?> fetchAttendance() async {
+    final Map<String, String> body = {
+      "__RequestVerificationToken": SessionManager.rf ?? "",
+      "ASP.NET_SessionId": SessionManager.asp ?? "",
+    };
+
     final attendanceUrl = AttendanceURL;
 
     final response = await post(attendanceUrl, headers, body);

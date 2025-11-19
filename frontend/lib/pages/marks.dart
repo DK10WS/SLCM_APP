@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:mujslcm/pages/redirects.dart';
+import 'package:mujslcm/session_manager.dart';
 import 'package:mujslcm/utils/util.dart';
 
 class Marks extends StatefulWidget {
@@ -24,6 +25,11 @@ class _MarksState extends State<Marks> {
     });
 
     final url = MarksURL + selectedSemester!;
+
+    final Map<String, String> body = {
+      "__RequestVerificationToken": SessionManager.rf ?? "",
+      "ASP.NET_SessionId": SessionManager.asp ?? "",
+    };
 
     try {
       var response = await post(url, headers, body);

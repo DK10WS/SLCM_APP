@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mujslcm/pages/redirects.dart';
+import 'package:mujslcm/session_manager.dart';
 
 import '../utils/util.dart';
 
@@ -22,6 +23,11 @@ class _InformationState extends State<Information> {
 
   Future<void> fetchInformation() async {
     final url = informationURL;
+
+    final Map<String, String> body = {
+      "__RequestVerificationToken": SessionManager.rf ?? "",
+      "ASP.NET_SessionId": SessionManager.asp ?? "",
+    };
 
     try {
       final response = await post(url, headers, body);

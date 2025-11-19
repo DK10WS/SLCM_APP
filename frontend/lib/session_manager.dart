@@ -1,18 +1,20 @@
 class SessionManager {
-  static Map<String, dynamic> sessionCookie = {};
+  static String? rf;
+  static String? asp;
   static bool loggedOut = false;
 
-  static void setSession(Map<String, dynamic> cookie) {
-    sessionCookie = cookie;
+  static void setSession(String cookie, String net) {
+    asp = net;
+    rf = cookie;
     loggedOut = false;
   }
 
   static void clearSession() {
-    sessionCookie = {};
+    rf = null;
     loggedOut = true;
   }
 
   static bool isLoggedIn() {
-    return sessionCookie != {} && !loggedOut;
+    return rf != null && !loggedOut;
   }
 }
