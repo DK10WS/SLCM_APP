@@ -113,6 +113,9 @@ class _MyLoginState extends State<MyLogin> {
         SessionManager.setSession(cookies, asp);
 
         return {'name': name ?? '', 'newCookies': cookies};
+      }
+      if (response.statusCode == 401) {
+        _showError(response.data["detail"]);
       } else {
         _showError("Login failed: ${response.data["message"]}");
         return null;
