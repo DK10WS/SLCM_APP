@@ -4,7 +4,7 @@ from typing import Any, AsyncGenerator
 from bs4 import BeautifulSoup
 from httpx import AsyncClient
 
-from .models import SlcmCookies
+from .models import SlcmCookies, SlcmCookiesWithName
 
 
 class SlcmSwitch:
@@ -31,6 +31,7 @@ class SlcmSwitch:
         client = AsyncClient(
             base_url=self.base_url,
             headers={"User-Agent": self.user_agent},
+            timeout=10,
             *args,
             **kwargs,
         )
@@ -57,7 +58,7 @@ class SlcmSwitch:
 
     """Student Endpoints"""
 
-    async def student_login(self, username: str, password: str) -> SlcmCookies:
+    async def student_login(self, username: str, password: str) -> SlcmCookiesWithName:
         csrf_token, cookies = await self._fetch_login_token()
 
         async with self._client() as client:
@@ -72,13 +73,14 @@ class SlcmSwitch:
             res = await client.post(
                 "/",
                 data=payload,
-                cookies=cookies.to_dict(),
+                cookies=cookies.model_dump(by_alias=True),
                 follow_redirects=False,
             )
 
-            return SlcmCookies(
+            return SlcmCookiesWithName(
                 verification_token=cookies.verification_token,
                 asp_net_id=res.cookies["ASP.NET_SessionId"],
+                name=username.split(".")[0].upper(),
             )
 
     """Parent Endpoints"""
@@ -96,7 +98,10 @@ class SlcmSwitch:
             }
 
             res = await client.post(
-                "/", data=payload, cookies=cookies.to_dict(), follow_redirects=False
+                "/",
+                data=payload,
+                cookies=cookies.model_dump(by_alias=True),
+                follow_redirects=False,
             )
 
             return SlcmCookies(
@@ -108,14 +113,16 @@ class SlcmSwitch:
         async with self._client() as client:
             # Fetch token from OTP page
             token_res = await client.get(
-                self.otp_index_endpoint, cookies=cookies.to_dict()
+                self.otp_index_endpoint, cookies=cookies.model_dump(by_alias=True)
             )
             token_res.raise_for_status()
             token = self._get_csrf_token(token_res.content)
 
             # Initial validation request
             validation_res = await client.post(
-                self.otp_validate_endpoint, data={"OTP": otp}, cookies=cookies.to_dict()
+                self.otp_validate_endpoint,
+                data={"OTP": otp},
+                cookies=cookies.model_dump(by_alias=True),
             )
             validation_res.raise_for_status()
 
@@ -124,7 +131,7 @@ class SlcmSwitch:
             res = await client.post(
                 self.otp_index_endpoint,
                 data=payload,
-                cookies=cookies.to_dict(),
+                cookies=cookies.model_dump(by_alias=True),
                 follow_redirects=False,
             )
             res.raise_for_status()
@@ -148,11 +155,13 @@ class SlcmSwitch:
     async def get_student_info(self, cookies: SlcmCookies):
         def extract_value(key: str) -> str:
             input_tag = soup.find("input", {"name": key})
-            return input_tag["value"] if input_tag else "Not found"
+            return input_tag["value"] if input_tag else "Not found"  # type: ignore
 
         async with self._client() as client:
             res = await client.get(
-                self.info_endpoint, cookies=cookies.to_dict(), follow_redirects=True
+                self.info_endpoint,
+                cookies=cookies.model_dump(by_alias=True),
+                follow_redirects=True,
             )
             res.raise_for_status()
 
@@ -175,7 +184,7 @@ class SlcmSwitch:
 
             rows = soup.find_all("tr")
             for row in rows:
-                cells = row.find_all("td")
+                cells = row.find_all("td")  # type: ignore
                 if len(cells) > 1 and cells[1].text.strip() == "Class Coordinator":
                     class_coordinator = (
                         cells[2].text.strip() if len(cells) > 2 else "Not found"
@@ -206,7 +215,9 @@ class SlcmSwitch:
         async with self._client() as client:
             payload = {"StudentCode": ""}
             res = await client.post(
-                self.attendance_endpoint, data=payload, cookies=cookies.to_dict()
+                self.attendance_endpoint,
+                data=payload,
+                cookies=cookies.model_dump(by_alias=True),
             )
             res.raise_for_status()
             return res.json()
@@ -215,7 +226,9 @@ class SlcmSwitch:
         async with self._client() as client:
             payload = {"Enrollment": "", "AcademicYear": "", "ProgramCode": ""}
             res = await client.post(
-                self.cgpa_endpoint, data=payload, cookies=cookies.to_dict()
+                self.cgpa_endpoint,
+                data=payload,
+                cookies=cookies.model_dump(by_alias=True),
             )
             res.raise_for_status()
             return res.json()
@@ -224,7 +237,9 @@ class SlcmSwitch:
         async with self._client() as client:
             payload = {"Enrollment": "", "Semester": semester}
             res = await client.post(
-                self.grades_endpoint, data=payload, cookies=cookies.to_dict()
+                self.grades_endpoint,
+                data=payload,
+                cookies=cookies.model_dump(by_alias=True),
             )
             res.raise_for_status()
             return res.json()
@@ -235,7 +250,9 @@ class SlcmSwitch:
         async with self._client() as client:
             payload = {"Enrollment": "", "Semester": semester}
             res = await client.post(
-                self.internal_marks_endpoint, data=payload, cookies=cookies.to_dict()
+                self.internal_marks_endpoint,
+                data=payload,
+                cookies=cookies.model_dump(by_alias=True),
             )
             res.raise_for_status()
             return res.json()
@@ -246,7 +263,9 @@ class SlcmSwitch:
         async with self._client() as client:
             payload = {"EventID": event_id}
             res = await client.post(
-                self.timetable_endpoint, data=payload, cookies=cookies.to_dict()
+                self.timetable_endpoint,
+                data=payload,
+                cookies=cookies.model_dump(by_alias=True),
             )
             res.raise_for_status()
 
@@ -264,7 +283,9 @@ class SlcmSwitch:
                 "PreNext": "2",
             }
             res = await client.post(
-                self.timetable_week_endpoint, data=payload, cookies=cookies.to_dict()
+                self.timetable_week_endpoint,
+                data=payload,
+                cookies=cookies.model_dump(by_alias=True),
             )
             res.raise_for_status()
 

@@ -10,7 +10,7 @@ slcm = SlcmSwitch()
 @router.post("/login/student")
 async def student_login(login: StudentLogin) -> dict[str, str]:
     cookies = await slcm.student_login(login.username, login.password)
-    return cookies.to_dict()
+    return cookies.model_dump(by_alias=True)
 
 
 @router.post("/login/parent")

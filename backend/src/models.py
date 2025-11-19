@@ -16,14 +16,9 @@ class SlcmCookies(BaseModel):
     class Config:
         populate_by_name = True
 
-    def to_dict(self) -> dict[str, str]:
-        cookies = {
-            "__RequestVerificationToken": self.verification_token,
-        }
-        if self.asp_net_id:
-            cookies["ASP.NET_SessionId"] = self.asp_net_id
 
-        return cookies
+class SlcmCookiesWithName(SlcmCookies):
+    name: str = Field(..., description="The name of the student")
 
 
 class ParentLogin(BaseModel):
