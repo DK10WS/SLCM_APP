@@ -11,6 +11,8 @@ final headers = {
   'Content-Type': 'application/json',
 };
 
+final Map<String, String> body = {...SessionManager.sessionCookie};
+
 final dio = Dio();
 Future<Response> get(String url, Map<String, String> headers) async {
   final response = await dio.get(url,
@@ -19,13 +21,6 @@ Future<Response> get(String url, Map<String, String> headers) async {
         validateStatus: (status) => status! < 400,
       ));
 
-  if (response.statusCode == 302) {
-    final prefs = await SharedPreferences.getInstance();
-    final username = prefs.getString('username') ?? '';
-    final password = prefs.getString('password') ?? '';
-    final cookie = await login(username, password);
-    SessionManager.setSession(cookie);
-  }
   return response;
 }
 
@@ -38,12 +33,5 @@ Future<Response> post(String url, Map<String, String> postheaders,
         contentType: Headers.jsonContentType,
         validateStatus: (status) => status! < 400,
       ));
-  if (response.statusCode == 302) {
-    final prefs = await SharedPreferences.getInstance();
-    final username = prefs.getString('username') ?? '';
-    final password = prefs.getString('password') ?? '';
-    final cookie = await login(username, password);
-    SessionManager.setSession(cookie);
-  }
   return response;
 }

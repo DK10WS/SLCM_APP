@@ -116,7 +116,7 @@ class _TimetableState extends State<Timetable> {
     }
 
     try {
-      var data = await weekTT(SessionManager.sessionCookie ?? "");
+      var data = await weekTT();
       if (data != null) {
         setState(() {
           eventsByDate = data;
@@ -148,8 +148,7 @@ class _TimetableState extends State<Timetable> {
 
   Future<void> _fetchAndCacheEventDetails(String entryNo) async {
     try {
-      var eventDetails =
-          await fetchEventDetails(entryNo, SessionManager.sessionCookie ?? "");
+      var eventDetails = await fetchEventDetails(entryNo);
       setState(() {
         attendanceCache[entryNo] =
             eventDetails['AttendanceType'] ?? 'Not Marked';
@@ -164,15 +163,8 @@ class _TimetableState extends State<Timetable> {
     }
   }
 
-  Future<Map<String, List<Map<String, dynamic>>>> weekTT(
-      String newCookies) async {
-    var response = await post(
-      TimetableWeek + selectedDate,
-      headers,
-      {
-        "login_cookies": newCookies,
-      },
-    );
+  Future<Map<String, List<Map<String, dynamic>>>> weekTT() async {
+    var response = await post(TimetableWeek + selectedDate, headers, body);
     if (response.statusCode == 200) {
       Map<String, List<Map<String, dynamic>>> groupedEvents = {};
       for (var event in response.data) {
@@ -184,13 +176,8 @@ class _TimetableState extends State<Timetable> {
     return {};
   }
 
-  Future<Map<String, String>> fetchEventDetails(
-      String entryNo, String newCookies) async {
-    var response = await post(
-      TimetableEvent + entryNo,
-      headers,
-      {"login_cookies": SessionManager.sessionCookie ?? "", "EventID": entryNo},
-    );
+  Future<Map<String, String>> fetchEventDetails(String entryNo) async {
+    var response = await post(TimetableEvent + entryNo, headers, body);
     var eventDetails = response.data;
     return {
       'AttendanceType': eventDetails['AttendanceType'] ?? "Not Marked",
@@ -315,15 +302,6 @@ class _TimetableState extends State<Timetable> {
               ),
             ),
             if (isLoading) LinearProgressIndicator(),
-            if (!isLoading && errorMessage.isNotEmpty)
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  errorMessage,
-                  style:
-                      TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
-                ),
-              ),
             Expanded(
               child: ListView.builder(
                 itemCount: eventsByDate[selectedDate]?.length ?? 0,

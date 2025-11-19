@@ -18,10 +18,8 @@ String capitalizeFirstName(String fullName) {
 
 class HomePage extends StatefulWidget {
   final String name;
-  final String newCookies;
 
-  const HomePage({Key? key, required this.name, required this.newCookies})
-      : super(key: key);
+  const HomePage({Key? key, required this.name}) : super(key: key);
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -37,7 +35,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     _pages = [
       Information(),
-      HomeScreen(name: widget.name, newCookies: widget.newCookies),
+      HomeScreen(name: widget.name),
       Settings(),
     ];
   }
@@ -159,10 +157,8 @@ class _HomePageState extends State<HomePage> {
 
 class HomeScreen extends StatelessWidget {
   final String name;
-  final String newCookies;
 
-  const HomeScreen({Key? key, required this.name, required this.newCookies})
-      : super(key: key);
+  const HomeScreen({Key? key, required this.name}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

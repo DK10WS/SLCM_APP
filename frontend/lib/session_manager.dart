@@ -1,18 +1,18 @@
 class SessionManager {
-  static String? sessionCookie;
+  static Map<String, dynamic> sessionCookie = {};
   static bool loggedOut = false;
 
-  static void setSession(String cookie) {
+  static void setSession(Map<String, dynamic> cookie) {
     sessionCookie = cookie;
     loggedOut = false;
   }
 
   static void clearSession() {
-    sessionCookie = null;
+    sessionCookie = {};
     loggedOut = true;
   }
 
   static bool isLoggedIn() {
-    return sessionCookie != null && !loggedOut;
+    return sessionCookie != {} && !loggedOut;
   }
 }

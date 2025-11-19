@@ -66,7 +66,6 @@ class _MyLoginState extends State<MyLogin> {
             MaterialPageRoute(
               builder: (context) => HomePage(
                 name: result['name'] ?? "",
-                newCookies: result['newCookies'] ?? "",
               ),
             ),
           );
@@ -107,12 +106,11 @@ class _MyLoginState extends State<MyLogin> {
       if (response.statusCode == 200) {
         _saveCredentials(username, password);
         final redirectDocument = response.data;
-        final name = redirectDocument["name"];
-        final cookies = redirectDocument["login_cookies"];
+        final name = redirectDocument.remove("name");
 
-        SessionManager.setSession(cookies);
+        SessionManager.setSession(redirectDocument);
 
-        return {'name': name ?? '', 'newCookies': cookies};
+        return {'name': name ?? ''};
       } else {
         _showError("Login failed: ${response.data["message"]}");
         return null;
@@ -303,7 +301,6 @@ class _MyLoginState extends State<MyLogin> {
                     MaterialPageRoute(
                       builder: (context) => HomePage(
                         name: result['name'] ?? "",
-                        newCookies: result['newCookies'] ?? "",
                       ),
                     ),
                   );
@@ -369,7 +366,6 @@ class _MyLoginState extends State<MyLogin> {
           MaterialPageRoute(
             builder: (context) => HomePage(
               name: reqname ?? "",
-              newCookies: Gcookie ?? "",
             ),
           ),
         );

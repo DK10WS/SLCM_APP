@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:mujslcm/pages/redirects.dart';
-import 'package:mujslcm/session_manager.dart';
 import 'package:mujslcm/utils/util.dart';
 
 class Grades extends StatefulWidget {
@@ -25,9 +24,6 @@ class _GradesState extends State<Grades> {
     });
 
     final url = GradesURL + selectedSemester!;
-    final Map<String, String> body = {
-      "login_cookies": SessionManager.sessionCookie ?? ""
-    };
 
     try {
       var response = await post(url, headers, body);
