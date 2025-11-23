@@ -2,7 +2,7 @@ from contextlib import asynccontextmanager
 from typing import Any, AsyncGenerator
 
 from bs4 import BeautifulSoup
-from httpx import AsyncClient
+from httpx import AsyncClient, AsyncHTTPTransport, Limits
 
 from .models import IncorrectPassword, SlcmCookies, SlcmCookiesWithName
 
@@ -26,12 +26,21 @@ class SlcmSwitch:
     grades_endpoint = "/Student/Academic/GetGradesForFaculty"
     internal_marks_endpoint = "/Student/Academic/GetInternalMarkForFaculty"
 
+    def __init__(self):
+        self._transport = AsyncHTTPTransport(
+            limits=Limits(
+                max_connections=50, max_keepalive_connections=30, keepalive_expiry=300
+            ),
+            retries=2,
+        )
+
     @asynccontextmanager
     async def _client(self, *args, **kwargs) -> AsyncGenerator[AsyncClient]:
         client = AsyncClient(
             base_url=self.base_url,
             headers={"User-Agent": self.user_agent},
             timeout=10,
+            transport=self._transport,
             *args,
             **kwargs,
         )
@@ -143,19 +152,23 @@ class SlcmSwitch:
         async with self._client() as client:
             # Expire existing OTP
             expire_res = await client.post(
-                self.otp_expire_endpoint, data={"Flag": "--"}
+                self.otp_expire_endpoint,
+                data={"Flag": "--"},
+                cookies=cookies.model_dump(by_alias=True),
             )
             expire_res.raise_for_status()
 
             # Resend OTP
             resend_res = await client.post(
-                self.otp_resend_endpoint, data={"QnsStr": "--"}
+                self.otp_resend_endpoint,
+                data={"QnsStr": "--"},
+                cookies=cookies.model_dump(by_alias=True),
             )
             resend_res.raise_for_status()
 
     """Common Endpoints"""
 
-    async def get_student_info(self, cookies: SlcmCookies):
+    async def get_student_info(self, cookies: SlcmCookies) -> dict:
         def extract_value(key: str) -> str:
             input_tag = soup.find("input", {"name": key})
             return input_tag["value"] if input_tag else "Not found"  # type: ignore
