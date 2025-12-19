@@ -7,9 +7,9 @@ RUN flutter pub get
 RUN flutter build web
 
 
-FROM nginx:alpine-slim AS runner
+FROM nginxinc/nginx-unprivileged:stable-alpine-slim
 
-COPY --from=builder /app/build/web /usr/share/nginx/html
+COPY --chown=nginx:nginx --from=builder /app/build/web /usr/share/nginx/html/
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8080

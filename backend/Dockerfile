@@ -20,13 +20,21 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 # Then, use a final image without uv
 FROM python:3.13-slim-bookworm
 
+# Setup a non-root user
+RUN groupadd --system --gid 999 nonroot \
+    && useradd --system --gid 999 --uid 999 --create-home nonroot
+
 WORKDIR /app
 
 # Copy the application from the builder
-COPY --from=builder --chown=app:app /app /app
+COPY --from=builder --chown=nonroot:nonroot /app /app
 
 # Place executables in the environment at the front of the path
 ENV PATH="/app/.venv/bin:$PATH"
+
+USER nonroot
+
+EXPOSE 8000
 
 # Run the FastAPI application by default
 CMD ["python", "-m", "src.main"]
