@@ -39,7 +39,7 @@ class SlcmSwitch:
         client = AsyncClient(
             base_url=self.base_url,
             headers={"User-Agent": self.user_agent},
-            timeout=10,
+            timeout=30,
             transport=self._transport,
             *args,
             **kwargs,
