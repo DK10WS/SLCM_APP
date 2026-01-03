@@ -3,6 +3,10 @@ on:
   push:
     branches:
       - web
+    paths:
+      - .github/workflows/build-release.yaml
+      - backend/**/*
+      - frontend/**/*
   workflow_dispatch:
 
 env:
@@ -89,3 +93,27 @@ jobs:
             ${{ env.IMAGE_PREFIX }}-frontend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  update-manifests:
+    runs-on: ubuntu-slim
+    needs:
+      - build-backend
+      - build-frontend
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Update image tags
+        run: |
+          yq -i ".spec.template.spec.containers[0].image = \"${{ env.IMAGE_PREFIX }}-frontend:${GITHUB_SHA}\"" k8s/frontend/deployment.yaml
+          yq -i ".spec.template.spec.containers[0].image = \"${{ env.IMAGE_PREFIX }}-backend:${GITHUB_SHA}\"" k8s/backend/deployment.yaml
+
+      - name: Commit to repo
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          commit_message: "k8s: Bump images to ${{ github.sha }} [no ci]"
+          file_pattern: "k8s/**/deployment.yaml"
