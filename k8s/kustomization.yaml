@@ -5,3 +5,4 @@ resources:
   - backend
   - frontend
   - httproute.yaml
+  - redirect.yaml

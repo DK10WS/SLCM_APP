@@ -1,4 +1,4 @@
-String baseURL = "https://betterslcm.whyredfire.tech/api";
+String baseURL = "https://betterslcm.whyredfire.dev/api";
 String loginURL = "$baseURL/login/student";
 String informationURL = "$baseURL/info";
 String cgpaURL = "$baseURL/cgpa";

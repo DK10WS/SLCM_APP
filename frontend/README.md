@@ -17,7 +17,7 @@ To build a secure, responsive, and user-friendly app that replicates and enhance
 - Install it on your device. Make sure to enable "Install from Unknown Sources" in your settings.
 
 ### iOS
-- Visit [https://betterslcm.whyredfire.tech](https://betterslcm.whyredfire.tech) in Safari.
+- Visit [https://betterslcm.whyredfire.dev](https://betterslcm.whyredfire.dev) in Safari.
 - Tap the **Share** icon and select **“Add to Home Screen”** to install it as a Web App.
 
 ## Features

@@ -1,0 +1,18 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: httproute-redirect
+spec:
+  parentRefs:
+    - name: traefik-gateway
+      namespace: traefik
+      kind: Gateway
+      sectionName: websecure-tech
+  hostnames:
+    - betterslcm.whyredfire.tech
+  rules:
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            hostname: betterslcm.whyredfire.dev
+            statusCode: 301
