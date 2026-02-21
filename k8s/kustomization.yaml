@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
   - backend
   - frontend
-  - ingress.yaml
+  - httproute.yaml
