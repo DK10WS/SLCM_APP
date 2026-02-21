@@ -19,3 +19,10 @@ spec:
           image: ghcr.io/dk10ws/slcm-backend:19d8ad1a88c7d6a53d1696383cd228477eb4a077
           ports:
             - containerPort: 8000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 256Mi
