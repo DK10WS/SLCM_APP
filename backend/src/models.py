@@ -1,5 +1,3 @@
-from typing import Optional
-
 from pydantic import BaseModel, Field
 
 
@@ -9,7 +7,7 @@ class SlcmCookies(BaseModel):
         alias="__RequestVerificationToken",
         description="The Request verification token",
     )
-    asp_net_id: Optional[str] = Field(
+    asp_net_id: str | None = Field(
         None, alias="ASP.NET_SessionId", description="The ASP.NET session id"
     )
 

@@ -1,5 +1,5 @@
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Any, AsyncGenerator
 
 from bs4 import BeautifulSoup
 from httpx import AsyncClient, AsyncHTTPTransport, Limits
@@ -35,14 +35,12 @@ class SlcmSwitch:
         )
 
     @asynccontextmanager
-    async def _client(self, *args, **kwargs) -> AsyncGenerator[AsyncClient]:
+    async def _client(self) -> AsyncGenerator[AsyncClient]:
         client = AsyncClient(
             base_url=self.base_url,
             headers={"User-Agent": self.user_agent},
             timeout=30,
             transport=self._transport,
-            *args,
-            **kwargs,
         )
         try:
             yield client
@@ -58,7 +56,7 @@ class SlcmSwitch:
     async def _fetch_login_token(self) -> tuple[str, SlcmCookies]:
         async with self._client() as client:
             res = await client.get("/")
-            res.raise_for_status()
+            _ = res.raise_for_status()
 
             csrf_token = self._get_csrf_token(res.content)
             verification_token = res.cookies["__RequestVerificationToken"]
@@ -127,7 +125,7 @@ class SlcmSwitch:
             token_res = await client.get(
                 self.otp_index_endpoint, cookies=cookies.model_dump(by_alias=True)
             )
-            token_res.raise_for_status()
+            _ = token_res.raise_for_status()
             token = self._get_csrf_token(token_res.content)
 
             # Initial validation request
@@ -136,7 +134,7 @@ class SlcmSwitch:
                 data={"OTP": otp},
                 cookies=cookies.model_dump(by_alias=True),
             )
-            validation_res.raise_for_status()
+            _ = validation_res.raise_for_status()
 
             # Final submit request
             payload = {"__RequestVerificationToken": token, "OTPPassword": otp}
@@ -146,7 +144,7 @@ class SlcmSwitch:
                 cookies=cookies.model_dump(by_alias=True),
                 follow_redirects=False,
             )
-            res.raise_for_status()
+            _ = res.raise_for_status()
 
     async def parent_resend_otp(self, cookies: SlcmCookies) -> None:
         async with self._client() as client:
@@ -156,7 +154,7 @@ class SlcmSwitch:
                 data={"Flag": "--"},
                 cookies=cookies.model_dump(by_alias=True),
             )
-            expire_res.raise_for_status()
+            _ = expire_res.raise_for_status()
 
             # Resend OTP
             resend_res = await client.post(
@@ -164,11 +162,11 @@ class SlcmSwitch:
                 data={"QnsStr": "--"},
                 cookies=cookies.model_dump(by_alias=True),
             )
-            resend_res.raise_for_status()
+            _ = resend_res.raise_for_status()
 
     """Common Endpoints"""
 
-    async def get_student_info(self, cookies: SlcmCookies) -> dict:
+    async def get_student_info(self, cookies: SlcmCookies) -> dict[str, object]:
         def extract_value(key: str) -> str:
             input_tag = soup.find("input", {"name": key})
             return input_tag["value"] if input_tag else "Not found"  # type: ignore
@@ -179,7 +177,7 @@ class SlcmSwitch:
                 cookies=cookies.model_dump(by_alias=True),
                 follow_redirects=True,
             )
-            res.raise_for_status()
+            _ = res.raise_for_status()
 
             soup = BeautifulSoup(res.content, "html.parser")
 
@@ -227,7 +225,7 @@ class SlcmSwitch:
                 "student_mentor": student_mentor,
             }
 
-    async def get_attendance(self, cookies: SlcmCookies) -> dict[str, Any]:
+    async def get_attendance(self, cookies: SlcmCookies) -> dict[str, object]:
         async with self._client() as client:
             payload = {"StudentCode": ""}
             res = await client.post(
@@ -235,10 +233,10 @@ class SlcmSwitch:
                 data=payload,
                 cookies=cookies.model_dump(by_alias=True),
             )
-            res.raise_for_status()
+            _ = res.raise_for_status()
             return res.json()
 
-    async def get_cgpa(self, cookies: SlcmCookies) -> dict[str, Any]:
+    async def get_cgpa(self, cookies: SlcmCookies) -> dict[str, object]:
         async with self._client() as client:
             payload = {"Enrollment": "", "AcademicYear": "", "ProgramCode": ""}
             res = await client.post(
@@ -246,10 +244,10 @@ class SlcmSwitch:
                 data=payload,
                 cookies=cookies.model_dump(by_alias=True),
             )
-            res.raise_for_status()
+            _ = res.raise_for_status()
             return res.json()
 
-    async def get_grade(self, cookies: SlcmCookies, semester: str) -> dict[str, Any]:
+    async def get_grade(self, cookies: SlcmCookies, semester: str) -> dict[str, object]:
         async with self._client() as client:
             payload = {"Enrollment": "", "Semester": semester}
             res = await client.post(
@@ -257,12 +255,12 @@ class SlcmSwitch:
                 data=payload,
                 cookies=cookies.model_dump(by_alias=True),
             )
-            res.raise_for_status()
+            _ = res.raise_for_status()
             return res.json()
 
     async def get_internal_marks(
         self, cookies: SlcmCookies, semester: str
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         async with self._client() as client:
             payload = {"Enrollment": "", "Semester": semester}
             res = await client.post(
@@ -270,12 +268,12 @@ class SlcmSwitch:
                 data=payload,
                 cookies=cookies.model_dump(by_alias=True),
             )
-            res.raise_for_status()
+            _ = res.raise_for_status()
             return res.json()
 
     async def get_timetable(
         self, cookies: SlcmCookies, event_id: str
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         async with self._client() as client:
             payload = {"EventID": event_id}
             res = await client.post(
@@ -283,13 +281,13 @@ class SlcmSwitch:
                 data=payload,
                 cookies=cookies.model_dump(by_alias=True),
             )
-            res.raise_for_status()
+            _ = res.raise_for_status()
 
             return res.json()
 
     async def get_timetable_week(
         self, cookies: SlcmCookies, date: str
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         async with self._client() as client:
             payload = {
                 "Year": "",
@@ -303,6 +301,6 @@ class SlcmSwitch:
                 data=payload,
                 cookies=cookies.model_dump(by_alias=True),
             )
-            res.raise_for_status()
+            _ = res.raise_for_status()
 
             return res.json()

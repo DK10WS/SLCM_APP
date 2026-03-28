@@ -1,7 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
 
 from .routes import router
 
@@ -15,11 +14,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-@app.get("/")
-async def redirect():
-    return RedirectResponse("https://github.com/whyredfire/betterslcm")
 
 
 @app.get("/health")
