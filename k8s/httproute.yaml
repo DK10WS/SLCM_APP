@@ -7,7 +7,7 @@ spec:
     - name: traefik-gateway
       namespace: traefik
       kind: Gateway
-      sectionName: websecure-dev
+      sectionName: websecure
   hostnames:
     - betterslcm.whyredfire.dev
   rules:
