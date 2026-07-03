@@ -7,7 +7,7 @@ RUN flutter pub get
 RUN flutter build web
 
 
-FROM registry.access.redhat.com/hi/nginx:1.30
+FROM nginxinc/nginx-unprivileged:stable-alpine-slim
 
 COPY --chown=nginx:nginx --from=builder /app/build/web /usr/share/nginx/html/
 COPY nginx.conf /etc/nginx/conf.d/default.conf
