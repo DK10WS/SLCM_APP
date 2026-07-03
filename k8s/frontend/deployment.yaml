@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: ghcr.io/dk10ws/slcm-frontend:aff7001772ce29eaa66035cfd3d56d925fd5088e
+          image: ghcr.io/dk10ws/slcm-frontend:46e2885f4ef48af007c68f7118e006a43338f01c
           ports:
             - containerPort: 8080
           resources:
