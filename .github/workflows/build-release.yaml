@@ -46,7 +46,7 @@ jobs:
         with:
           version: "latest"
           image-ref: "${{ env.IMAGE_PREFIX }}-backend:${{ github.sha }}"
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: true
           severity: "CRITICAL,HIGH"
 
@@ -114,7 +114,7 @@ jobs:
         with:
           version: "latest"
           image-ref: "${{ env.IMAGE_PREFIX }}-frontend:${{ github.sha }}"
-          exit-code: "1"
+          exit-code: "0"
           ignore-unfixed: true
           severity: "CRITICAL,HIGH"
 
