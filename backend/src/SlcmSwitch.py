@@ -40,7 +40,11 @@ class SlcmSwitch:
     async def _client(self) -> AsyncGenerator[AsyncClient]:
         client = AsyncClient(
             base_url=self.base_url,
-            headers={"User-Agent": self.user_agent},
+            headers={
+                "User-Agent": self.user_agent,
+                "Referer": f"{self.base_url}/",
+                "Sec-Fetch-Site": "same-origin",
+            },
             timeout=30,
             transport=self._transport,
         )
