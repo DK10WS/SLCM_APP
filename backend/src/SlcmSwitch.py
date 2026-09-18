@@ -2,7 +2,7 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from bs4 import BeautifulSoup
-from httpx import AsyncClient, AsyncHTTPTransport, Limits
+from httpx import AsyncClient, AsyncHTTPTransport
 
 from .models import IncorrectPassword, SlcmCookies, SlcmCookiesWithName
 
@@ -26,16 +26,6 @@ class SlcmSwitch:
     grades_endpoint = "/Student/Academic/GetGradesForFaculty"
     internal_marks_endpoint = "/Student/Academic/GetInternalMarkForFaculty"
 
-    def __init__(self):
-        self._transport = AsyncHTTPTransport(
-            limits=Limits(
-                max_connections=50,
-                max_keepalive_connections=30,
-                keepalive_expiry=15,
-            ),
-            retries=2,
-        )
-
     @asynccontextmanager
     async def _client(self) -> AsyncGenerator[AsyncClient]:
         client = AsyncClient(
@@ -46,7 +36,7 @@ class SlcmSwitch:
                 "Sec-Fetch-Site": "same-origin",
             },
             timeout=30,
-            transport=self._transport,
+            transport=AsyncHTTPTransport(retries=2),
         )
         try:
             yield client
