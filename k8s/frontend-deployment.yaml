@@ -13,7 +13,7 @@ spec:
         app.kubernetes.io/name: frontend
     spec:
       containers:
-        - image: ghcr.io/dk10ws/slcm-frontend:f75132b28fdc00c01b98ee239bb98888410d3198
+        - image: ghcr.io/dk10ws/slcm-frontend:3add91fe11cf0f82cd814e597bfdcc962c40bb6f
           livenessProbe:
             httpGet:
               path: /
