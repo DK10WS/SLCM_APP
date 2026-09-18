@@ -29,7 +29,9 @@ class SlcmSwitch:
     def __init__(self):
         self._transport = AsyncHTTPTransport(
             limits=Limits(
-                max_connections=50, max_keepalive_connections=30, keepalive_expiry=300
+                max_connections=50,
+                max_keepalive_connections=30,
+                keepalive_expiry=15,
             ),
             retries=2,
         )
