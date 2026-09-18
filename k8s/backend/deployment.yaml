@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: ghcr.io/dk10ws/slcm-backend:a50673ee9470060ba47531d3f5c2873cf5d67f62
+          image: ghcr.io/dk10ws/slcm-backend:c4786aa1acaf25faf5c746389ec63b6df9c0bd15
           ports:
             - containerPort: 8000
           resources:
