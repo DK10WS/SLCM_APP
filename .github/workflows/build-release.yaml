@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set Gradle Java Home
-        run: sed -i '$d' android/gradle.properties
+        run: sed -i '/org.gradle.java.home/d' android/gradle.properties
 
       - name: Set app version using tags
         run: |
