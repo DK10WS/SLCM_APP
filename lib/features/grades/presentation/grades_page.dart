@@ -1,7 +1,6 @@
-import 'redirects.dart';
 import 'package:flutter/material.dart';
-import 'package:mujslcm/session_manager.dart';
-import 'package:mujslcm/utils/util.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
+import 'package:mujslcm/features/grades/data/grades_repository.dart';
 
 class Grades extends StatefulWidget {
   const Grades({super.key});
@@ -23,29 +22,12 @@ class _GradesState extends State<Grades> {
       isLoading = true;
     });
 
-    final url = GradesURL;
-
-    final Map<String, String> header = {
-      "Cookie": SessionManager.sessionCookie ?? "",
-      ...headers,
-    };
-
-    final Map<String, String> body = {
-      "Enrollment": "",
-      "Semester": selectedSemester!
-    };
-
     try {
-      var response = await post(url, header, body);
-
-      if (response.statusCode == 200) {
-        setState(() {
-          gradesData = response.data;
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to fetch grades');
-      }
+      final data = await GradesRepository.fetchGrades(selectedSemester!);
+      setState(() {
+        gradesData = data;
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -81,13 +63,13 @@ class _GradesState extends State<Grades> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121316),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           "Grades",
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF121316),
+        backgroundColor: AppColors.background,
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
         shadowColor: Colors.transparent,
@@ -96,7 +78,7 @@ class _GradesState extends State<Grades> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
-          color: Color(0xFF212121),
+          color: AppColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -110,14 +92,14 @@ class _GradesState extends State<Grades> {
                 width: screenWidth * 0.90,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF121316),
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: DropdownButton<String>(
                   value: selectedSemester,
                   hint: const Text('Select Semester',
                       style: TextStyle(color: Colors.white)),
-                  dropdownColor: const Color(0xFF121316),
+                  dropdownColor: AppColors.background,
                   style: const TextStyle(color: Colors.white),
                   iconEnabledColor: Colors.white,
                   isExpanded: true,
@@ -226,7 +208,7 @@ class _GradesState extends State<Grades> {
                                       Text(
                                         'Credits: $credits',
                                         style: const TextStyle(
-                                            color: Color(0xFFD5E7B5),
+                                            color: AppColors.accent,
                                             fontSize: 14),
                                       ),
                                     ],

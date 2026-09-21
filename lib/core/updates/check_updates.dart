@@ -1,8 +1,9 @@
 import "package:flutter/material.dart";
-import "package:mujslcm/pages/redirects.dart";
+import 'package:mujslcm/core/theme/app_colors.dart';
+import "package:mujslcm/core/constants/urls.dart";
+import "package:mujslcm/core/network/slcm_client.dart";
 import "package:package_info_plus/package_info_plus.dart";
 import 'package:url_launcher/url_launcher.dart';
-import "util.dart";
 
 Future<String> getAppVersion() async {
   PackageInfo packageInfo = await PackageInfo.fromPlatform();
@@ -18,14 +19,14 @@ Future<void> _launchURL(String url) async {
   }
 }
 
-Future<Object?> check_update(context) async {
+Future<Object?> checkUpdate(context) async {
   final appversion = await getAppVersion();
-  final response = await get(repolink, headers);
+  final response = await slcm.get(Urls.releases);
   if ("v$appversion" != response.data["tag_name"]) {
     return showDialog(
         context: context,
         builder: (BuildContext context) => Dialog(
-              backgroundColor: const Color(0xFF232531),
+              backgroundColor: AppColors.card,
               child: Padding(
                 padding: const EdgeInsets.all(8),
                 child: Column(
@@ -53,12 +54,11 @@ Future<Object?> check_update(context) async {
                       alignment: Alignment.bottomRight,
                       child: TextButton(
                         onPressed: () {
-                          _launchURL(
-                              "https://github.com/DK10WS/SLCM_APP/releases/");
+                          _launchURL(Urls.releasesPage);
                         },
                         child: const Text('Download',
                             style: TextStyle(
-                                color: Color(0xFFD5E7B5), fontSize: 15)),
+                                color: AppColors.accent, fontSize: 15)),
                       ),
                     )
                   ],

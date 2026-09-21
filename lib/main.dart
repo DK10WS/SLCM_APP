@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:mujslcm/pages/login.dart';
-import 'session_manager.dart';
+import 'package:mujslcm/core/session/session_store.dart';
+import 'package:mujslcm/features/auth/data/auth_repository.dart';
+import 'package:mujslcm/features/auth/presentation/login_page.dart';
 import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  AuthRepository.bindSessionRefresh();
 
   await SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -19,5 +22,5 @@ void main() async {
 }
 
 String _initialRoute() {
-  return SessionManager.isLoggedIn() ? 'home' : 'login';
+  return SessionStore.isLoggedIn() ? 'home' : 'login';
 }

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'redirects.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
+import 'package:mujslcm/features/timetable/data/timetable_repository.dart';
 import 'package:intl/intl.dart';
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:mujslcm/session_manager.dart';
-import 'package:mujslcm/utils/util.dart';
 
 class Timetable extends StatefulWidget {
   const Timetable({super.key});
@@ -116,7 +115,7 @@ class _TimetableState extends State<Timetable> {
     }
 
     try {
-      var data = await weekTT(SessionManager.sessionCookie ?? "");
+      var data = await weekTT();
       if (data != null) {
         setState(() {
           eventsByDate = data;
@@ -148,8 +147,7 @@ class _TimetableState extends State<Timetable> {
 
   Future<void> _fetchAndCacheEventDetails(String entryNo) async {
     try {
-      var eventDetails =
-          await fetchEventDetails(entryNo, SessionManager.sessionCookie ?? "");
+      var eventDetails = await fetchEventDetails(entryNo);
       setState(() {
         attendanceCache[entryNo] =
             eventDetails['AttendanceType'] ?? 'Not Marked';
@@ -164,43 +162,11 @@ class _TimetableState extends State<Timetable> {
     }
   }
 
-  Future<Map<String, List<Map<String, dynamic>>>> weekTT(
-      String newCookies) async {
-    var response = await post(
-      TimeTableWeek,
-      {"Cookie": SessionManager.sessionCookie ?? "", ...headers},
-      {
-        "Year": "",
-        "Month": "",
-        "Type": "agendaWeek",
-        "Dated": selectedDate,
-        "PreNext": "2"
-      },
-    );
-    if (response.statusCode == 200) {
-      Map<String, List<Map<String, dynamic>>> groupedEvents = {};
-      for (var event in response.data) {
-        String date = event['StartDate'].split('T')[0];
-        groupedEvents.putIfAbsent(date, () => []).add(event);
-      }
-      return groupedEvents;
-    }
-    return {};
-  }
+  Future<Map<String, List<Map<String, dynamic>>>> weekTT() =>
+      TimetableRepository.weekEvents(selectedDate);
 
-  Future<Map<String, String>> fetchEventDetails(
-      String entryNo, String newCookies) async {
-    var response = await post(
-      TimeTableEvent,
-      {...headers, "Cookie": SessionManager.sessionCookie ?? ""},
-      {"EventID": entryNo},
-    );
-    var eventDetails = response.data;
-    return {
-      'AttendanceType': eventDetails['AttendanceType'] ?? "Not Marked",
-      'Time': eventDetails['SlotScheme'] ?? '',
-    };
-  }
+  Future<Map<String, String>> fetchEventDetails(String entryNo) =>
+      TimetableRepository.eventDetails(entryNo);
 
   void shiftWeek(int direction) {
     setState(() {
@@ -249,17 +215,17 @@ class _TimetableState extends State<Timetable> {
             Navigator.of(context).pop();
           },
         ),
-        backgroundColor: Color(0xFF121316),
+        backgroundColor: AppColors.background,
         title: Text(
           'Timetable',
           style: TextStyle(color: Colors.white),
         ),
         scrolledUnderElevation: 0.0,
       ),
-      backgroundColor: Color(0xFF121316),
+      backgroundColor: AppColors.background,
       body: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF212121),
+          color: AppColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -293,7 +259,7 @@ class _TimetableState extends State<Timetable> {
                   width: MediaQuery.of(context).size.width * 0.5,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFFD5E7B5),
+                      backgroundColor: AppColors.accent,
                     ),
                     onPressed: () => _selectDate(context),
                     child: Text(
@@ -321,10 +287,10 @@ class _TimetableState extends State<Timetable> {
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         backgroundColor: isSelected
-                            ? Color(0xFF232531)
+                            ? AppColors.card
                             : Color.fromARGB(255, 32, 32, 32),
                         side: isSelected
-                            ? BorderSide(color: Color(0xFFD5E7B5), width: 2)
+                            ? BorderSide(color: AppColors.accent, width: 2)
                             : BorderSide.none,
                         elevation: isSelected ? 100 : 0,
                       ),

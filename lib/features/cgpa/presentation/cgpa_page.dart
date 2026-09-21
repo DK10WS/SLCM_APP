@@ -1,10 +1,7 @@
-import 'package:mujslcm/session_manager.dart';
-
-import 'redirects.dart';
+import 'package:mujslcm/features/cgpa/data/cgpa_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'app_colors.dart';
-import 'package:mujslcm/utils/util.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
 
 class CGPA extends StatefulWidget {
   const CGPA({super.key});
@@ -27,30 +24,12 @@ class _CGPAState extends State<CGPA> {
   }
 
   Future<void> fetchGrades() async {
-    final url = CGPAURL;
-
-    final Map<String, String> header = {
-      ...headers,
-      "Cookie": SessionManager.sessionCookie ?? "",
-    };
-
-    final Map<String, String> body = {
-      "Enrollment": "",
-      "AcademicYear": "",
-      "ProgramCode": "",
-    };
-
     try {
-      final response = await post(url, header, body);
-      if (response.statusCode == 200) {
-        final data = response.data;
-        setState(() {
-          gradesData = data["InternalMarksList"][0];
-          isLoading = false;
-        });
-      } else {
-        throw Exception("Failed to load data");
-      }
+      final data = await CgpaRepository.fetchData();
+      setState(() {
+        gradesData = data;
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -97,7 +76,7 @@ class _CGPAState extends State<CGPA> {
       padding: const EdgeInsets.symmetric(vertical: 16.0),
       child: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF212121),
+          color: AppColors.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
         padding: const EdgeInsets.all(16),
@@ -140,7 +119,7 @@ class _CGPAState extends State<CGPA> {
                   isCurved: true,
                   gradient: LinearGradient(
                     colors: [
-                      Color(0xFFD5E7B5), // Light Green
+                      AppColors.accent, // Light Green
                       Color(0xFFA3C78F), // Muted Green
                     ],
                   ),
@@ -150,7 +129,7 @@ class _CGPAState extends State<CGPA> {
                     show: true,
                     gradient: LinearGradient(
                       colors: [
-                        Color(0xFFD5E7B5)
+                        AppColors.accent
                             .withOpacity(0.2), // Light Green (transparent)
                         Color(0xFFE7F5D5).withOpacity(0.4), // Pale Green
                       ],
@@ -207,16 +186,16 @@ class _CGPAState extends State<CGPA> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121316),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text("CGPA/GPA", style: TextStyle(color: Colors.white)),
         iconTheme: const IconThemeData(color: Colors.white),
-        backgroundColor: const Color(0xFF121316),
+        backgroundColor: AppColors.background,
         scrolledUnderElevation: 0.0,
       ),
       body: Container(
         decoration: const BoxDecoration(
-          color: Color(0xFF212121),
+          color: AppColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -225,7 +204,7 @@ class _CGPAState extends State<CGPA> {
         padding: const EdgeInsets.all(16),
         child: isLoading
             ? const Center(
-                child: CircularProgressIndicator(color: Color(0xFFD5E7B5)))
+                child: CircularProgressIndicator(color: AppColors.accent))
             : gradesData == null
                 ? const Center(
                     child: Text(
@@ -260,7 +239,7 @@ class _CGPAState extends State<CGPA> {
         width: MediaQuery.of(context).size.width * 0.9,
         child: Container(
           decoration: BoxDecoration(
-            color: Color(0xFFD5E7B5),
+            color: AppColors.accent,
             borderRadius: BorderRadius.circular(20),
           ),
           padding: const EdgeInsets.all(16),
@@ -291,7 +270,7 @@ class _CGPAState extends State<CGPA> {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
-          color: Color(0xFFD5E7B5).withOpacity(0.2),
+          color: AppColors.accent.withOpacity(0.2),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -307,7 +286,7 @@ class _CGPAState extends State<CGPA> {
                   padding: EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     color: selectedIndex == 0
-                        ? Color(0xFFD5E7B5)
+                        ? AppColors.accent
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -318,7 +297,7 @@ class _CGPAState extends State<CGPA> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color:
-                          selectedIndex == 0 ? Colors.black : Color(0xFFD5E7B5),
+                          selectedIndex == 0 ? Colors.black : AppColors.accent,
                     ),
                   ),
                 ),
@@ -335,7 +314,7 @@ class _CGPAState extends State<CGPA> {
                   padding: EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     color: selectedIndex == 1
-                        ? Color(0xFFD5E7B5)
+                        ? AppColors.accent
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -346,7 +325,7 @@ class _CGPAState extends State<CGPA> {
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
                       color:
-                          selectedIndex == 1 ? Colors.black : Color(0xFFD5E7B5),
+                          selectedIndex == 1 ? Colors.black : AppColors.accent,
                     ),
                   ),
                 ),
@@ -377,21 +356,21 @@ class _CGPAState extends State<CGPA> {
           .reversed
           .map((entry) {
         return Card(
-          color: Color(0xFF212121),
+          color: AppColors.surface,
           elevation: 0,
           margin: const EdgeInsets.symmetric(vertical: 5),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Color(0xFFD5E7B5),
+              backgroundColor: AppColors.accent,
               child: Text(entry.key.split(" ")[1],
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold)),
             ),
             title: Text(entry.key,
                 style: const TextStyle(
-                    color: Color(0xFFD5E7B5), fontWeight: FontWeight.bold)),
+                    color: AppColors.accent, fontWeight: FontWeight.bold)),
             trailing: Text(entry.value.toString(),
-                style: const TextStyle(color: Color(0xFFD5E7B5), fontSize: 18)),
+                style: const TextStyle(color: AppColors.accent, fontSize: 18)),
           ),
         );
       }).toList(),
@@ -425,16 +404,16 @@ class _CGPAState extends State<CGPA> {
           margin: const EdgeInsets.symmetric(vertical: 5),
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Color(0xFFD5E7B5),
+              backgroundColor: AppColors.accent,
               child: Text(entry.key.split(" ")[1],
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold)),
             ),
             title: Text(entry.key,
                 style: const TextStyle(
-                    color: Color(0xFFD5E7B5), fontWeight: FontWeight.bold)),
+                    color: AppColors.accent, fontWeight: FontWeight.bold)),
             trailing: Text(entry.value.toString(),
-                style: const TextStyle(color: Color(0xFFD5E7B5), fontSize: 18)),
+                style: const TextStyle(color: AppColors.accent, fontSize: 18)),
           ),
         );
       }).toList(),

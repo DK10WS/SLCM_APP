@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -39,11 +40,11 @@ class _SettingsState extends State<Settings> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121316),
+      backgroundColor: AppColors.background,
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
-          color: Color(0xFF212121),
+          color: AppColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -78,7 +79,7 @@ class _SettingsState extends State<Settings> {
               ),
               const SizedBox(height: 8),
               ListTile(
-                leading: const Icon(Icons.person, color: Color(0xFFD5E7B5)),
+                leading: const Icon(Icons.person, color: AppColors.accent),
                 title: const Text('Dhruv Kunzru',
                     style: TextStyle(color: Colors.white)),
                 subtitle: const Text('Lead Developer',
@@ -86,7 +87,7 @@ class _SettingsState extends State<Settings> {
                 onTap: () => _launchURL('https://github.com/dk10ws'),
               ),
               ListTile(
-                leading: const Icon(Icons.person, color: Color(0xFFD5E7B5)),
+                leading: const Icon(Icons.person, color: AppColors.accent),
                 title: const Text('Amey Santosh Gupte',
                     style: TextStyle(color: Colors.white)),
                 subtitle: const Text('UI/UX Designer',
@@ -94,7 +95,7 @@ class _SettingsState extends State<Settings> {
                 onTap: () => _launchURL('https://github.com/Vanillaicee17'),
               ),
               ListTile(
-                leading: const Icon(Icons.person, color: Color(0xFFD5E7B5)),
+                leading: const Icon(Icons.person, color: AppColors.accent),
                 title: const Text('Karan Parashar',
                     style: TextStyle(color: Colors.white)),
                 subtitle: const Text('iOS Last Hope (Backend Developer)',
@@ -112,13 +113,13 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.email, color: Color(0xFFD5E7B5)),
+                leading: const Icon(Icons.email, color: AppColors.accent),
                 title: const Text('Contact Support',
                     style: TextStyle(color: Colors.white)),
                 onTap: () => _launchURL('https://t.me/dk10ws'),
               ),
               ListTile(
-                leading: const Icon(Icons.web, color: Color(0xFFD5E7B5)),
+                leading: const Icon(Icons.web, color: AppColors.accent),
                 title: const Text('Visit MUJ Website',
                     style: TextStyle(color: Colors.white)),
                 onTap: () => _launchURL('https://mujslcm.jaipur.manipal.edu'),
@@ -134,7 +135,7 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.contacts, color: Color(0xFFD5E7B5)),
+                leading: const Icon(Icons.contacts, color: AppColors.accent),
                 title: const Text('Message me your interest in the project',
                     style: TextStyle(color: Colors.white)),
                 onTap: () => _launchURL('https://t.me/dk10ws'),
@@ -150,7 +151,7 @@ class _SettingsState extends State<Settings> {
                 ),
               ),
               ListTile(
-                leading: const Icon(Icons.download, color: Color(0xFFD5E7B5)),
+                leading: const Icon(Icons.download, color: AppColors.accent),
                 title: Text('App Version: $_version ($_buildNumber)',
                     style: const TextStyle(color: Colors.white)),
                 onTap: () =>

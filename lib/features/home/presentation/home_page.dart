@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:mujslcm/pages/Attendance.dart';
-import 'package:mujslcm/pages/grades.dart';
-import 'package:mujslcm/pages/information.dart';
-import 'package:mujslcm/pages/marks.dart';
-import 'package:mujslcm/pages/settings.dart';
-import 'package:mujslcm/pages/timetable.dart';
-import 'package:mujslcm/pages/cgpa.dart';
-import 'package:mujslcm/utils/checkupdates.dart';
-import 'login.dart';
-import 'package:mujslcm/session_manager.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
+import 'package:mujslcm/features/attendance/presentation/attendance_page.dart';
+import 'package:mujslcm/features/grades/presentation/grades_page.dart';
+import 'package:mujslcm/features/information/presentation/information_page.dart';
+import 'package:mujslcm/features/marks/presentation/marks_page.dart';
+import 'package:mujslcm/features/settings/presentation/settings_page.dart';
+import 'package:mujslcm/features/timetable/presentation/timetable_page.dart';
+import 'package:mujslcm/features/cgpa/presentation/cgpa_page.dart';
+import 'package:mujslcm/core/updates/check_updates.dart';
+import 'package:mujslcm/features/auth/presentation/login_page.dart';
+import 'package:mujslcm/core/session/session_store.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 String capitalizeFirstName(String fullName) {
@@ -36,7 +37,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    check_update(context);
+    checkUpdate(context);
     _pages = [
       Information(),
       HomeScreen(name: widget.name, newCookies: widget.newCookies),
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _logout() {
-    SessionManager.clearSession();
+    SessionStore.clear();
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const MyLogin()),
@@ -62,9 +63,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF121316),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF121316),
+        backgroundColor: AppColors.background,
         title: const Text(
           "MUJ SWITCH",
           style: TextStyle(
@@ -75,7 +76,7 @@ class _HomePageState extends State<HomePage> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.logout, color: Color(0xFFD5E7B5)),
+            icon: const Icon(Icons.logout, color: AppColors.accent),
             onPressed: _logout,
           ),
         ],
@@ -84,7 +85,7 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         height: MediaQuery.of(context).size.height * 1,
         decoration: const BoxDecoration(
-          color: Color(0xFF212121),
+          color: AppColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -94,7 +95,7 @@ class _HomePageState extends State<HomePage> {
       ),
       bottomNavigationBar: NavigationBarTheme(
         data: NavigationBarThemeData(
-          backgroundColor: const Color(0xFF232531),
+          backgroundColor: AppColors.card,
           indicatorColor: Colors.transparent,
           indicatorShape: CircleBorder(),
           labelTextStyle: MaterialStateProperty.all(
@@ -107,12 +108,12 @@ class _HomePageState extends State<HomePage> {
           onDestinationSelected: _onItemTapped,
           destinations: [
             NavigationDestination(
-              icon: Icon(Icons.person_outline, color: Color(0xFFD5E7B5)),
+              icon: Icon(Icons.person_outline, color: AppColors.accent),
               selectedIcon: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: _selectedIndex == 0
-                      ? Color(0xFFD5E7B5)
+                      ? AppColors.accent
                       : Colors.transparent,
                 ),
                 padding: const EdgeInsets.all(8),
@@ -121,12 +122,12 @@ class _HomePageState extends State<HomePage> {
               label: 'Me',
             ),
             NavigationDestination(
-              icon: Icon(Icons.home_outlined, color: Color(0xFFD5E7B5)),
+              icon: Icon(Icons.home_outlined, color: AppColors.accent),
               selectedIcon: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: _selectedIndex == 1
-                      ? Color(0xFFD5E7B5)
+                      ? AppColors.accent
                       : Colors.transparent,
                 ),
                 padding: const EdgeInsets.all(8),
@@ -137,14 +138,14 @@ class _HomePageState extends State<HomePage> {
             NavigationDestination(
               icon: const Icon(
                 Icons.contact_support_outlined,
-                color: Color(0xFFD5E7B5),
+                color: AppColors.accent,
                 size: 20,
               ),
               selectedIcon: Container(
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: _selectedIndex == 2
-                      ? Color(0xFFD5E7B5)
+                      ? AppColors.accent
                       : Colors.transparent,
                 ),
                 padding: const EdgeInsets.all(8),
@@ -216,7 +217,7 @@ class HomeScreen extends StatelessWidget {
                           'assets/svg/timetable.svg',
                           height: screenWidth * 1.15,
                           width: screenWidth * 1.1,
-                          color: const Color(0xFF121316).withOpacity(0.8),
+                          color: AppColors.background.withOpacity(0.8),
                         ),
                       ),
                       const Positioned(
@@ -275,7 +276,7 @@ class HomeScreen extends StatelessWidget {
                 'assets/svg/people.svg',
                 height: screenWidth * 0.27,
                 width: screenWidth * 0.5,
-                color: const Color(0xFF121316).withOpacity(0.8),
+                color: AppColors.background.withOpacity(0.8),
               ),
             ),
             const Positioned(
@@ -319,7 +320,7 @@ class HomeScreen extends StatelessWidget {
                   'assets/svg/cap.svg',
                   height: screenWidth * 0.45,
                   width: screenWidth * 0.6,
-                  color: const Color(0xFF121316).withOpacity(0.8),
+                  color: AppColors.background.withOpacity(0.8),
                 ),
               ),
               const Positioned(
@@ -362,7 +363,7 @@ class HomeScreen extends StatelessWidget {
                 'assets/svg/graph.svg',
                 height: screenWidth * 0.4,
                 width: screenWidth * 0.2,
-                color: const Color(0xFF121316).withOpacity(0.8),
+                color: AppColors.background.withOpacity(0.8),
               ),
             ),
             const Positioned(
@@ -406,7 +407,7 @@ class HomeScreen extends StatelessWidget {
                     'assets/images/grades.svg',
                     height: screenWidth * 0.36,
                     width: screenWidth * 0.2,
-                    color: const Color(0xFF121316).withOpacity(0.8),
+                    color: AppColors.background.withOpacity(0.8),
                   ),
                 ),
                 const Positioned(

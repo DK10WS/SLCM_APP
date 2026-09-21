@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mujslcm/session_manager.dart';
-import 'redirects.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
+import 'package:mujslcm/features/attendance/data/attendance_repository.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:mujslcm/utils/util.dart';
 
 class AttendancePage extends StatefulWidget {
   const AttendancePage({super.key});
@@ -17,72 +16,7 @@ class _AttendancePageState extends State<AttendancePage> {
   @override
   void initState() {
     super.initState();
-    _attendanceData = fetchAttendance(SessionManager.sessionCookie ?? "");
-  }
-
-  Future<List<Map<String, dynamic>>?> fetchAttendance(String newCookies) async {
-    final Map<String, String> header = {
-      ...headers,
-      "Cookie": newCookies,
-    };
-
-    final Map<String, String> body = {"StudentCode": ""};
-
-    final attendanceUrl = Attendance;
-
-    final response = await post(attendanceUrl, header, body);
-
-    if (response.statusCode != 200) {
-      print('Failed to load attendance data');
-      return null;
-    }
-
-    final decoded = response.data;
-    final List<dynamic> attendanceList = decoded["AttendanceSummaryList"];
-
-    List<Map<String, dynamic>> attendanceData = [];
-
-    for (var record in attendanceList) {
-      String fullName = record["CourseID"] ?? "Unknown Subject";
-      String percentage = record["Percentage"] ?? "0";
-      int newpercentage = int.tryParse(record["Percentage"] ?? "0%") ?? 0;
-
-      String courseCode = fullName.split(":").length > 1
-          ? fullName.split(":")[0].trim()
-          : "Unknown Code";
-
-      String subjectName = fullName.split(":").length > 1
-          ? fullName.split(":")[1].trim()
-          : fullName;
-
-      int totalClasses = int.tryParse(record["Total"] ?? "0") ?? 0;
-      int attendedClasses = int.tryParse(record["Present"] ?? "0") ?? 0;
-      int missedClasses = totalClasses - attendedClasses;
-
-      String statusMessage;
-      int? classesNeeded;
-      if (newpercentage < 75) {
-        classesNeeded =
-            ((0.75 * totalClasses - attendedClasses) / (1 - 0.75)).floor();
-        statusMessage = "$classesNeeded more classes needed to reach 75%.";
-      } else {
-        statusMessage = "Good! Your attendance is above or equal to 75%.";
-        classesNeeded = null;
-      }
-
-      attendanceData.add({
-        "courseCode": courseCode,
-        "subject": subjectName,
-        "percentage": percentage,
-        "attendedClasses": attendedClasses,
-        "missedClasses": missedClasses,
-        "totalClasses": totalClasses,
-        "statusMessage": statusMessage,
-        "classesNeeded": classesNeeded,
-      });
-    }
-
-    return attendanceData;
+    _attendanceData = AttendanceRepository.fetchSummary();
   }
 
   @override
@@ -90,9 +24,9 @@ class _AttendancePageState extends State<AttendancePage> {
     final double boxWidth = MediaQuery.of(context).size.width * 0.95;
 
     return Scaffold(
-        backgroundColor: const Color(0xFF121316),
+        backgroundColor: AppColors.background,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF121316),
+          backgroundColor: AppColors.background,
           iconTheme: const IconThemeData(
             color: Colors.white,
           ),
@@ -108,7 +42,7 @@ class _AttendancePageState extends State<AttendancePage> {
             width: double.infinity,
             height: double.infinity,
             decoration: const BoxDecoration(
-              color: Color(0xFF212121),
+              color: AppColors.surface,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(40),
                 topRight: Radius.circular(40),
@@ -119,7 +53,7 @@ class _AttendancePageState extends State<AttendancePage> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                    child: CircularProgressIndicator(color: Color(0xFFD5E7B5)),
+                    child: CircularProgressIndicator(color: AppColors.accent),
                   );
                 } else if (snapshot.hasError) {
                   return Center(
@@ -168,7 +102,7 @@ class _AttendancePageState extends State<AttendancePage> {
                               showDialog(
                                 context: context,
                                 builder: (context) => AlertDialog(
-                                  backgroundColor: Color(0xFF232531),
+                                  backgroundColor: AppColors.card,
                                   title: Text(
                                     subject,
                                     style: const TextStyle(color: Colors.white),
@@ -218,7 +152,7 @@ class _AttendancePageState extends State<AttendancePage> {
                                       child: const Text(
                                         "Close",
                                         style:
-                                            TextStyle(color: Color(0xFFD5E7B5)),
+                                            TextStyle(color: AppColors.accent),
                                       ),
                                     ),
                                   ],
@@ -246,7 +180,7 @@ class _AttendancePageState extends State<AttendancePage> {
                                       Text(
                                         "Attended: $attendedClasses | Missed Classes: $missedClasses ",
                                         style: const TextStyle(
-                                          color: Color(0xFFD5E7B5),
+                                          color: AppColors.accent,
                                           fontSize: 14,
                                         ),
                                       ),

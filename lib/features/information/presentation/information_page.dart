@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mujslcm/utils/login.dart';
-import 'redirects.dart';
-import 'package:html/parser.dart';
-import 'package:mujslcm/utils/util.dart';
-import 'package:mujslcm/session_manager.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
+import 'package:mujslcm/features/information/data/information_repository.dart';
 
 class Information extends StatefulWidget {
   const Information({super.key});
@@ -23,55 +20,11 @@ class _InformationState extends State<Information> {
   }
 
   Future<void> fetchInformation() async {
-    final Map<String, String> header = {
-      ...headers,
-      "Cookie": SessionManager.sessionCookie ?? "",
-    };
-    final url = InformationURL;
-
     try {
-      final response = await get(url, header);
-      final document = parse(response.data);
-
-      final registrationNumber = document
-          .querySelector('input[name="RegistrationNo"]')
-          ?.attributes['value'];
-      final name =
-          document.querySelector('input[name="EmpName"]')?.attributes['value'];
-      final semester =
-          document.querySelector('input[name="Semester"]')?.attributes['value'];
-      final program = document
-          .querySelector('input[name="CourseName"]')
-          ?.attributes['value'];
-      final batch =
-          document.querySelector('input[name="Batch"]')?.attributes['value'];
-      final section =
-          document.querySelector('input[name="Section"]')?.attributes['value'];
-
-      var rows = document.querySelectorAll('table#kt_View tr');
-      String? classCoordinator;
-      String? classCoordinatoremail;
-      for (var row in rows) {
-        var cells = row.querySelectorAll('td');
-        if (cells.length > 1 && cells[1].text.trim() == "Class Coordinator") {
-          classCoordinator = cells[2].text.trim();
-          classCoordinatoremail = cells[3].text.trim();
-          break;
-        }
-      }
-
+      final info = await InformationRepository.fetchInfo();
       if (mounted) {
         setState(() {
-          userInfo = {
-            "Name": name ?? "N/A",
-            "Registration Number": registrationNumber ?? "N/A",
-            "Section": section ?? "N/A",
-            "Program": program ?? "N/A",
-            "Semester": semester ?? "N/A",
-            "Batch": batch ?? "N/A",
-            "Class Coordinator": classCoordinator ?? "N/A",
-            "Class Coordinator Email": classCoordinatoremail ?? "N/A",
-          };
+          userInfo = info;
           isLoading = false;
         });
       }
@@ -88,16 +41,16 @@ class _InformationState extends State<Information> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF121316),
+      backgroundColor: AppColors.background,
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(
-                color: Color(0xFFD5E7B5),
+                color: AppColors.accent,
               ),
             )
           : Container(
               decoration: const BoxDecoration(
-                color: Color(0xFF212121),
+                color: AppColors.surface,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(40),
                   topRight: Radius.circular(40),
@@ -139,7 +92,7 @@ class _InformationState extends State<Information> {
                                 decoration: BoxDecoration(
                                   color: Colors.grey[900],
                                   border: Border.all(
-                                    color: Color(0xFFD5E7B5),
+                                    color: AppColors.accent,
                                     width: 2.0,
                                   ),
                                   borderRadius: BorderRadius.circular(8.0),

@@ -1,8 +1,7 @@
-import 'package:mujslcm/session_manager.dart';
-import 'package:mujslcm/utils/util.dart';
+import 'package:mujslcm/features/marks/data/marks_repository.dart';
 
-import 'redirects.dart';
 import 'package:flutter/material.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class Marks extends StatefulWidget {
@@ -25,67 +24,12 @@ class _MarksState extends State<Marks> {
       isLoading = true;
     });
 
-    final Map<String, String> header = {
-      "Cookie": SessionManager.sessionCookie ?? "",
-      ...headers,
-    };
-
-    final Map<String, String> body = {
-      "Enrollment": "",
-      "Semester": selectedSemester!,
-    };
-
     try {
-      var response = await post(MarksURL, header, body);
-
-      if (response.statusCode == 200) {
-        setState(() {
-          marksData = List<Map<String, dynamic>>.from(
-              (response.data["InternalMarksList"] as List).map((course) {
-            final courseMap = Map<String, dynamic>.from(course);
-
-            double total = 0.0;
-            double maxMarks = 100;
-
-            double mte1 =
-                double.tryParse(courseMap['MTE1']?.toString() ?? "0") ?? 0;
-            double mte2 =
-                double.tryParse(courseMap['MTE2']?.toString() ?? "0") ?? 0;
-            double cws =
-                double.tryParse(courseMap['CWS']?.toString() ?? "0") ?? 0;
-            double ete =
-                double.tryParse(courseMap['ETE']?.toString() ?? "0") ?? 0;
-            double prs =
-                double.tryParse(courseMap['PRS']?.toString() ?? "0") ?? 0;
-
-            if (courseMap['Total'] == "-") {
-              if (prs > 0) {
-                total = prs;
-                maxMarks = 60;
-              } else if (mte1 > 0 && mte2 > 0) {
-                total = mte1 + mte2 + cws + ete;
-                maxMarks = 100; // 40 + 20 + 40
-              } else if (mte1 > 0) {
-                total = mte1 + cws + ete;
-                maxMarks = 100; // 30 + 30 + 40
-              }
-            } else {
-              total = double.tryParse(courseMap['Total']?.toString() ?? "0") ?? 0;
-            }
-
-            courseMap['RESESSION'] = courseMap['RESESSION'] ?? "-";
-
-            return {
-              ...courseMap,
-              'Total': total,
-              'MaxMarks': maxMarks,
-            };
-          }));
-          isLoading = false;
-        });
-      } else {
-        throw Exception('Failed to fetch marks');
-      }
+      final data = await MarksRepository.fetchMarks(selectedSemester!);
+      setState(() {
+        marksData = data;
+        isLoading = false;
+      });
     } catch (e) {
       setState(() {
         isLoading = false;
@@ -103,13 +47,13 @@ class _MarksState extends State<Marks> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF121316),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text(
           "Marks Details",
           style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF121316),
+        backgroundColor: AppColors.background,
         iconTheme: const IconThemeData(color: Colors.white),
         elevation: 0,
         shadowColor: Colors.transparent,
@@ -118,7 +62,7 @@ class _MarksState extends State<Marks> {
       body: Container(
         height: MediaQuery.of(context).size.height,
         decoration: const BoxDecoration(
-          color: Color(0xFF212121),
+          color: AppColors.surface,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(40),
             topRight: Radius.circular(40),
@@ -132,14 +76,14 @@ class _MarksState extends State<Marks> {
                 width: screenWidth * 0.90,
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF121316),
+                  color: AppColors.background,
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: DropdownButton<String>(
                   value: selectedSemester,
                   hint: const Text('Select Semester',
                       style: TextStyle(color: Colors.white)),
-                  dropdownColor: const Color(0xFF121316),
+                  dropdownColor: AppColors.background,
                   style: const TextStyle(color: Colors.white),
                   iconEnabledColor: Colors.white,
                   isExpanded: true,
@@ -175,7 +119,7 @@ class _MarksState extends State<Marks> {
                 const Expanded(
                     child: Center(
                         child: CircularProgressIndicator(
-                            color: Color(0xFFD5E7B5)))),
+                            color: AppColors.accent))),
               if (errorMessage.isNotEmpty)
                 Center(
                     child: Text(errorMessage,
@@ -271,31 +215,31 @@ class _MarksState extends State<Marks> {
                                     if (course['CWS'] != "-")
                                       Text('CWS: ${course['CWS']}',
                                           style: const TextStyle(
-                                              color: Color(0xFFD5E7B5))),
+                                              color: AppColors.accent)),
                                     if (course['MTE1'] != "-")
                                       Text('MTE1: ${course['MTE1']}',
                                           style: const TextStyle(
-                                              color: Color(0xFFD5E7B5))),
+                                              color: AppColors.accent)),
                                     if (course['MTE2'] != "-")
                                       Text('MTE2: ${course['MTE2']}',
                                           style: const TextStyle(
-                                              color: Color(0xFFD5E7B5))),
+                                              color: AppColors.accent)),
                                     if (course['RESESSION'] != "-")
                                       Text('Ressional: ${course['RESESSION']}',
                                           style: const TextStyle(
-                                              color: Color(0xFFD5E7B5))),
+                                              color: AppColors.accent)),
                                     if (course['PRS'] != "-")
                                       Text('PRS: ${course['PRS']}',
                                           style: const TextStyle(
-                                              color: Color(0xFFD5E7B5))),
+                                              color: AppColors.accent)),
                                     if (course['ETE'] != "-")
                                       Text('ETE: ${course['ETE']}',
                                           style: const TextStyle(
-                                              color: Color(0xFFD5E7B5))),
+                                              color: AppColors.accent)),
                                     if (course['Total'] != "-")
                                       Text('Total: ${course['Total']}/100',
                                           style: const TextStyle(
-                                              color: Color(0xFFD5E7B5))),
+                                              color: AppColors.accent)),
                                   ],
                                 ),
                               ),

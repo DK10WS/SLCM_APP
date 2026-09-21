@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:mujslcm/core/theme/app_colors.dart';
 import 'package:html/parser.dart' show parse;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'home_page.dart';
+import 'package:mujslcm/features/home/presentation/home_page.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:mujslcm/session_manager.dart';
+import 'package:mujslcm/core/constants/urls.dart';
+import 'package:mujslcm/core/network/slcm_client.dart';
+import 'package:mujslcm/core/session/session_store.dart';
+import 'package:mujslcm/features/auth/data/auth_repository.dart';
 import 'package:local_auth/local_auth.dart';
-import 'redirects.dart';
 import 'dart:async';
-import 'change_password.dart';
-import 'package:mujslcm/utils/util.dart';
+import 'change_password_page.dart';
 import 'package:dio/dio.dart';
 
 class MyLogin extends StatefulWidget {
@@ -54,7 +56,7 @@ class _MyLoginState extends State<MyLogin> {
     });
 
     // Prevent auto-login if loggedOut is true
-    if (!SessionManager.loggedOut &&
+    if (!SessionStore.loggedOut &&
         savedUsername.isNotEmpty &&
         savedPassword.isNotEmpty &&
         selectedIndex == 0) {
@@ -86,114 +88,52 @@ class _MyLoginState extends State<MyLogin> {
     await prefs.setString('password', password);
   }
 
-  String extractSessionId(String cookie) {
-    final parts = cookie.split(';');
-    return parts.isNotEmpty ? parts[0].trim() : '';
-  }
-
   Future<Map<String, String>?> _login(String username, String password) async {
     if (username.isEmpty || password.isEmpty) {
       _showError('Please fill in both fields.');
       return null;
     }
 
-    var baseurl = loginURL;
-
     try {
-      final response = await get(
-        baseurl,
-        headers,
+      final result =
+          await AuthRepository.loginStudentFull(username, password);
+      if (result.cookies.isEmpty) {
+        _showError("Login failed. Please check your credentials.");
+        return null;
+      }
+
+      final locationHeader = result.location;
+      if (locationHeader == null) {
+        _showError("Login failed. Please check your credentials.");
+        return null;
+      }
+
+      if (locationHeader.contains('/Home/ChangePassword')) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ChangePasswordPage(sessionCookie: result.cookies),
+          ),
+        );
+        return null;
+      }
+
+      final redirectResponse = await slcm.get(
+        Urls.login + locationHeader,
+        headers: {'Cookie': result.cookies},
       );
 
-      if (response.statusCode != 200) {
-        _showError("Failed to fetch login page.");
-        return null;
-      }
+      if (redirectResponse.statusCode == 200) {
+        final redirectDocument = parse(redirectResponse.data);
+        final name =
+            redirectDocument.querySelector('.kt-user-card__name')?.text.trim();
 
-      final document = parse(response.data);
-      final tokenElement =
-          document.querySelector('input[name="__RequestVerificationToken"]');
-      final token = tokenElement?.attributes['value'];
-      final cookies = response.headers['set-cookie'];
+        _saveCredentials(username, password);
 
-      if (token == null || cookies == null) {
-        _showError("Token or session cookies missing.");
-        return null;
-      }
+        SessionStore.set(result.cookies);
 
-      final cleanedCookies =
-          cookies.map((cookie) => extractSessionId(cookie)).join(';');
-
-      final payload = {
-        "__RequestVerificationToken": token,
-        "EmailFor": "@muj.manipal.edu",
-        "LoginFor": "2",
-        "UserName": username,
-        "Password": password,
-      };
-
-      final headersForLogin = {
-        ...headers,
-        'Cookie': cleanedCookies,
-      };
-
-      final loginResponse = await dio.post(baseurl,
-          data: payload,
-          options: Options(
-            headers: headersForLogin,
-            contentType: Headers.formUrlEncodedContentType,
-            validateStatus: (status) => status! < 500,
-          ));
-
-      var apiCookies = loginResponse.headers.map['set-cookie'];
-      final cleanedAPI = apiCookies != null
-          ? apiCookies.map((cookie) => extractSessionId(cookie)).join(';')
-          : '';
-
-      if (loginResponse.statusCode == 302) {
-        final locationHeader = loginResponse.headers.value('location');
-
-        if (locationHeader != null) {
-          if (locationHeader.contains('/Home/ChangePassword')) {
-            final newCookies =
-                cleanedCookies + (cleanedAPI.isNotEmpty ? '; $cleanedAPI' : '');
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) =>
-                    ChangePasswordPage(sessionCookie: newCookies),
-              ),
-            );
-            return null;
-          }
-
-          final redirectedUrl = baseurl + locationHeader;
-
-          final newCookies =
-              cleanedCookies + (cleanedAPI.isNotEmpty ? '; $cleanedAPI' : '');
-
-          final redirectResponse = await get(
-            redirectedUrl,
-            {
-              'Cookie': newCookies,
-              ...headers,
-            },
-          );
-
-          if (redirectResponse.statusCode == 200) {
-            final redirectDocument = parse(redirectResponse.data);
-            final name = redirectDocument
-                .querySelector('.kt-user-card__name')
-                ?.text
-                .trim();
-
-            _saveCredentials(username, password);
-
-            SessionManager.setSession(cleanedCookies + '; ' + cleanedAPI);
-
-            return {'name': name ?? '', 'newCookies': newCookies};
-          }
-        }
+        return {'name': name ?? '', 'newCookies': result.cookies};
       }
 
       _showError("Login failed. Please check your credentials.");
@@ -235,7 +175,7 @@ class _MyLoginState extends State<MyLogin> {
       child: Container(
         width: MediaQuery.of(context).size.width * 0.9,
         decoration: BoxDecoration(
-          color: const Color(0xFFD5E7B5).withOpacity(0.2),
+          color: AppColors.accent.withOpacity(0.2),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
@@ -247,7 +187,7 @@ class _MyLoginState extends State<MyLogin> {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     color: selectedIndex == 0
-                        ? const Color(0xFFD5E7B5)
+                        ? AppColors.accent
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -259,7 +199,7 @@ class _MyLoginState extends State<MyLogin> {
                       fontWeight: FontWeight.bold,
                       color: selectedIndex == 0
                           ? Colors.black
-                          : const Color(0xFFD5E7B5),
+                          : AppColors.accent,
                     ),
                   ),
                 ),
@@ -272,7 +212,7 @@ class _MyLoginState extends State<MyLogin> {
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
                     color: selectedIndex == 1
-                        ? const Color(0xFFD5E7B5)
+                        ? AppColors.accent
                         : Colors.transparent,
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -284,7 +224,7 @@ class _MyLoginState extends State<MyLogin> {
                       fontWeight: FontWeight.bold,
                       color: selectedIndex == 1
                           ? Colors.black
-                          : const Color(0xFFD5E7B5),
+                          : AppColors.accent,
                     ),
                   ),
                 ),
@@ -304,7 +244,7 @@ class _MyLoginState extends State<MyLogin> {
           controller: _usernameController,
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFF24272B),
+            fillColor: AppColors.inputFill,
             hintText: 'name.registration',
             hintStyle: const TextStyle(color: Colors.grey),
             prefixIcon: const Icon(Icons.email, color: Colors.grey),
@@ -326,7 +266,7 @@ class _MyLoginState extends State<MyLogin> {
           decoration: InputDecoration(
             suffixIcon: IconButton(
               icon: Icon(
-                color: const Color(0xFFD5E7B5),
+                color: AppColors.accent,
                 _isObscure ? Icons.visibility_off : Icons.visibility,
               ),
               onPressed: () async {
@@ -363,7 +303,7 @@ class _MyLoginState extends State<MyLogin> {
               },
             ),
             filled: true,
-            fillColor: const Color(0xFF24272B),
+            fillColor: AppColors.inputFill,
             hintText: 'Enter your password',
             hintStyle: const TextStyle(color: Colors.grey),
             prefixIcon: const Icon(Icons.lock, color: Colors.grey),
@@ -389,7 +329,7 @@ class _MyLoginState extends State<MyLogin> {
             },
             child: const Text(
               'Forgot Password?',
-              style: TextStyle(color: Color(0xFFD5E7B5)),
+              style: TextStyle(color: AppColors.accent),
             ),
           ),
         ),
@@ -398,7 +338,7 @@ class _MyLoginState extends State<MyLogin> {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD5E7B5),
+              backgroundColor: AppColors.accent,
               foregroundColor: Colors.black,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
@@ -509,7 +449,7 @@ class _MyLoginState extends State<MyLogin> {
           controller: _otpController,
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFF24272B),
+            fillColor: AppColors.inputFill,
             hintText: 'Enter OTP',
             hintStyle: const TextStyle(color: Colors.grey),
             prefixIcon: const Icon(Icons.email, color: Colors.grey),
@@ -525,7 +465,7 @@ class _MyLoginState extends State<MyLogin> {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD5E7B5),
+              backgroundColor: AppColors.accent,
               foregroundColor: Colors.black,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
@@ -547,14 +487,13 @@ class _MyLoginState extends State<MyLogin> {
   }
 
   void _resendOTP() async {
-    final OTPheaders = {
-      ...headers,
-      'Cookie': Gcookie,
-    };
-
     final ExpirePayload = {"Flag": "--"};
 
-    final onExpire = await post(OnExpireURL, OTPheaders, ExpirePayload);
+    final onExpire = await slcm.post(
+      Urls.onExpire,
+      headers: {'Cookie': Gcookie},
+      body: ExpirePayload,
+    );
 
     if (onExpire.statusCode != 200) {
       _showError("Expire request failed: ${onExpire.statusCode}");
@@ -563,7 +502,7 @@ class _MyLoginState extends State<MyLogin> {
 
     final payload = {"QnsStr": "--"};
 
-    final response = await post(ResendOTPUrl, headers, payload);
+    final response = await slcm.post(Urls.resendOtp, body: payload);
 
     if (response.statusCode == 200) {
       print("OTP Sent Successfully!");
@@ -584,7 +523,7 @@ class _MyLoginState extends State<MyLogin> {
           controller: _usernameController,
           decoration: InputDecoration(
             filled: true,
-            fillColor: const Color(0xFF24272B),
+            fillColor: AppColors.inputFill,
             hintText: 'name.regestration',
             hintStyle: const TextStyle(color: Colors.grey),
             prefixIcon: const Icon(Icons.email, color: Colors.grey),
@@ -604,7 +543,7 @@ class _MyLoginState extends State<MyLogin> {
           width: double.infinity,
           child: ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFD5E7B5),
+              backgroundColor: AppColors.accent,
               foregroundColor: Colors.black,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8.0),
@@ -646,15 +585,12 @@ class _MyLoginState extends State<MyLogin> {
       "OTP": otp,
     };
 
-    final OTPheaders = {
-      ...headers,
-      'Cookie': Gcookie,
-    };
-
-    final url = otpIndexURL;
     var name = "";
 
-    final otpPage = await get(url, OTPheaders);
+    final otpPage = await slcm.get(
+      Urls.otpIndex,
+      headers: {'Cookie': Gcookie},
+    );
 
     final document = parse(otpPage.data);
 
@@ -662,10 +598,10 @@ class _MyLoginState extends State<MyLogin> {
         document.querySelector('input[name="__RequestVerificationToken"]');
     final token = tokenElement?.attributes['value'];
 
-    final response = await dio.post(otpValidateURL,
+    final response = await slcm.dio.post(Urls.otpValidate,
         data: payload,
         options: Options(
-          headers: headers,
+          headers: SlcmClient.defaultHeaders,
           contentType: Headers.formUrlEncodedContentType,
           validateStatus: (status) => status! < 500,
         ));
@@ -675,10 +611,10 @@ class _MyLoginState extends State<MyLogin> {
       "OTPPassword": otp ?? ""
     };
     if (response.data == "Yes") {
-      final finalresponse = await post(url, headers, newpayload);
+      final finalresponse = await slcm.post(Urls.otpIndex, body: newpayload);
 
       if (finalresponse.statusCode == 302) {
-        final request = await get(HomeURL, headers);
+        final request = await slcm.get(Urls.home);
         final redirectDocument = parse(request.data);
         name =
             redirectDocument.querySelector('.kt-user-card__name')!.text.trim();
@@ -695,65 +631,14 @@ class _MyLoginState extends State<MyLogin> {
       return false;
     }
 
-    var url = loginURL;
-
     try {
-      final response = await get(url, headers);
-
-      if (response.statusCode != 200) {
-        _showError("Failed to fetch login page.");
-        return false;
-      }
-
-      final document = parse(response.data);
-      final tokenElement =
-          document.querySelector('input[name="__RequestVerificationToken"]');
-      final token = tokenElement?.attributes['value'];
-      final cookies = response.headers['set-cookie'];
-
-      if (token == null || cookies == null) {
-        _showError("Token or session cookies missing.");
-        return false;
-      }
-
-      final cleanedCookies =
-          cookies.map((cookie) => extractSessionId(cookie)).join(';');
-
-      final payload = {
-        "__RequestVerificationToken": token,
-        "EmailFor": "",
-        "LoginFor": "3",
-        "UserName": "$username@muj.manipal.edu",
-        "Password": ""
-      };
-
-      final headersForLogin = {
-        ...headers,
-        'Cookie': cleanedCookies,
-      };
-
-      final loginResponse = await dio.post(url,
-          data: payload,
-          options: Options(
-            headers: headersForLogin,
-            contentType: Headers.formUrlEncodedContentType,
-            validateStatus: (status) => status! < 500,
-          ));
-
-      if (loginResponse.statusCode == 302) {
-        final API = loginResponse.headers['set-cookie'];
-        final cleanedAPI = API != null
-            ? API.map((cookie) => extractSessionId(cookie)).join(';')
-            : '';
-
-        final newCookies =
-            cleanedCookies + (cleanedAPI.isNotEmpty ? '; $cleanedAPI' : '');
-        Gcookie = newCookies;
-        return true;
-      } else {
+      final newCookies = await AuthRepository.loginParent(username);
+      if (newCookies.isEmpty) {
         _showError("Invalid Credentials or Server Error");
         return false;
       }
+      Gcookie = newCookies;
+      return true;
     } catch (e) {
       _showError("An error occurred: $e");
       return false;
@@ -763,7 +648,7 @@ class _MyLoginState extends State<MyLogin> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF212121),
+      backgroundColor: AppColors.surface,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -774,7 +659,7 @@ class _MyLoginState extends State<MyLogin> {
               const Text(
                 'Hello,',
                 style: TextStyle(
-                  color: Color(0xFFD5E7B5),
+                  color: AppColors.accent,
                   fontSize: 36,
                   fontWeight: FontWeight.bold,
                 ),

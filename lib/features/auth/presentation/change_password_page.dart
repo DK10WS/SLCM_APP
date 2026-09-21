@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:html/parser.dart' show parse;
+import 'package:mujslcm/core/theme/app_colors.dart';
+import 'package:mujslcm/features/auth/data/auth_repository.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   final String sessionCookie;
@@ -85,37 +85,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     }
   }
 
-  Future<bool> changePassword(String cookies, String newPassword) async {
-    const url = "https://mujslcm.jaipur.manipal.edu/Home/ChangePassword";
-    final session = http.Client();
-
-    final headers = {
-      "User-Agent":
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36",
-      "Cookie": cookies,
-    };
-
-    final response = await session.get(Uri.parse(url), headers: headers);
-    if (response.statusCode != 200) return false;
-
-    final document = parse(response.body);
-    final token = document
-        .querySelector('input[name="__RequestVerificationToken"]')
-        ?.attributes['value'];
-
-    if (token == null) return false;
-
-    final payload = {
-      "__RequestVerificationToken": token,
-      "newPassword": newPassword,
-      "confirmPassword": newPassword,
-    };
-
-    final result =
-        await session.post(Uri.parse(url), headers: headers, body: payload);
-
-    return result.statusCode == 302 && result.headers['location'] == "/";
-  }
+  Future<bool> changePassword(String cookies, String newPassword) =>
+      AuthRepository.changePassword(cookies, newPassword);
 
   Map<String, dynamic> validatePasswordStrength(String password) {
     int strength = 0;
@@ -164,7 +135,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF212121),
+      backgroundColor: AppColors.surface,
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -175,7 +146,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                 const Text(
                   'Change Password',
                   style: TextStyle(
-                    color: Color(0xFFD5E7B5),
+                    color: AppColors.accent,
                     fontSize: 30,
                     fontWeight: FontWeight.bold,
                   ),
@@ -186,7 +157,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   obscureText: !_newPassVisible,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: const Color(0xFF24272B),
+                    fillColor: AppColors.inputFill,
                     hintText: 'Enter new password',
                     hintStyle: const TextStyle(color: Colors.grey),
                     prefixIcon: const Icon(Icons.lock, color: Colors.grey),
@@ -221,7 +192,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   obscureText: !_confirmPassVisible,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: const Color(0xFF24272B),
+                    fillColor: AppColors.inputFill,
                     hintText: 'Confirm new password',
                     hintStyle: const TextStyle(color: Colors.grey),
                     prefixIcon:
@@ -252,7 +223,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   child: ElevatedButton(
                     onPressed: _handleSubmit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFD5E7B5),
+                      backgroundColor: AppColors.accent,
                       foregroundColor: Colors.black,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
