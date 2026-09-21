@@ -18,6 +18,12 @@ jobs:
       - name: Set Gradle Java Home
         run: sed -i '$d' android/gradle.properties
 
+      - name: Set app version using tags
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i -E "s/^version: .*/version: ${VERSION}+${{ github.run_number }}/" pubspec.yaml
+          grep '^version:' pubspec.yaml
+
       - name: Set Up Java
         uses: actions/setup-java@v3
         with:
