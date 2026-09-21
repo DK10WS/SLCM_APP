@@ -30,7 +30,7 @@ environment:
 dependencies:
   cupertino_icons: ^1.0.8
   dio: ^5.9.0
-  fl_chart: ^0.69.2
+  fl_chart: ^1.2.0
   flutter:
     sdk: flutter
   flutter_pie_chart: ^0.0.1
@@ -38,13 +38,13 @@ dependencies:
   html: ^0.15.0
   html_unescape: ^2.0.0
   http: ^1.2.2
-  local_auth: ^2.3.0
-  package_info_plus: ^8.3.1
+  local_auth: ^3.0.2
+  package_info_plus: ^10.2.1
   shared_preferences: ^2.3.3
-  syncfusion_flutter_calendar: ^28.1.38
+  syncfusion_flutter_calendar: ^34.2.8
 
 dev_dependencies:
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
   url_launcher: ^6.1.7
