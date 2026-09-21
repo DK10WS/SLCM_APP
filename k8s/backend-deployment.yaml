@@ -13,7 +13,7 @@ spec:
         app.kubernetes.io/name: backend
     spec:
       containers:
-        - image: ghcr.io/dk10ws/slcm-backend:3add91fe11cf0f82cd814e597bfdcc962c40bb6f
+        - image: ghcr.io/dk10ws/slcm-backend:e9d63f60aad43393211c88a20a3643d008968668
           livenessProbe:
             httpGet:
               path: /health
