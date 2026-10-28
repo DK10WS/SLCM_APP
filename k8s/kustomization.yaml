@@ -3,6 +3,8 @@ kind: Kustomization
 resources:
   - backend-deployment.yaml
   - backend-service.yaml
+  - backend-networkpolicy.yaml
   - frontend-deployment.yaml
   - frontend-service.yaml
+  - frontend-networkpolicy.yaml
   - httproute.yaml
